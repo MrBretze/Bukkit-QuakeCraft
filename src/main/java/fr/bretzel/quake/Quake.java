@@ -1,8 +1,6 @@
 package fr.bretzel.quake;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,7 +37,7 @@ public class Quake extends JavaPlugin implements Listener {
         if(event.getPlayer().getItemInHand() != null) {
             Player player = event.getPlayer();
 
-            List<Location> locs = Util.getLocationByDirection(player, 100, 1.2D);
+            List<Location> locs = Util.getLocationByDirection(player, 100, 0.1D);
 
             for(Location l : locs) {
                 ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, l, 100);
