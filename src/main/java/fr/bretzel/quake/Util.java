@@ -37,11 +37,14 @@ public class Util {
         return list;
     }
 
-    public static List<Player> getPlayerListInDirection(List<Location> locations, double distance) {
+    public static List<Player> getPlayerListInDirection(List<Location> locations, Player shoot, double distance) {
         List<Player> players = new ArrayList<>();
         for(Entity e : getEntityListInDirection(locations, distance)) {
             if(e instanceof Player) {
-                players.add((Player)e);
+                Player p = (Player) e;
+                if(p != shoot && !players.contains(p) && !p.isDead()) {
+                    players.add(p);
+                }
             }
         }
         return players;
