@@ -41,13 +41,8 @@ public class Quake extends JavaPlugin implements Listener {
 
             List<Location> locs = Util.getLocationByDirection(player, 100, 1.2D);
 
-            Iterator<Location> locationIterator = locs.iterator();
-
-            Bukkit.broadcastMessage(locs.size() + " ");
-
-            while (locationIterator.hasNext()) {
-                Location l = locationIterator.next();
-                ParticleEffect.FLAME.display(0f, 0f, 0f, 0f, 1, l, 100);
+            for(Location l : locs) {
+                ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, l, 100);
             }
         }
     }
