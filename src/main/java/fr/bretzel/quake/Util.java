@@ -20,17 +20,13 @@ public class Util {
         Location f = playerEyes.clone();
         Vector progress = direction.clone().multiply(distance);
         int maxRange = 100 * range / 70;
-        int loop = 0;
         boolean wallHack = false;
 
-        while (loop < maxRange) {
-            ++loop;
+        for(int loop = 0; loop < maxRange; loop++) {
             f.add(progress);
-
             if(!wallHack && f.getBlock().getType().isSolid()) {
                 break;
             }
-
             list.add(f.clone());
         }
 
