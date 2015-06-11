@@ -1,10 +1,7 @@
 package fr.bretzel.quake;
 
 import org.bukkit.*;
-
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,8 +11,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.*;
-import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -49,15 +44,15 @@ public class Quake extends JavaPlugin implements Listener {
             List<Location> locs = Util.getLocationByDirection(player, 100, 0.8D);
 
             for(Location l : locs) {
-                ParticleEffect.SUSPENDED_DEPTH.display(0, 0, 0, 2, 1, l, 100);
+                ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, l, 100);
             }
 
             List<Player> pList = Util.getPlayerListInDirection(locs, player, 0.59D);
 
             for(Player p : pList) {
-                p.setHealth(0);
                 p.setMetadata("killedby", new FixedMetadataValue(this, player));
-                shootFirework(p.getLocation());
+                p.setHealth(0);
+                shootFirework(p.getLocation(), -3);
             }
         }
     }
@@ -73,7 +68,7 @@ public class Quake extends JavaPlugin implements Listener {
         event.setDeathMessage(null);
     }
 
-    public void shootFirework(Location l) {
+    public void shootFirework(Location l, int power) {
         Firework fw = l.getWorld().spawn(l.clone().add(0.0D, 0.7D, 0.0D),Firework.class);
         FireworkMeta fm = fw.getFireworkMeta();
         Random r = new Random();
@@ -108,7 +103,7 @@ public class Quake extends JavaPlugin implements Listener {
         try {
             Field f = fm.getClass().getDeclaredField("power");
             f.setAccessible(true);
-            f.set(fm, -2);
+            f.set(fm, power);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
