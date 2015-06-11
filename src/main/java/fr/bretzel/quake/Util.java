@@ -60,9 +60,9 @@ public class Util {
                     double px = h.getX();
                     double py = h.getY();
                     double pz = h.getZ();
-                    boolean dX = Math.abs(l.getX() - px) < 1D * distance;
+                    boolean dX = Math.abs(l.getX() - px) < 0.7D * distance;
                     boolean dY = Math.abs(l.getY() - py) < 1.6D * distance;
-                    boolean dZ = Math.abs(l.getZ() - pz) < 1D * distance;
+                    boolean dZ = Math.abs(l.getZ() - pz) < 0.7D * distance;
 
                     if(dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
                         entities.add(e);
