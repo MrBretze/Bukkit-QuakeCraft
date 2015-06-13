@@ -14,6 +14,12 @@ public interface IArena {
 
     void setSecondLocation(Location location);
 
+    void setName(String name);
+
+    String getName();
+
+    byte[] getNameByByte();
+
     Location getFirstLocation();
 
     Location getSecondLocation();

@@ -19,8 +19,10 @@ public class Arena implements IArena {
     private Location firstLocation;
     private Location secondLocation;
     private LinkedList<Block> blocks = new LinkedList<>();
+    private String name;
+    private byte[] byteName = name.getBytes();
 
-    public Arena(Location firstLocation, Location secondLocation) {
+    public Arena(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
         setSecondLocation(secondLocation);
 
@@ -57,6 +59,21 @@ public class Arena implements IArena {
     @Override
     public void setSecondLocation(Location location) {
         this.secondLocation = location;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public byte[] getNameByByte() {
+        return getName().getBytes();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.bretzel.quake;
 
+import fr.bretzel.quake.arena.ArenaManager;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -23,12 +24,15 @@ public class Quake extends JavaPlugin implements Listener {
 
     public static PluginManager manager;
 
+    public static ArenaManager arenaManager;
+
     @Override
     public void onEnable() {
         manager = getServer().getPluginManager();
 
         manager.registerEvents(this, this);
 
+        arenaManager = new ArenaManager(this);
     }
 
     @Override
