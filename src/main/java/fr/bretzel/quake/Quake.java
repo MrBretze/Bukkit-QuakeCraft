@@ -33,6 +33,9 @@ public class Quake extends JavaPlugin implements Listener {
         manager.registerEvents(this, this);
 
         arenaManager = new ArenaManager(this);
+
+        getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
+        getCommand("quake").setTabCompleter(new fr.bretzel.quake.command.Command());
     }
 
     @Override

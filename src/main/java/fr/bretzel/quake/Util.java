@@ -101,4 +101,28 @@ public class Util {
 
         return blocks;
     }
+
+    public static String toBinary(String s) {
+        StringBuilder builder = new StringBuilder();
+        byte[] bytes = s.getBytes();
+
+        for (byte b : bytes) {
+            int val = b;
+            for (int i = 0; i < 8; i++)
+            {
+                builder.append((val & 128) == 0 ? 0 : 1);
+                val <<= 1;
+            }
+            builder.append(' ');
+        }
+        return builder.toString();
+    }
+
+    public static String toText(String s){
+        int charCode = Integer.parseInt(s, 2);
+
+        String str = new Character((char)charCode).toString();
+
+        return str;
+    }
 }
