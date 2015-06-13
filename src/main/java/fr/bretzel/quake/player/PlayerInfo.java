@@ -49,6 +49,7 @@ public class PlayerInfo {
         return rule;
     }
 
+
     public void setArena(Arena arena) {
         this.arena = arena;
     }
