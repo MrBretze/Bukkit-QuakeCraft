@@ -2,7 +2,10 @@ package fr.bretzel.quake.arena;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.arena.api.IArena;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 
@@ -20,8 +23,23 @@ public class ArenaManager {
         this.quake = quake;
     }
 
-    public void registerArena(String name, Location loc1, Location loc2) {
-
+    public void registerArena(Player creator, String name, Location loc1, Location loc2) {
+        if(loc1 == null) {
+            creator.sendMessage(ChatColor.RED + "The second is not set !");
+            return;
+        }
+        if (loc2 == null) {
+            creator.sendMessage(ChatColor.RED + "The first is not set !");
+            return;
+        }
+        if(containsArena(name)) {
+            creator.sendMessage(ChatColor.RED + "The arena is already exist !");
+            return;
+        } else {
+            Arena arena = new Arena(loc1, loc2, name);
+            arenaLinkedList.add(arena);
+            creator.sendMessage(ChatColor.GREEN + "The arena " + name + " has bin create !");
+        }
     }
 
     public IArena getArenaByName(String name) {
