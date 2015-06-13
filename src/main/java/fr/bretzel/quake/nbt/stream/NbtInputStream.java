@@ -1,11 +1,12 @@
 package fr.bretzel.quake.nbt.stream;
 
-import fr.bretzel.globalplug.utils.nbt.ITag;
-import fr.bretzel.globalplug.utils.nbt.TagType;
+import fr.bretzel.quake.nbt.ITag;
+import fr.bretzel.quake.nbt.TagType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.lang.reflect.Constructor;
 
 

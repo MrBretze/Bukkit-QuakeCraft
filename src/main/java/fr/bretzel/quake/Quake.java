@@ -26,8 +26,12 @@ public class Quake extends JavaPlugin implements Listener {
 
     public static ArenaManager arenaManager;
 
+    public static Quake quake;
+
     @Override
     public void onEnable() {
+        quake = this;
+
         manager = getServer().getPluginManager();
 
         manager.registerEvents(this, this);

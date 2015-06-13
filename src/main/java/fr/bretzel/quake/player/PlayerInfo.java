@@ -1,11 +1,19 @@
 package fr.bretzel.quake.player;
 
 import fr.bretzel.quake.ParticleEffect;
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.arena.Arena;
 import fr.bretzel.quake.arena.Rule;
 
+import fr.bretzel.quake.nbt.TagCompound;
+import fr.bretzel.quake.nbt.stream.NbtInputStream;
+
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +33,35 @@ public class PlayerInfo {
 
     private List<Rule> rule = new ArrayList<>();
 
+    private TagCompound compound;
+
     public PlayerInfo(Player player) {
         setPlayer(player);
+
+        File file = new File(Quake.quake.getDataFolder() + File.separator + "players" + File.separator, player.getUniqueId() + ".dat");
+
+        if(!file.exists()) {
+            try {
+                if(!Quake.quake.getDataFolder().exists()) {
+                    Quake.quake.getDataFolder().mkdir();
+                }
+
+                file.createNewFile();
+
+            } catch (IOException e) {}
+
+            compound = new TagCompound("player");
+
+        } else {
+            try {
+                NbtInputStream stream = new NbtInputStream(new FileInputStream(file));
+                compound = (TagCompound) stream.readTag();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public Arena getArena() {
@@ -49,7 +84,6 @@ public class PlayerInfo {
         return rule;
     }
 
-
     public void setArena(Arena arena) {
         this.arena = arena;
     }
@@ -68,5 +102,13 @@ public class PlayerInfo {
 
     public void setRule(List<Rule> rule) {
         this.rule = rule;
+    }
+
+    public TagCompound getCompound() {
+        return compound;
+    }
+
+    public void setCompound(TagCompound compound) {
+        this.compound = compound;
     }
 }
