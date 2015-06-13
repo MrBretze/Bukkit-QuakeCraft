@@ -1,3 +1,6 @@
 name: Quake
 version: 0.1
 main: fr.bretzel.quake.Quake
+commands:
+   quake:
+      description: The quake command !
