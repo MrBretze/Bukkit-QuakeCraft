@@ -25,7 +25,7 @@ public class Command implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
         if(sender instanceof Player) {
             Player player = (Player) sender;
-            PlayerInfo info = new PlayerInfo(player);
+            PlayerInfo info = Quake.getPlayerInfo(player);
             if(player.hasPermission("quake.command")) {
                 if (args.length > 0) {
                     if(args[0].equalsIgnoreCase("create")) {

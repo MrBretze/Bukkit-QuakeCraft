@@ -20,11 +20,13 @@ public class Arena implements IArena {
     private Location secondLocation;
     private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
-    private byte[] byteName = name.getBytes();
+    private byte[] byteName;
 
     public Arena(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
         setSecondLocation(secondLocation);
+        setName(name);
+        this.byteName = getName().getBytes();
 
         for(Block block : Util.blocksFromTwoPoints(getFirstLocation(), getSecondLocation())) {
             addBlock(block);

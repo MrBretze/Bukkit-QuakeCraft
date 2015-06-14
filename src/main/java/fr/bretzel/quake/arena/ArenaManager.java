@@ -3,11 +3,14 @@ package fr.bretzel.quake.arena;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.arena.api.IArena;
 
+import fr.bretzel.quake.player.PlayerInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.LinkedList;
@@ -72,6 +75,34 @@ public class ArenaManager implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        Action action = event.getAction();
+        Player player = event.getPlayer();
 
+        if(player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE) {
+            switch (action) {
+                case LEFT_CLICK_BLOCK:
+                    leftClick(player, event);
+                    break;
+                case RIGHT_CLICK_BLOCK:
+                    rightClick(player, event);
+                    break;
+            }
+        }
+    }
+
+    private void rightClick(Player player, PlayerInteractEvent event) {
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        Location location = event.getClickedBlock().getLocation();
+        info.setSecondLocation(location);
+        player.sendMessage(ChatColor.GREEN + "The second point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
+        event.setCancelled(true);
+    }
+
+    private void leftClick(Player player, PlayerInteractEvent event) {
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        Location location = event.getClickedBlock().getLocation();
+        info.setFirstLocation(location);
+        player.sendMessage(ChatColor.GREEN + "The first point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
+        event.setCancelled(true);
     }
 }

@@ -1,6 +1,7 @@
 package fr.bretzel.quake.nbt.stream;
 
-import fr.bretzel.globalplug.utils.nbt.ITag;
+
+import fr.bretzel.quake.nbt.ITag;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

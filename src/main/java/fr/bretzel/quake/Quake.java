@@ -1,6 +1,7 @@
 package fr.bretzel.quake;
 
 import fr.bretzel.quake.arena.ArenaManager;
+import fr.bretzel.quake.player.PlayerInfo;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -28,13 +29,15 @@ public class Quake extends JavaPlugin implements Listener {
 
     public static Quake quake;
 
+    private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
+
     @Override
     public void onEnable() {
         quake = this;
 
         manager = getServer().getPluginManager();
 
-        manager.registerEvents(this, this);
+        //manager.registerEvents(this, this);
 
         arenaManager = new ArenaManager(this);
 
@@ -162,5 +165,19 @@ public class Quake extends JavaPlugin implements Listener {
             case 17:
                 return Color.YELLOW;
         }
+    }
+
+    public static PlayerInfo getPlayerInfo(Player player) {
+        PlayerInfo playerInfo = null;
+        for(PlayerInfo pi : playerInfos) {
+            if(pi.getPlayer() == player) {
+                playerInfo = pi;
+            }
+        }
+        if(playerInfo == null) {
+            playerInfo = new PlayerInfo(player);
+            playerInfos.add(playerInfo);
+        }
+        return playerInfo;
     }
 }
