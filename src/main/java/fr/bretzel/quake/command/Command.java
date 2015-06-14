@@ -1,6 +1,11 @@
 package fr.bretzel.quake.command;
 
 import com.google.common.collect.ImmutableList;
+
+import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.arena.ArenaManager;
+import fr.bretzel.quake.player.PlayerInfo;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,15 +19,54 @@ import java.util.List;
  */
 public class Command implements CommandExecutor, TabCompleter {
 
-    @Override
-    public boolean onCommand(CommandSender commandSender, org.bukkit.command.Command command, String s, String[] strings) {
-        if(commandSender instanceof Player) {
+    private ArenaManager manager = Quake.arenaManager;
 
+    @Override
+    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+        if(sender instanceof Player) {
+            Player player = (Player) sender;
+            PlayerInfo info = new PlayerInfo(player);
+            if(player.hasPermission("quake.command")) {
+                if (args.length > 0) {
+                    if(args[0].equalsIgnoreCase("create")) {
+                        if(player.hasPermission("quake.command.create")) {
+                            if(args.length > 1) {
+                                manager.registerArena(player, args[1], info.getFirstLocation(), info.getSecondLocation());
+                                return true;
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Usage: /quake create <name>");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You dont have the permission for this command.");
+                            return true;
+                        }
+                    } else if(args[0].equalsIgnoreCase("edit")) {
+                        /*
+                         TODO:
+                        */
+                        return true;
+                    } else if(args[0].equalsIgnoreCase("delete")) {
+                        /*
+                         TODO:
+                        */
+                        return true;
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Usage: /quake <create | edit | delete>");
+                        return true;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Usage: /quake <create | edit | delete>");
+                    return true;
+                }
+            } else {
+                sender.sendMessage(ChatColor.RED + "You dont have the permission for this command.");
+                return true;
+            }
         } else {
-            commandSender.sendMessage(ChatColor.RED + "Player ?");
+            sender.sendMessage(ChatColor.RED + "Player ?");
             return true;
         }
-        return false;
     }
 
     @Override

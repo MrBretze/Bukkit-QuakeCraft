@@ -8,6 +8,7 @@ import fr.bretzel.quake.arena.Rule;
 import fr.bretzel.quake.nbt.TagCompound;
 import fr.bretzel.quake.nbt.stream.NbtInputStream;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -34,6 +35,10 @@ public class PlayerInfo {
     private List<Rule> rule = new ArrayList<>();
 
     private TagCompound compound;
+
+    private Location firstLocation = null;
+
+    private Location secondLocation = null;
 
     public PlayerInfo(Player player) {
         setPlayer(player);
@@ -110,5 +115,29 @@ public class PlayerInfo {
 
     public void setCompound(TagCompound compound) {
         this.compound = compound;
+    }
+
+    public long getReload() {
+        return reload;
+    }
+
+    public Location getFirstLocation() {
+        return firstLocation;
+    }
+
+    public Location getSecondLocation() {
+        return secondLocation;
+    }
+
+    public void setReload(long reload) {
+        this.reload = reload;
+    }
+
+    public void setFirstLocation(Location firstLocation) {
+        this.firstLocation = firstLocation;
+    }
+
+    public void setSecondLocation(Location secondLocation) {
+        this.secondLocation = secondLocation;
     }
 }
