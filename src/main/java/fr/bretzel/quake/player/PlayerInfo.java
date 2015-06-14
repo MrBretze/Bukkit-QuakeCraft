@@ -8,13 +8,12 @@ import fr.bretzel.quake.arena.Rule;
 import fr.bretzel.quake.nbt.TagCompound;
 import fr.bretzel.quake.nbt.stream.NbtInputStream;
 
+import fr.bretzel.quake.nbt.stream.NbtOutputStream;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +39,8 @@ public class PlayerInfo {
 
     private Location secondLocation = null;
 
+    private File file;
+
     public PlayerInfo(Player player) {
         setPlayer(player);
 
@@ -57,16 +58,21 @@ public class PlayerInfo {
 
             compound = new TagCompound("player");
 
-        } else {
             try {
-                NbtInputStream stream = new NbtInputStream(new FileInputStream(file));
-                compound = (TagCompound) stream.readTag();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+
+                compound.write(new NbtOutputStream(new FileOutputStream(file)), false);
+
+            } catch (IOException e) {}
+
         }
+
+        this.file = file;
+
+        try {
+            NbtInputStream stream = new NbtInputStream(new FileInputStream(file));
+
+            compound = (TagCompound) stream.readTag();
+        } catch (Exception e) {}
     }
 
     public Arena getArena() {
@@ -117,10 +123,6 @@ public class PlayerInfo {
         this.compound = compound;
     }
 
-    public long getReload() {
-        return reload;
-    }
-
     public Location getFirstLocation() {
         return firstLocation;
     }
@@ -139,5 +141,43 @@ public class PlayerInfo {
 
     public void setSecondLocation(Location secondLocation) {
         this.secondLocation = secondLocation;
+    }
+
+    public PlayerInfo clone() {
+        try {
+            return (PlayerInfo)super.clone();
+        } catch (CloneNotSupportedException var2) {
+            throw new Error(var2);
+        }
+    }
+
+    public void save() {
+        compound.setString("loc1", toStringLocation(getFirstLocation()));
+        compound.setString("loc2", toStringLocation(getSecondLocation()));
+        compound.setLong("reload", getReloadTime());
+
+        compound.setString("effect", getEffect().name());
+        compound.setString("arena", getArena().getName());
+
+        try {
+            compound.write(new NbtOutputStream(new FileOutputStream(this.file)), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String toStringLocation(Location location) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(location.getWorld() + ";")
+                .append(location.getBlockX() + ";")
+                .append(location.getBlockY() + ";")
+                .append(location.getBlockZ() + ";");
+        return builder.toString();
+    }
+
+    private Location toLocationString(String string) {
+        String[] strings = string.split(";");
+        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]));
     }
 }

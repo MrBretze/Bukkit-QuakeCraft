@@ -6,6 +6,9 @@ import fr.bretzel.quake.arena.api.IArena;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.LinkedList;
 
@@ -13,7 +16,7 @@ import java.util.LinkedList;
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class ArenaManager {
+public class ArenaManager implements Listener {
 
     private LinkedList<Arena> arenaLinkedList = new LinkedList<>();
 
@@ -21,6 +24,8 @@ public class ArenaManager {
 
     public ArenaManager(Quake quake) {
         this.quake = quake;
+
+        quake.manager.registerEvents(this, quake);
     }
 
     public void registerArena(Player creator, String name, Location loc1, Location loc2) {
@@ -63,5 +68,10 @@ public class ArenaManager {
 
     public Quake getQuake() {
         return quake;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+
     }
 }

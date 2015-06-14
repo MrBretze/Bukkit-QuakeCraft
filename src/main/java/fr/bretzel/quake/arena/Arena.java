@@ -102,4 +102,12 @@ public class Arena implements IArena {
     public void addBlock(Block block) {
         getBlocks().add(block);
     }
+
+    public Arena clone() {
+        try {
+            return (Arena)super.clone();
+        } catch (CloneNotSupportedException var2) {
+            throw new Error(var2);
+        }
+    }
 }
