@@ -1,12 +1,22 @@
 package fr.bretzel.quake.arena;
 
+import com.evilco.mc.nbt.TagCompound;
+import com.evilco.mc.nbt.TagString;
+import com.evilco.mc.nbt.stream.NbtInputStream;
+import com.evilco.mc.nbt.stream.NbtOutputStream;
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.api.IArena;
 import fr.bretzel.quake.arena.api.IRule;
-import fr.bretzel.quake.nbt.TagCompound;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -22,6 +32,7 @@ public class Arena implements IArena {
     private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
     private TagCompound compound;
+    private File file;
     private byte[] byteName;
 
     public Arena(Location firstLocation, Location secondLocation, String name) {
@@ -34,7 +45,42 @@ public class Arena implements IArena {
             addBlock(block);
         }
 
+        File mk = new File(Quake.quake.getDataFolder(), File.separator + "arena" + File.separator);
 
+        mk.mkdir();
+
+        setFile(new File(mk, getName() + ".dat"));
+
+        try {
+            if (getFile().exists()) {
+                NbtInputStream stream = new NbtInputStream(new FileInputStream(getFile()));
+
+                setCompound(((TagCompound)stream.readTag()));
+
+                stream.close();
+            } else {
+
+                setCompound(new TagCompound(getName()));
+
+                getCompound().setTag(new TagString("name", getName()));
+
+                NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(getFile()));
+
+                stream.write(getCompound());
+
+            }
+        } catch (IOException e) {
+            e.fillInStackTrace();
+        }
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+
+    public void setFile(File file) {
+        this.file = file;
     }
 
     @Override
@@ -107,6 +153,14 @@ public class Arena implements IArena {
 
     public void addBlock(Block block) {
         getBlocks().add(block);
+    }
+
+    public TagCompound getCompound() {
+        return compound;
+    }
+
+    public void setCompound(TagCompound compound) {
+        this.compound = compound;
     }
 
     public void save() {

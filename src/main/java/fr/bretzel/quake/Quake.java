@@ -30,12 +30,16 @@ public class Quake extends JavaPlugin implements Listener {
     public void onEnable() {
         quake = this;
 
+        getDataFolder().mkdir();
+
         manager = getServer().getPluginManager();
 
         arenaManager = new ArenaManager(this);
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
         getCommand("quake").setTabCompleter(new fr.bretzel.quake.command.Command());
+
+
     }
 
     @Override
@@ -52,6 +56,11 @@ public class Quake extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
+            PlayerInfo playerInfo = getPlayerInfo(((Player)sender));
+
+            sender.sendMessage(playerInfo.getFirstLocation() + " ");
+
+            sender.sendMessage(playerInfo.getSecondLocation() + " ");
             return true;
         }
         return true;

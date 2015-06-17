@@ -33,11 +33,11 @@ public class ArenaManager implements Listener {
 
     public void registerArena(Player creator, String name, Location loc1, Location loc2) {
         if(loc1 == null) {
-            creator.sendMessage(ChatColor.RED + "The second is not set !");
+            creator.sendMessage(ChatColor.RED + "The first is not set !");
             return;
         }
         if (loc2 == null) {
-            creator.sendMessage(ChatColor.RED + "The first is not set !");
+            creator.sendMessage(ChatColor.RED + "The second is not set !");
             return;
         }
         if(containsArena(name)) {
@@ -97,7 +97,7 @@ public class ArenaManager implements Listener {
     private void rightClick(Player player, PlayerInteractEvent event) {
         PlayerInfo info = Quake.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
-        info.setSecondLocation(location);
+        info.setSecondLocation(location.clone());
         player.sendMessage(ChatColor.GREEN + "The second point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
         event.setCancelled(true);
     }
@@ -105,7 +105,7 @@ public class ArenaManager implements Listener {
     private void leftClick(Player player, PlayerInteractEvent event) {
         PlayerInfo info = Quake.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
-        info.setFirstLocation(location);
+        info.setFirstLocation(location.clone());
         player.sendMessage(ChatColor.GREEN + "The first point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
         event.setCancelled(true);
     }
