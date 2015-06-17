@@ -2,8 +2,8 @@ package fr.bretzel.quake.arena;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.arena.api.IArena;
-
 import fr.bretzel.quake.player.PlayerInfo;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -71,6 +71,10 @@ public class ArenaManager implements Listener {
 
     public Quake getQuake() {
         return quake;
+    }
+
+    public LinkedList<Arena> getArenaLinkedList() {
+        return arenaLinkedList;
     }
 
     @EventHandler

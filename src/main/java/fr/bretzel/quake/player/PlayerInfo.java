@@ -1,14 +1,13 @@
 package fr.bretzel.quake.player;
 
+import com.evilco.mc.nbt.TagCompound;
+import com.evilco.mc.nbt.stream.NbtInputStream;
+import com.evilco.mc.nbt.stream.NbtOutputStream;
 import fr.bretzel.quake.ParticleEffect;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.arena.Arena;
 import fr.bretzel.quake.arena.Rule;
 
-import fr.bretzel.quake.nbt.TagCompound;
-import fr.bretzel.quake.nbt.stream.NbtInputStream;
-
-import fr.bretzel.quake.nbt.stream.NbtOutputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -51,12 +50,14 @@ public class PlayerInfo {
                 if(!Quake.quake.getDataFolder().exists()) {
                     Quake.quake.getDataFolder().mkdir();
                 }
-
+                if(!new File(Quake.quake.getDataFolder() + File.separator + "players" + File.separator).exists()) {
+                    new File(Quake.quake.getDataFolder() + File.separator + "players" + File.separator).mkdir();
+                }
                 file.createNewFile();
 
             } catch (IOException e) {}
 
-            compound = new TagCompound("player");
+            //compound = new TagCompound("player", );
 
             try {
 
@@ -72,6 +73,7 @@ public class PlayerInfo {
             NbtInputStream stream = new NbtInputStream(new FileInputStream(file));
 
             compound = (TagCompound) stream.readTag();
+
         } catch (Exception e) {}
     }
 
@@ -152,15 +154,17 @@ public class PlayerInfo {
     }
 
     public void save() {
-        compound.setString("loc1", toStringLocation(getFirstLocation()));
+        /*compound.setString("loc1", toStringLocation(getFirstLocation()));
         compound.setString("loc2", toStringLocation(getSecondLocation()));
         compound.setLong("reload", getReloadTime());
 
         compound.setString("effect", getEffect().name());
-        compound.setString("arena", getArena().getName());
+        compound.setString("arena", getArena().getName());*/
 
         try {
-            compound.write(new NbtOutputStream(new FileOutputStream(this.file)), false);
+            NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(this.file));
+            stream.write(compound);
+            stream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

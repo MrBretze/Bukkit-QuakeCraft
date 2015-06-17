@@ -3,6 +3,7 @@ package fr.bretzel.quake.arena;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.api.IArena;
 import fr.bretzel.quake.arena.api.IRule;
+import fr.bretzel.quake.nbt.TagCompound;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
@@ -20,6 +21,7 @@ public class Arena implements IArena {
     private Location secondLocation;
     private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
+    private TagCompound compound;
     private byte[] byteName;
 
     public Arena(Location firstLocation, Location secondLocation, String name) {
@@ -31,6 +33,8 @@ public class Arena implements IArena {
         for(Block block : Util.blocksFromTwoPoints(getFirstLocation(), getSecondLocation())) {
             addBlock(block);
         }
+
+
     }
 
     @Override
@@ -103,6 +107,10 @@ public class Arena implements IArena {
 
     public void addBlock(Block block) {
         getBlocks().add(block);
+    }
+
+    public void save() {
+
     }
 
     public Arena clone() {

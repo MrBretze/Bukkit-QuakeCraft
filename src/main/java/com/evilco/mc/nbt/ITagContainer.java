@@ -1,5 +1,4 @@
-package fr.bretzel.quake.nbt;
-
+package com.evilco.mc.nbt;
 
 /**
  * @auhtor Johannes Donath <johannesd@evil-co.com>
@@ -7,11 +6,10 @@ package fr.bretzel.quake.nbt;
  */
 public interface ITagContainer extends ITag {
 
-    /**
-     * Removes a tag from the container.
-     *
-     * @param tag The tag.
-     * @return
-     */
-    void removeTag( ITag tag);
+	/**
+	 * Removes a tag from the container.
+	 * @param tag The tag.
+	 * @return
+	 */
+	public void removeTag (ITag tag);
 }
