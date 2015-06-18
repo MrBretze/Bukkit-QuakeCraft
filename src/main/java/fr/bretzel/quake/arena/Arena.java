@@ -12,10 +12,14 @@ import fr.bretzel.quake.arena.api.IArena;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by MrBretzel on 12/06/2015.
@@ -23,21 +27,23 @@ import java.util.LinkedList;
 
 public class Arena implements IArena {
 
-    private LinkedList<Rule> rules = new LinkedList<>();
     private LinkedList<Location> respawn = new LinkedList<>();
     private Location firstLocation;
     private Location secondLocation;
+    private Location spawn;
     private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
     private TagCompound compound;
     private File file;
-    private byte[] byteName;
+
+    private List<Player> playerList = new ArrayList<>();
+
+    private boolean view = false;
 
     public Arena(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
         setSecondLocation(secondLocation);
         setName(name);
-        this.byteName = getName().getBytes();
 
         for(Block block : Util.blocksFromTwoPoints(getFirstLocation(), getSecondLocation())) {
             addBlock(block);
@@ -57,6 +63,8 @@ public class Arena implements IArena {
 
                 stream.close();
             } else {
+
+                calculeSpawnBase();
 
                 setCompound(new TagCompound(getName()));
 
@@ -91,9 +99,6 @@ public class Arena implements IArena {
         this.firstLocation = location;
     }
 
-    public void addRules(Rule rule) {
-        this.rules.add(rule);
-    }
 
     public LinkedList<Location> getRespawn() {
         return respawn;
@@ -103,9 +108,6 @@ public class Arena implements IArena {
         this.respawn = respawn;
     }
 
-    public void setRules(LinkedList<Rule> rules) {
-        this.rules = rules;
-    }
 
     public void addRespawn(Location location) {
         getRespawn().add(location);
@@ -127,11 +129,6 @@ public class Arena implements IArena {
     }
 
     @Override
-    public byte[] getNameByByte() {
-        return getName().getBytes();
-    }
-
-    @Override
     public Location getFirstLocation() {
         return this.firstLocation;
     }
@@ -139,11 +136,6 @@ public class Arena implements IArena {
     @Override
     public Location getSecondLocation() {
         return this.secondLocation;
-    }
-
-    @Override
-    public LinkedList<Rule> getRules() {
-        return rules;
     }
 
     public LinkedList<Block> getBlocks() {
@@ -162,8 +154,61 @@ public class Arena implements IArena {
         return compound;
     }
 
+
+
+    public void view(boolean view) {
+        this.view = view;
+        if(view == true) {
+            for(Location location : getRespawn()) {
+                location.getWorld().getBlockAt(location).setType(Material.STAINED_CLAY);
+                location.getWorld().getBlockAt(location.add(0.0, 1.0, 0.0)).setType(Material.STAINED_CLAY);
+            }
+        } else {
+            for(Location location : getRespawn()) {
+                location.getWorld().getBlockAt(location).setType(Material.AIR);
+                location.getWorld().getBlockAt(location.add(0.0, 1.0, 0.0)).setType(Material.AIR);
+            }
+        }
+    }
+
+    public void view() {
+        if(this.view = false) {
+            view(true);
+        } else {
+            view(false);
+        }
+    }
+
+    public boolean isView() {
+        return view;
+    }
+
     public void setCompound(TagCompound compound) {
         this.compound = compound;
+    }
+
+    public Location getSpawn() {
+        return spawn;
+    }
+
+    public void setSpawn(Location spawn) {
+        this.spawn = spawn;
+    }
+
+    private void calculeSpawnBase() {
+        int x1 = getFirstLocation().getBlockX();
+        int y1 = getFirstLocation().getBlockY();
+        int z1 = getFirstLocation().getBlockZ();
+
+        int x2 = getSecondLocation().getBlockX();
+        int y2 = getSecondLocation().getBlockY();
+        int z2 = getSecondLocation().getBlockZ();
+
+        int x = (x1 + x2) / 2;
+        int y = (y1 + y2) / 2;
+        int z = (z1 + z2) / 2;
+
+        setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
     }
 
     public void save() {
@@ -188,14 +233,6 @@ public class Arena implements IArena {
             respawn.setTag(new TagInteger("size", l));
 
             getCompound().setTag(respawn);
-        }
-
-        if(getRules().size() > 0) {
-            TagCompound rules = new TagCompound("rules");
-
-            rules.setTag(new TagString("TODO", "TODO"));
-
-            getCompound().setTag(rules);
         }
 
         try {

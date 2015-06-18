@@ -6,10 +6,14 @@ import fr.bretzel.quake.player.PlayerInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.LinkedList;
@@ -21,6 +25,8 @@ import java.util.LinkedList;
 public class ArenaManager implements Listener {
 
     private LinkedList<Arena> arenaLinkedList = new LinkedList<>();
+
+    private LinkedList<Block> signLinkedList = new LinkedList<>();
 
     private Quake quake;
 
@@ -90,6 +96,47 @@ public class ArenaManager implements Listener {
                     break;
             }
         }
+
+        if(player.hasPermission("quake.event.join")) {
+            switch (action) {
+                case RIGHT_CLICK_BLOCK:
+                    Block block = event.getClickedBlock();
+
+                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+                        BlockState blockState = block.getState();
+                        Sign sign = (Sign) blockState;
+                        if(getSignLinkedList().contains(block)) {
+                            Arena arena = getArenaByName(sign.getLine(1));
+                            player.teleport(arena.getSpawn());
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onSignChange(SignChangeEvent event) {
+        Player player = event.getPlayer();
+        String[] lines = event.getLines();
+
+        if(lines[0].equalsIgnoreCase("[quake]") && getArenaByName(lines[1]) != null) {
+            event.setLine(0, ChatColor.RED + "QuakeCraft");
+
+            Arena arena = getArenaByName(lines[1]);
+
+            event.setLine(1, arena.getName());
+
+            getSignLinkedList().add(event.getBlock());
+        }
+    }
+
+    public LinkedList<Block> getSignLinkedList() {
+        return signLinkedList;
+    }
+
+    public void setArenaLinkedList(LinkedList<Arena> arenaLinkedList) {
+        this.arenaLinkedList = arenaLinkedList;
     }
 
     private void rightClick(Player player, PlayerInteractEvent event) {

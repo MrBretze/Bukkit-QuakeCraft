@@ -19,12 +19,8 @@ public interface IArena {
 
     String getName();
 
-    byte[] getNameByByte();
-
     Location getFirstLocation();
 
     Location getSecondLocation();
-
-    LinkedList<Rule> getRules();
 
 }

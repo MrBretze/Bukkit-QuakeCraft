@@ -1,6 +1,7 @@
 package fr.bretzel.quake.player;
 
 import com.evilco.mc.nbt.TagCompound;
+import com.evilco.mc.nbt.TagDouble;
 import com.evilco.mc.nbt.TagLong;
 import com.evilco.mc.nbt.TagString;
 import com.evilco.mc.nbt.error.TagNotFoundException;
@@ -32,7 +33,7 @@ public class PlayerInfo {
 
     private ParticleEffect effect = ParticleEffect.FIREWORKS_SPARK;
 
-    private long reload;
+    private double reload = 1.5;
 
     private Arena arena;
 
@@ -95,7 +96,7 @@ public class PlayerInfo {
         return arena;
     }
 
-    public long getReloadTime() {
+    public double getReloadTime() {
         return reload;
     }
 
@@ -189,11 +190,7 @@ public class PlayerInfo {
 
     public void save() {
         if(compound != null) {
-            compound.setTag(new TagString("location1", toStringLocation(getFirstLocation())));
-
-            compound.setTag(new TagString("location2", toStringLocation(getSecondLocation())));
-
-            compound.setTag(new TagLong("reload", getReloadTime()));
+            compound.setTag(new TagDouble("reload", getReloadTime()));
 
             compound.setTag(new TagString("effect", getEffect().name()));
 
