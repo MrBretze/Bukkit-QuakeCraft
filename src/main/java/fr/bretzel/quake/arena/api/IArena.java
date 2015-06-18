@@ -1,5 +1,6 @@
 package fr.bretzel.quake.arena.api;
 
+import fr.bretzel.quake.arena.Rule;
 import org.bukkit.Location;
 
 import java.util.LinkedList;
@@ -24,6 +25,6 @@ public interface IArena {
 
     Location getSecondLocation();
 
-    LinkedList<? super IRule> getRules();
+    LinkedList<Rule> getRules();
 
 }

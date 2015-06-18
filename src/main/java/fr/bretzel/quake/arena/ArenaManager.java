@@ -1,7 +1,6 @@
 package fr.bretzel.quake.arena;
 
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.arena.api.IArena;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.ChatColor;
@@ -50,11 +49,10 @@ public class ArenaManager implements Listener {
         }
     }
 
-    public IArena getArenaByName(String name) {
+    public Arena getArenaByName(String name) {
         Arena arena = null;
-        byte[] bytes = name.getBytes();
         for(Arena a : arenaLinkedList) {
-            if(bytes == a.getNameByByte() && a.getName().equals(name)) {
+            if(a.getName().equals(name)) {
                 arena = a;
             }
         }

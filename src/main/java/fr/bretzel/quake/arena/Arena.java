@@ -1,22 +1,20 @@
 package fr.bretzel.quake.arena;
 
 import com.evilco.mc.nbt.TagCompound;
+import com.evilco.mc.nbt.TagInteger;
 import com.evilco.mc.nbt.TagString;
 import com.evilco.mc.nbt.stream.NbtInputStream;
 import com.evilco.mc.nbt.stream.NbtOutputStream;
+
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.api.IArena;
-import fr.bretzel.quake.arena.api.IRule;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
 import java.util.LinkedList;
 
 /**
@@ -25,7 +23,7 @@ import java.util.LinkedList;
 
 public class Arena implements IArena {
 
-    private LinkedList<? super IRule> rules = new LinkedList<>();
+    private LinkedList<Rule> rules = new LinkedList<>();
     private LinkedList<Location> respawn = new LinkedList<>();
     private Location firstLocation;
     private Location secondLocation;
@@ -68,10 +66,15 @@ public class Arena implements IArena {
 
                 stream.write(getCompound());
 
+                stream.close();
             }
         } catch (IOException e) {
             e.fillInStackTrace();
         }
+    }
+
+    public Arena(Quake quake) {
+        quake.arenaManager.getArenaLinkedList().add(this);
     }
 
     public File getFile() {
@@ -88,7 +91,7 @@ public class Arena implements IArena {
         this.firstLocation = location;
     }
 
-    public void addRules(IRule rule) {
+    public void addRules(Rule rule) {
         this.rules.add(rule);
     }
 
@@ -100,7 +103,7 @@ public class Arena implements IArena {
         this.respawn = respawn;
     }
 
-    public void setRules(LinkedList<? super IRule> rules) {
+    public void setRules(LinkedList<Rule> rules) {
         this.rules = rules;
     }
 
@@ -139,7 +142,7 @@ public class Arena implements IArena {
     }
 
     @Override
-    public LinkedList<? super IRule> getRules() {
+    public LinkedList<Rule> getRules() {
         return rules;
     }
 
@@ -165,6 +168,48 @@ public class Arena implements IArena {
 
     public void save() {
 
+        if(!getName().equals(null) && !getName().isEmpty()) {
+            getCompound().setTag(new TagString("name", getName()));
+        }
+
+        getCompound().setTag(new TagString("location1", toStringLocation(getFirstLocation())));
+        getCompound().setTag(new TagString("location2", toStringLocation(getSecondLocation())));
+
+        int l = 0;
+        if(getRespawn().size() > 0) {
+
+            TagCompound respawn = new TagCompound("respawn");
+
+            for(Location location : getRespawn()) {
+                respawn.setTag(new TagString(String.valueOf(l), toStringLocation(location)));
+                l++;
+            }
+
+            respawn.setTag(new TagInteger("size", l));
+
+            getCompound().setTag(respawn);
+        }
+
+        if(getRules().size() > 0) {
+            TagCompound rules = new TagCompound("rules");
+
+            rules.setTag(new TagString("TODO", "TODO"));
+
+            getCompound().setTag(rules);
+        }
+
+        try {
+            NbtOutputStream outputStream = new NbtOutputStream(new FileOutputStream(getFile()));
+
+            outputStream.write(getCompound());
+
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public Arena clone() {
@@ -173,5 +218,36 @@ public class Arena implements IArena {
         } catch (CloneNotSupportedException var2) {
             throw new Error(var2);
         }
+    }
+
+    private String toStringLocation(Location location) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(location.getWorld().getName() + ";")
+                .append(location.getBlockX() + ";")
+                .append(location.getBlockY() + ";")
+                .append(location.getBlockZ() + ";");
+        return builder.toString();
+    }
+
+    private Location toLocationString(String string) {
+        String[] strings = string.split(";");
+        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]));
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("{");
+
+        builder.append(getFirstLocation().toString() + ", ");
+
+        builder.append(getSecondLocation().toString() + ", ");
+
+        builder.append("ArenaName: " + getName());
+
+        builder.append("}");
+
+        return builder.toString();
     }
 }
