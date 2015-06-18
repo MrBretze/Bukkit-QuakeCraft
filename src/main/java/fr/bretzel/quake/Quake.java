@@ -112,7 +112,9 @@ public class Quake extends JavaPlugin implements Listener {
             Player player = (Player) sender;
 
             for(Arena arena : arenaManager.getArenaLinkedList()) {
-                player.sendMessage(arena.getName());
+                for(Location location : arena.getRespawn()) {
+                    player.sendMessage(location.toString());
+                }
             }
 
             return true;

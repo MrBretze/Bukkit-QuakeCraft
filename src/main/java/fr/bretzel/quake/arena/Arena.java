@@ -20,6 +20,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by MrBretzel on 12/06/2015.
@@ -36,7 +37,7 @@ public class Arena implements IArena {
     private TagCompound compound;
     private File file;
 
-    private List<Player> playerList = new ArrayList<>();
+    private List<UUID> playerList = new ArrayList<>();
 
     private boolean view = false;
 
@@ -99,6 +100,17 @@ public class Arena implements IArena {
         this.firstLocation = location;
     }
 
+    public List<UUID> getPlayerList() {
+        return playerList;
+    }
+
+    public void setPlayerList(List<UUID> playerList) {
+        this.playerList = playerList;
+    }
+
+    public void addPlayer(Player player) {
+        getPlayerList().add(player.getUniqueId());
+    }
 
     public LinkedList<Location> getRespawn() {
         return respawn;
@@ -233,6 +245,20 @@ public class Arena implements IArena {
             respawn.setTag(new TagInteger("size", l));
 
             getCompound().setTag(respawn);
+        }
+
+        if(getPlayerList().size() > 0 ) {
+            TagCompound players = new TagCompound("players");
+
+            int h = 0;
+            for(UUID id : getPlayerList()) {
+                players.setTag(new TagString(String.valueOf(h), id.toString()));
+                h++;
+            }
+
+            players.setTag(new TagInteger("size", h));
+
+            getCompound().setTag(players);
         }
 
         try {

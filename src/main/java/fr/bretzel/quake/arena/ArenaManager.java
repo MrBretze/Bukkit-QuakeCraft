@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.LinkedList;
 
@@ -81,6 +82,16 @@ public class ArenaManager implements Listener {
         return arenaLinkedList;
     }
 
+    public Arena getArenaByPlayer(Player player) {
+        for(Arena a : getArenaLinkedList()) {
+            if(a.getPlayerList().contains(player.getUniqueId())) {
+                return a;
+            }
+        }
+
+        return null;
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Action action = event.getAction();
@@ -111,6 +122,20 @@ public class ArenaManager implements Listener {
                         }
                     }
                     break;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        if(getArenaByPlayer(player) != null) {
+            Arena arena = getArenaByPlayer(player);
+            for(Block block : arena.getBlocks()) {
+                if(event.getTo().getBlockZ() != block.getLocation().getBlockZ() && event.getTo().getBlockY() != block.getLocation().getBlockY() && event.getTo().getBlockX() != block.getLocation().getBlockX()) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
