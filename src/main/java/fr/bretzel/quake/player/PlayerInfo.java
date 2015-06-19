@@ -2,7 +2,6 @@ package fr.bretzel.quake.player;
 
 import com.evilco.mc.nbt.TagCompound;
 import com.evilco.mc.nbt.TagDouble;
-import com.evilco.mc.nbt.TagLong;
 import com.evilco.mc.nbt.TagString;
 import com.evilco.mc.nbt.error.TagNotFoundException;
 import com.evilco.mc.nbt.error.UnexpectedTagTypeException;
@@ -11,7 +10,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 
 import fr.bretzel.quake.ParticleEffect;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.arena.Arena;
+import fr.bretzel.quake.arena.Game;
 import fr.bretzel.quake.arena.Rule;
 
 import org.bukkit.Bukkit;
@@ -35,7 +34,7 @@ public class PlayerInfo {
 
     private double reload = 1.5;
 
-    private Arena arena;
+    private Game game;
 
     private List<Rule> rule = new ArrayList<>();
 
@@ -92,8 +91,8 @@ public class PlayerInfo {
         this.file = file;
     }
 
-    public Arena getArena() {
-        return arena;
+    public Game getGame() {
+        return game;
     }
 
     public double getReloadTime() {
@@ -112,8 +111,8 @@ public class PlayerInfo {
         return rule;
     }
 
-    public void setArena(Arena arena) {
-        this.arena = arena;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     public void setEffect(ParticleEffect effect) {

@@ -15,18 +15,16 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class Arena implements IArena {
+public class Game implements IArena {
 
     private LinkedList<Location> respawn = new LinkedList<>();
     private Location firstLocation;
@@ -36,12 +34,11 @@ public class Arena implements IArena {
     private String name;
     private TagCompound compound;
     private File file;
-
     private List<UUID> playerList = new ArrayList<>();
-
+    private LinkedList<Location> signList = new LinkedList<>();
     private boolean view = false;
 
-    public Arena(Location firstLocation, Location secondLocation, String name) {
+    public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
         setSecondLocation(secondLocation);
         setName(name);
@@ -65,6 +62,8 @@ public class Arena implements IArena {
                 stream.close();
             } else {
 
+                getFile().createNewFile();
+
                 calculeSpawnBase();
 
                 setCompound(new TagCompound(getName()));
@@ -82,8 +81,8 @@ public class Arena implements IArena {
         }
     }
 
-    public Arena(Quake quake) {
-        quake.arenaManager.getArenaLinkedList().add(this);
+    public Game(Quake quake) {
+        quake.gameManager.getGameLinkedList().add(this);
     }
 
     public File getFile() {
@@ -109,7 +108,15 @@ public class Arena implements IArena {
     }
 
     public void addPlayer(Player player) {
-        getPlayerList().add(player.getUniqueId());
+        if(!getPlayerList().contains(player.getUniqueId())) {
+            getPlayerList().add(player.getUniqueId());
+        }
+    }
+
+    public void addPlayer(UUID uuid) {
+        if(!getPlayerList().contains(uuid)) {
+            getPlayerList().add(uuid);
+        }
     }
 
     public LinkedList<Location> getRespawn() {
@@ -166,7 +173,17 @@ public class Arena implements IArena {
         return compound;
     }
 
+    public LinkedList<Location> getSignList() {
+        return signList;
+    }
 
+    public void setSignList(LinkedList<Location> signList) {
+        this.signList = signList;
+    }
+
+    public void addSign(Location location) {
+        this.signList.add(location);
+    }
 
     public void view(boolean view) {
         this.view = view;
@@ -247,7 +264,22 @@ public class Arena implements IArena {
             getCompound().setTag(respawn);
         }
 
-        if(getPlayerList().size() > 0 ) {
+        int k = 0;
+        if(getRespawn().size() > 0) {
+
+            TagCompound signs = new TagCompound("signs");
+
+            for(Location location : getSignList()) {
+                signs.setTag(new TagString(String.valueOf(k), toStringLocation(location)));
+                k++;
+            }
+
+            signs.setTag(new TagInteger("size", k));
+
+            getCompound().setTag(signs);
+        }
+
+        if(!getPlayerList().isEmpty()) {
             TagCompound players = new TagCompound("players");
 
             int h = 0;
@@ -259,7 +291,15 @@ public class Arena implements IArena {
             players.setTag(new TagInteger("size", h));
 
             getCompound().setTag(players);
+        } else {
+            TagCompound players = new TagCompound("players");
+
+            players.setTag(new TagInteger("size", 0));
+
+            getCompound().setTag(players);
         }
+
+        getCompound().setTag(new TagString("spawn", toStringLocation(getSpawn())));
 
         try {
             NbtOutputStream outputStream = new NbtOutputStream(new FileOutputStream(getFile()));
@@ -275,9 +315,9 @@ public class Arena implements IArena {
 
     }
 
-    public Arena clone() {
+    public Game clone() {
         try {
-            return (Arena)super.clone();
+            return (Game)super.clone();
         } catch (CloneNotSupportedException var2) {
             throw new Error(var2);
         }

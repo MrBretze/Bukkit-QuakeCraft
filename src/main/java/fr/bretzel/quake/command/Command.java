@@ -3,13 +3,12 @@ package fr.bretzel.quake.command;
 import com.google.common.collect.ImmutableList;
 
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.arena.Arena;
-import fr.bretzel.quake.arena.ArenaManager;
+import fr.bretzel.quake.arena.Game;
+import fr.bretzel.quake.arena.GameManager;
 import fr.bretzel.quake.player.PlayerInfo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -24,9 +23,9 @@ import java.util.List;
  */
 public class Command implements CommandExecutor, TabCompleter {
 
-    private ArenaManager manager = Quake.arenaManager;
+    private GameManager manager = Quake.gameManager;
 
-    private List<String> MAIN = ImmutableList.of("create", "edit", "link", "delete");
+    private List<String> MAIN = ImmutableList.of("create", "edit", "player", "delete");
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
@@ -50,23 +49,23 @@ public class Command implements CommandExecutor, TabCompleter {
                         }
                     } else if (args[0].equalsIgnoreCase("edit")) {
                         if (args.length > 1) {
-                            if (manager.getArenaByName(args[1]) != null) {
-                                Arena arena = manager.getArenaByName(args[1]);
+                            if (manager.getGameByName(args[1]) != null) {
+                                Game game = manager.getGameByName(args[1]);
                                 if (args.length > 2) {
                                     if(args[2].equalsIgnoreCase("setspawn")) {
-                                        arena.setSpawn(player.getLocation());
-                                        player.sendMessage(ChatColor.GREEN + "The new spawn for " + arena.getName() + " has bin set tou your position !");
+                                        game.setSpawn(player.getLocation());
+                                        player.sendMessage(ChatColor.GREEN + "The new spawn for " + game.getName() + " has bin set tou your position !");
 
                                     } else if (args[2].equalsIgnoreCase("addrespawn")) {
-                                        arena.addRespawn(player.getLocation().add(0.0, 1, 0.0).clone());
+                                        game.addRespawn(player.getLocation().add(0.0, 1, 0.0).clone());
                                         player.sendMessage(ChatColor.GREEN + "The respawn point has bin set tout your position");
                                     } else if(args[2].equalsIgnoreCase("view")) {
-                                        if(arena.getRespawn().isEmpty()) {
-                                            player.sendMessage(ChatColor.GREEN + "The respawn has bin not set for the arena !");
+                                        if(game.getRespawn().isEmpty()) {
+                                            player.sendMessage(ChatColor.GREEN + "The respawn has bin not set for the game !");
                                             return true;
                                         } else {
-                                            arena.view();
-                                            if(arena.isView()) {
+                                            game.view();
+                                            if(game.isView()) {
                                                 player.sendMessage(ChatColor.GREEN + "The respawn location is visible !");
                                                 return true;
                                             } else {
@@ -75,11 +74,11 @@ public class Command implements CommandExecutor, TabCompleter {
                                             }
                                         }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "Usage: /quake edit " + arena.getName() + " <setspawn | addrespawn | view>");
+                                        player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | view>");
                                         return true;
                                     }
                                 } else {
-                                    player.sendMessage(ChatColor.RED + "Usage: /quake edit " + arena.getName() + " <setspawn | addrespawn | view>");
+                                    player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | view>");
                                     return true;
                                 }
                             } else {
@@ -95,6 +94,56 @@ public class Command implements CommandExecutor, TabCompleter {
                          TODO:
                         */
                         return true;
+                    } else if(args[0].equalsIgnoreCase("player")) {
+                        if(args.length > 1) {
+                            if(Bukkit.getPlayer(args[1]) != null) {
+                                Player target = Bukkit.getPlayer(args[1]);
+                                if(args.length > 2) {
+                                    if(args[2].equalsIgnoreCase("join")) {
+                                        Game b = manager.getArenaByPlayer(target);
+                                        if(args.length > 3) {
+                                            if(manager.getGameByName(args[3]) != null && b == null) {
+                                                manager.getGameByName(args[3]).addPlayer(target);
+                                                player.sendMessage(ChatColor.GREEN + "Player has join the arena !");
+                                            } else if(b != null) {
+                                                player.sendMessage(ChatColor.RED + "The player is already in a a arena !");
+                                                return true;
+                                            } else if(manager.getGameByName(args[3]) == null) {
+                                                player.sendMessage(ChatColor.RED + "Game not found !");
+                                                return true;
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <arena>");
+                                                return true;
+                                            }
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <arena>");
+                                            return true;
+                                        }
+                                    } else if(args[2].equalsIgnoreCase("quit")) {
+                                        if(manager.getArenaByPlayer(target) != null) {
+                                            manager.getArenaByPlayer(target).getPlayerList().remove(target.getUniqueId());
+                                            player.sendMessage(ChatColor.GREEN + "Player has left the arena !");
+                                            return true;
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Game not found !");
+                                            return true;
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Usage: /quake player <player> <join | quit>");
+                                        return true;
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Usage: /quake player <player> <join | quit>");
+                                    return true;
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Player is not online !");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Usage: /quake player <player> <join | quit>");
+                            return true;
+                        }
                     } else {
                         player.sendMessage(ChatColor.RED + "Usage: /quake <create | edit | delete>");
                         return true;

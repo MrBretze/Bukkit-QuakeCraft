@@ -16,6 +16,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.LinkedList;
 
@@ -23,15 +25,13 @@ import java.util.LinkedList;
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class ArenaManager implements Listener {
+public class GameManager implements Listener {
 
-    private LinkedList<Arena> arenaLinkedList = new LinkedList<>();
-
-    private LinkedList<Block> signLinkedList = new LinkedList<>();
+    private LinkedList<Game> gameLinkedList = new LinkedList<>();
 
     private Quake quake;
 
-    public ArenaManager(Quake quake) {
+    public GameManager(Quake quake) {
         this.quake = quake;
 
         quake.manager.registerEvents(this, quake);
@@ -46,44 +46,44 @@ public class ArenaManager implements Listener {
             creator.sendMessage(ChatColor.RED + "The second is not set !");
             return;
         }
-        if(containsArena(name)) {
+        if(containsGame(name)) {
             creator.sendMessage(ChatColor.RED + "The arena is already exist !");
             return;
         } else {
-            Arena arena = new Arena(loc1, loc2, name);
-            arenaLinkedList.add(arena);
-            creator.sendMessage(ChatColor.GREEN + "The arena " + name + " has bin create !");
+            Game game = new Game(loc1, loc2, name);
+            gameLinkedList.add(game);
+            creator.sendMessage(ChatColor.GREEN + "The game " + name + " has bin create !");
         }
     }
 
-    public Arena getArenaByName(String name) {
-        Arena arena = null;
-        for(Arena a : arenaLinkedList) {
+    public Game getGameByName(String name) {
+        Game game = null;
+        for(Game a : gameLinkedList) {
             if(a.getName().equals(name)) {
-                arena = a;
+                game = a;
             }
         }
-        return arena;
+        return game;
     }
 
-    public boolean containsArena(Arena arena) {
-        return arenaLinkedList.contains(arena);
+    public boolean containsGame(Game game) {
+        return gameLinkedList.contains(game);
     }
 
-    public boolean containsArena(String arena) {
-        return arenaLinkedList.contains(getArenaByName(arena));
+    public boolean containsGame(String arena) {
+        return gameLinkedList.contains(getGameByName(arena));
     }
 
     public Quake getQuake() {
         return quake;
     }
 
-    public LinkedList<Arena> getArenaLinkedList() {
-        return arenaLinkedList;
+    public LinkedList<Game> getGameLinkedList() {
+        return gameLinkedList;
     }
 
-    public Arena getArenaByPlayer(Player player) {
-        for(Arena a : getArenaLinkedList()) {
+    public Game getArenaByPlayer(Player player) {
+        for(Game a : getGameLinkedList()) {
             if(a.getPlayerList().contains(player.getUniqueId())) {
                 return a;
             }
@@ -113,13 +113,10 @@ public class ArenaManager implements Listener {
                 case RIGHT_CLICK_BLOCK:
                     Block block = event.getClickedBlock();
 
-                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-                        BlockState blockState = block.getState();
-                        Sign sign = (Sign) blockState;
-                        if(getSignLinkedList().contains(block)) {
-                            Arena arena = getArenaByName(sign.getLine(1));
-                            player.teleport(arena.getSpawn());
-                        }
+                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block.hasMetadata("game")) {
+                        Game game = getGameByName(block.getMetadata("game").get(0).asString());
+                        player.teleport(game.getSpawn());
+                        game.addPlayer(player);
                     }
                     break;
             }
@@ -131,11 +128,11 @@ public class ArenaManager implements Listener {
         Player player = event.getPlayer();
 
         if(getArenaByPlayer(player) != null) {
-            Arena arena = getArenaByPlayer(player);
-            for(Block block : arena.getBlocks()) {
-                if(event.getTo().getBlockZ() != block.getLocation().getBlockZ() && event.getTo().getBlockY() != block.getLocation().getBlockY() && event.getTo().getBlockX() != block.getLocation().getBlockX()) {
-                    event.setCancelled(true);
-                }
+            Game game = getArenaByPlayer(player);
+            if(!game.getBlocks().contains(event.getTo().getBlock())) {
+                Vector vector = player.getEyeLocation().getDirection().normalize().multiply(-0.3);
+                vector.setY(0);
+                player.teleport(event.getFrom().add(vector));
             }
         }
     }
@@ -145,23 +142,21 @@ public class ArenaManager implements Listener {
         Player player = event.getPlayer();
         String[] lines = event.getLines();
 
-        if(lines[0].equalsIgnoreCase("[quake]") && getArenaByName(lines[1]) != null) {
+        if(lines[0].equalsIgnoreCase("[quake]") && getGameByName(lines[1]) != null) {
             event.setLine(0, ChatColor.RED + "QuakeCraft");
 
-            Arena arena = getArenaByName(lines[1]);
+            Game game = getGameByName(lines[1]);
 
-            event.setLine(1, arena.getName());
+            event.getBlock().setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
 
-            getSignLinkedList().add(event.getBlock());
+            game.addSign(event.getBlock().getLocation());
+
+            event.setLine(1, ChatColor.AQUA + game.getName());
         }
     }
 
-    public LinkedList<Block> getSignLinkedList() {
-        return signLinkedList;
-    }
-
-    public void setArenaLinkedList(LinkedList<Arena> arenaLinkedList) {
-        this.arenaLinkedList = arenaLinkedList;
+    public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
+        this.gameLinkedList = gameLinkedList;
     }
 
     private void rightClick(Player player, PlayerInteractEvent event) {
