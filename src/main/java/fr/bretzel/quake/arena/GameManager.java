@@ -7,8 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -113,10 +111,16 @@ public class GameManager implements Listener {
                 case RIGHT_CLICK_BLOCK:
                     Block block = event.getClickedBlock();
 
-                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block.hasMetadata("game")) {
-                        Game game = getGameByName(block.getMetadata("game").get(0).asString());
-                        player.teleport(game.getSpawn());
-                        game.addPlayer(player);
+                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block.hasMetadata("game") && block.hasMetadata("isjoin")) {
+                        boolean b = block.getMetadata("isjoin").get(0).asBoolean();
+                        if (b) {
+                            Game game = getGameByName(block.getMetadata("game").get(0).asString());
+                            player.teleport(game.getSpawn());
+                            game.addPlayer(player);
+                        } else {
+                            player.chat("/spawn");
+                            player.chat("/quake player " + player.getName() + " quit");
+                        }
                     }
                     break;
             }
@@ -142,16 +146,27 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         String[] lines = event.getLines();
 
-        if(lines[0].equalsIgnoreCase("[quake]") && getGameByName(lines[1]) != null) {
-            event.setLine(0, ChatColor.RED + "QuakeCraft");
+        if(lines[0].equalsIgnoreCase("[quake]") && getGameByName(lines[1]) != null && !lines[2].equals(null) && !lines[2].isEmpty()) {
+            if(lines[2].equalsIgnoreCase("join")) {
+                event.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, true));
 
-            Game game = getGameByName(lines[1]);
+                event.setLine(0, ChatColor.RED + "QuakeCraft");
 
-            event.getBlock().setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
+                Game game = getGameByName(lines[1]);
 
-            game.addSign(event.getBlock().getLocation());
+                event.getBlock().setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
 
-            event.setLine(1, ChatColor.AQUA + game.getName());
+                event.setLine(2, "" + ChatColor.AQUA + game.getPlayerList().size() + ChatColor.RED + "/" + game.getMaxPlayer());
+
+                game.addSign(event.getBlock().getLocation());
+
+                event.setLine(1, ChatColor.AQUA + game.getName());
+            } else if(lines[2].equalsIgnoreCase("quit")) {
+                event.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, false));
+                event.setLine(0, ChatColor.RED + "QuakeCraft");
+                event.setLine(2, "");
+                event.setLine(3, "" + ChatColor.RED + ChatColor.BOLD + "Quit !");
+            }
         }
     }
 

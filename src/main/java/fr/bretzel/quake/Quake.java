@@ -7,7 +7,7 @@ import fr.bretzel.quake.arena.Game;
 import fr.bretzel.quake.arena.GameManager;
 import fr.bretzel.quake.player.PlayerInfo;
 
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -72,18 +72,18 @@ public class Quake extends JavaPlugin implements Listener {
 
                         game.setCompound(compound);
 
-                        game.setFirstLocation(toLocationString(compound.getString("location1")));
+                        game.setFirstLocation(Util.toLocationString(compound.getString("location1")));
 
-                        game.setSecondLocation(toLocationString(compound.getString("location2")));
+                        game.setSecondLocation(Util.toLocationString(compound.getString("location2")));
 
-                        game.setSpawn(toLocationString(compound.getString("spawn")));
+                        game.setSpawn(Util.toLocationString(compound.getString("spawn")));
 
                         if(compound.getTag("respawn") != null) {
                             TagCompound respawn = compound.getCompound("respawn");
                             int u = respawn.getInteger("size");
 
                             for(int i = 0; i < u; i++) {
-                                Location location = toLocationString(respawn.getString(String.valueOf(i)));
+                                Location location = Util.toLocationString(respawn.getString(String.valueOf(i)));
                                 game.addRespawn(location);
                             }
                         }
@@ -102,8 +102,16 @@ public class Quake extends JavaPlugin implements Listener {
                             TagCompound signs = compound.getCompound("signs");
                             int u = signs.getInteger("size");
                             for(int i = 0; i < u; i++) {
-                                Location location = toLocationString(signs.getString(String.valueOf(i)));
+                                Location location = Util.toLocationString(signs.getString(String.valueOf(i)));
                                 location.getBlock().setMetadata("game", new FixedMetadataValue(this, game.getName()));
+                                if(location.getBlock().getType() == Material.WALL_SIGN || location.getBlock().getType() == Material.SIGN_POST) {
+                                    Sign sign = (Sign) location.getBlock().getState();
+                                    if(sign.getLine(3).equalsIgnoreCase("" + ChatColor.RED + ChatColor.BOLD + "Quit !")) {
+                                        location.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, false));
+                                    } else {
+                                        location.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, true));
+                                    }
+                                }
                                 game.addSign(location);
                             }
                         }
@@ -156,19 +164,5 @@ public class Quake extends JavaPlugin implements Listener {
             playerInfos.add(playerInfo);
         }
         return playerInfo;
-    }
-
-    private String toStringLocation(Location location) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(location.getWorld().getName() + ";")
-                .append(location.getBlockX() + ";")
-                .append(location.getBlockY() + ";")
-                .append(location.getBlockZ() + ";");
-        return builder.toString();
-    }
-
-    private Location toLocationString(String string) {
-        String[] strings = string.split(";");
-        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]));
     }
 }

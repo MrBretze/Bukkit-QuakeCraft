@@ -1,5 +1,6 @@
 package fr.bretzel.quake;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -124,5 +125,22 @@ public class Util {
         String str = new Character((char)charCode).toString();
 
         return str;
+    }
+
+    public static String toStringLocation(Location location) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(location.getWorld().getName() + ";")
+                .append(location.getBlockX() + ";")
+                .append(location.getBlockY() + ";")
+                .append(location.getBlockZ() + ";")
+                .append(location.getYaw() + ";")
+                .append(location.getPitch() + "");
+
+        return builder.toString();
+    }
+
+    public static Location toLocationString(String string) {
+        String[] strings = string.split(";");
+        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]), Float.valueOf(strings[4]), Float.valueOf(strings[5]));
     }
 }

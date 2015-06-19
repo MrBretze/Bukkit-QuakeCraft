@@ -10,6 +10,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 
 import fr.bretzel.quake.ParticleEffect;
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.Game;
 import fr.bretzel.quake.arena.Rule;
 
@@ -172,12 +173,12 @@ public class PlayerInfo {
             String loc = compound.getString("location1");
 
             if(!loc.equals(null) && !loc.isEmpty()) {
-                setFirstLocation(toLocationString(loc));
+                setFirstLocation(Util.toLocationString(loc));
                 loc = compound.getString("location2");
             }
 
             if(!loc.equals(null) && !loc.isEmpty()) {
-                setFirstLocation(toLocationString(loc));
+                setFirstLocation(Util.toLocationString(loc));
             }
 
         } catch (UnexpectedTagTypeException e) {
@@ -204,19 +205,5 @@ public class PlayerInfo {
             Bukkit.broadcastMessage(ChatColor.RED + "Error the compound was null !");
         }
 
-    }
-
-    private String toStringLocation(Location location) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(location.getWorld().getName() + ";")
-                .append(location.getBlockX() + ";")
-                .append(location.getBlockY() + ";")
-                .append(location.getBlockZ() + ";");
-        return builder.toString();
-    }
-
-    private Location toLocationString(String string) {
-        String[] strings = string.split(";");
-        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]));
     }
 }

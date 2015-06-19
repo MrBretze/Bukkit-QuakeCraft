@@ -10,12 +10,10 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.api.IArena;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.*;
 import java.util.*;
@@ -37,6 +35,8 @@ public class Game implements IArena {
     private List<UUID> playerList = new ArrayList<>();
     private LinkedList<Location> signList = new LinkedList<>();
     private boolean view = false;
+    private int maxPlayer = 16;
+    private int minPlayer = 2;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -92,6 +92,22 @@ public class Game implements IArena {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public int getMaxPlayer() {
+        return maxPlayer;
+    }
+
+    public void setMaxPlayer(int maxPlayer) {
+        this.maxPlayer = maxPlayer;
+    }
+
+    public int getMinPlayer() {
+        return minPlayer;
+    }
+
+    public void setMinPlayer(int minPlayer) {
+        this.minPlayer = minPlayer;
     }
 
     @Override
@@ -246,8 +262,8 @@ public class Game implements IArena {
             getCompound().setTag(new TagString("name", getName()));
         }
 
-        getCompound().setTag(new TagString("location1", toStringLocation(getFirstLocation())));
-        getCompound().setTag(new TagString("location2", toStringLocation(getSecondLocation())));
+        getCompound().setTag(new TagString("location1", Util.toStringLocation(getFirstLocation())));
+        getCompound().setTag(new TagString("location2", Util.toStringLocation(getSecondLocation())));
 
         int l = 0;
         if(getRespawn().size() > 0) {
@@ -255,7 +271,7 @@ public class Game implements IArena {
             TagCompound respawn = new TagCompound("respawn");
 
             for(Location location : getRespawn()) {
-                respawn.setTag(new TagString(String.valueOf(l), toStringLocation(location)));
+                respawn.setTag(new TagString(String.valueOf(l), Util.toStringLocation(location)));
                 l++;
             }
 
@@ -270,7 +286,7 @@ public class Game implements IArena {
             TagCompound signs = new TagCompound("signs");
 
             for(Location location : getSignList()) {
-                signs.setTag(new TagString(String.valueOf(k), toStringLocation(location)));
+                signs.setTag(new TagString(String.valueOf(k), Util.toStringLocation(location)));
                 k++;
             }
 
@@ -299,7 +315,7 @@ public class Game implements IArena {
             getCompound().setTag(players);
         }
 
-        getCompound().setTag(new TagString("spawn", toStringLocation(getSpawn())));
+        getCompound().setTag(new TagString("spawn", Util.toStringLocation(getSpawn())));
 
         try {
             NbtOutputStream outputStream = new NbtOutputStream(new FileOutputStream(getFile()));
@@ -321,20 +337,6 @@ public class Game implements IArena {
         } catch (CloneNotSupportedException var2) {
             throw new Error(var2);
         }
-    }
-
-    private String toStringLocation(Location location) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(location.getWorld().getName() + ";")
-                .append(location.getBlockX() + ";")
-                .append(location.getBlockY() + ";")
-                .append(location.getBlockZ() + ";");
-        return builder.toString();
-    }
-
-    private Location toLocationString(String string) {
-        String[] strings = string.split(";");
-        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]));
     }
 
     @Override
