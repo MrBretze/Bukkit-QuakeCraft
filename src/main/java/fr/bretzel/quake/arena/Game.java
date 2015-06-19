@@ -47,7 +47,7 @@ public class Game implements IArena {
             addBlock(block);
         }
 
-        File mk = new File(Quake.quake.getDataFolder(), File.separator + "arena" + File.separator);
+        File mk = new File(Quake.quake.getDataFolder(), File.separator + "game" + File.separator);
 
         mk.mkdir();
 

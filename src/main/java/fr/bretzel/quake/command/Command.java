@@ -25,7 +25,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     private GameManager manager = Quake.gameManager;
 
-    private List<String> MAIN = ImmutableList.of("create", "edit", "player", "delete");
+    private List<String> MAIN = ImmutableList.of("create", "edit", "player", "delete", "setlobby");
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
@@ -54,14 +54,14 @@ public class Command implements CommandExecutor, TabCompleter {
                                 if (args.length > 2) {
                                     if(args[2].equalsIgnoreCase("setspawn")) {
                                         game.setSpawn(player.getLocation());
-                                        player.sendMessage(ChatColor.GREEN + "The new spawn for " + game.getName() + " has bin set tou your position !");
+                                        player.sendMessage(ChatColor.GREEN + "The new spawn for " + game.getName() + " has been set tou your position !");
 
                                     } else if (args[2].equalsIgnoreCase("addrespawn")) {
                                         game.addRespawn(player.getLocation().add(0.0, 1, 0.0).clone());
-                                        player.sendMessage(ChatColor.GREEN + "The respawn point has bin set tout your position");
+                                        player.sendMessage(ChatColor.GREEN + "The respawn point has been set tout your position");
                                     } else if(args[2].equalsIgnoreCase("view")) {
                                         if(game.getRespawn().isEmpty()) {
-                                            player.sendMessage(ChatColor.GREEN + "The respawn has bin not set for the game !");
+                                            player.sendMessage(ChatColor.GREEN + "The respawn has been not set for the game !");
                                             return true;
                                         } else {
                                             game.view();

@@ -1,20 +1,19 @@
 package fr.bretzel.quake.arena;
 
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.Util;
 import fr.bretzel.quake.player.PlayerInfo;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.util.LinkedList;
@@ -26,13 +25,22 @@ import java.util.LinkedList;
 public class GameManager implements Listener {
 
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
-
     private Quake quake;
+    public SignEvent signEvent;
+    private Location lobby;
 
     public GameManager(Quake quake) {
         this.quake = quake;
 
         quake.manager.registerEvents(this, quake);
+
+        this.signEvent = new SignEvent(this);
+
+        if(!quake.getConfig().isSet("lobby")) {
+            quake.getConfig().set("lobby", Util.toStringLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
+        } else {
+            lobby = Util.toLocationString(quake.getConfig().getString("lobby"));
+        }
     }
 
     public void registerArena(Player creator, String name, Location loc1, Location loc2) {
@@ -50,7 +58,7 @@ public class GameManager implements Listener {
         } else {
             Game game = new Game(loc1, loc2, name);
             gameLinkedList.add(game);
-            creator.sendMessage(ChatColor.GREEN + "The game " + name + " has bin create !");
+            creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
         }
     }
 
@@ -70,6 +78,22 @@ public class GameManager implements Listener {
 
     public boolean containsGame(String arena) {
         return gameLinkedList.contains(getGameByName(arena));
+    }
+
+    public Location getLobby() {
+        return lobby;
+    }
+
+    public void setLobby(Location lobby) {
+        this.lobby = lobby;
+    }
+
+    public SignEvent getSignEvent() {
+        return signEvent;
+    }
+
+    public void setSignEvent(SignEvent signEvent) {
+        this.signEvent = signEvent;
     }
 
     public Quake getQuake() {
@@ -105,67 +129,17 @@ public class GameManager implements Listener {
                     break;
             }
         }
-
-        if(player.hasPermission("quake.event.join")) {
-            switch (action) {
-                case RIGHT_CLICK_BLOCK:
-                    Block block = event.getClickedBlock();
-
-                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block.hasMetadata("game") && block.hasMetadata("isjoin")) {
-                        boolean b = block.getMetadata("isjoin").get(0).asBoolean();
-                        if (b) {
-                            Game game = getGameByName(block.getMetadata("game").get(0).asString());
-                            player.teleport(game.getSpawn());
-                            game.addPlayer(player);
-                        } else {
-                            player.chat("/spawn");
-                            player.chat("/quake player " + player.getName() + " quit");
-                        }
-                    }
-                    break;
-            }
-        }
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-
         if(getArenaByPlayer(player) != null) {
             Game game = getArenaByPlayer(player);
             if(!game.getBlocks().contains(event.getTo().getBlock())) {
                 Vector vector = player.getEyeLocation().getDirection().normalize().multiply(-0.3);
                 vector.setY(0);
                 player.teleport(event.getFrom().add(vector));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onSignChange(SignChangeEvent event) {
-        Player player = event.getPlayer();
-        String[] lines = event.getLines();
-
-        if(lines[0].equalsIgnoreCase("[quake]") && getGameByName(lines[1]) != null && !lines[2].equals(null) && !lines[2].isEmpty()) {
-            if(lines[2].equalsIgnoreCase("join")) {
-                event.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, true));
-
-                event.setLine(0, ChatColor.RED + "QuakeCraft");
-
-                Game game = getGameByName(lines[1]);
-
-                event.getBlock().setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-
-                event.setLine(2, "" + ChatColor.AQUA + game.getPlayerList().size() + ChatColor.RED + "/" + game.getMaxPlayer());
-
-                game.addSign(event.getBlock().getLocation());
-
-                event.setLine(1, ChatColor.AQUA + game.getName());
-            } else if(lines[2].equalsIgnoreCase("quit")) {
-                event.getBlock().setMetadata("isjoin", new FixedMetadataValue(Quake.quake, false));
-                event.setLine(0, ChatColor.RED + "QuakeCraft");
-                event.setLine(2, "");
-                event.setLine(3, "" + ChatColor.RED + ChatColor.BOLD + "Quit !");
             }
         }
     }
