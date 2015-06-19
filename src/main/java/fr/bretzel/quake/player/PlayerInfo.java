@@ -11,8 +11,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 import fr.bretzel.quake.ParticleEffect;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-import fr.bretzel.quake.arena.Game;
-import fr.bretzel.quake.arena.Rule;
+import fr.bretzel.quake.game.Game;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,8 +19,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -36,8 +33,6 @@ public class PlayerInfo {
     private double reload = 1.5;
 
     private Game game;
-
-    private List<Rule> rule = new ArrayList<>();
 
     private TagCompound compound;
 
@@ -108,10 +103,6 @@ public class PlayerInfo {
         return player;
     }
 
-    public List<Rule> getRule() {
-        return rule;
-    }
-
     public void setGame(Game game) {
         this.game = game;
     }
@@ -126,10 +117,6 @@ public class PlayerInfo {
 
     public void setReloadTime(long reload) {
         this.reload = reload;
-    }
-
-    public void setRule(List<Rule> rule) {
-        this.rule = rule;
     }
 
     public TagCompound getCompound() {

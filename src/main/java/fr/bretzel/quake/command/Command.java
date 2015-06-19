@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-import fr.bretzel.quake.arena.Game;
-import fr.bretzel.quake.arena.GameManager;
+import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Bukkit;
@@ -38,7 +38,7 @@ public class Command implements CommandExecutor, TabCompleter {
                     if (args[0].equalsIgnoreCase("create")) {
                         if (player.hasPermission("quake.command.create")) {
                             if (args.length > 1) {
-                                manager.registerArena(player, args[1], info.getFirstLocation(), info.getSecondLocation());
+                                manager.registerGame(player, args[1], info.getFirstLocation(), info.getSecondLocation());
                                 return true;
                             } else {
                                 player.sendMessage(ChatColor.RED + "Usage: /quake create <name>");
@@ -83,11 +83,11 @@ public class Command implements CommandExecutor, TabCompleter {
                                     return true;
                                 }
                             } else {
-                                player.sendMessage(ChatColor.RED + "The arena is not found !");
+                                player.sendMessage(ChatColor.RED + "The game is not found !");
                                 return true;
                             }
                         } else {
-                            player.sendMessage(ChatColor.RED + "Usage: /quake edit <arena>");
+                            player.sendMessage(ChatColor.RED + "Usage: /quake edit <game>");
                             return true;
                         }
                     } else if (args[0].equalsIgnoreCase("delete")) {
@@ -101,29 +101,29 @@ public class Command implements CommandExecutor, TabCompleter {
                                 Player target = Bukkit.getPlayer(args[1]);
                                 if(args.length > 2) {
                                     if(args[2].equalsIgnoreCase("join")) {
-                                        Game b = manager.getArenaByPlayer(target);
+                                        Game b = manager.getGameByPlayer(target);
                                         if(args.length > 3) {
                                             if(manager.getGameByName(args[3]) != null && b == null) {
                                                 manager.getGameByName(args[3]).addPlayer(target);
-                                                player.sendMessage(ChatColor.GREEN + "Player has join the arena !");
+                                                player.sendMessage(ChatColor.GREEN + "Player has join the game !");
                                             } else if(b != null) {
-                                                player.sendMessage(ChatColor.RED + "The player is already in a a arena !");
+                                                player.sendMessage(ChatColor.RED + "The player is already in a a game !");
                                                 return true;
                                             } else if(manager.getGameByName(args[3]) == null) {
                                                 player.sendMessage(ChatColor.RED + "Game not found !");
                                                 return true;
                                             } else {
-                                                player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <arena>");
+                                                player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <game>");
                                                 return true;
                                             }
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <arena>");
+                                            player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <game>");
                                             return true;
                                         }
                                     } else if(args[2].equalsIgnoreCase("quit")) {
-                                        if(manager.getArenaByPlayer(target) != null) {
-                                            manager.getArenaByPlayer(target).getPlayerList().remove(target.getUniqueId());
-                                            player.sendMessage(ChatColor.GREEN + "Player has left the arena !");
+                                        if(manager.getGameByPlayer(target) != null) {
+                                            manager.getGameByPlayer(target).getPlayerList().remove(target.getUniqueId());
+                                            player.sendMessage(ChatColor.GREEN + "Player has left the game !");
                                             return true;
                                         } else {
                                             player.sendMessage(ChatColor.RED + "Game not found !");

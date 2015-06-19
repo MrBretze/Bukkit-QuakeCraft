@@ -3,14 +3,12 @@ package fr.bretzel.quake;
 import com.evilco.mc.nbt.TagCompound;
 import com.evilco.mc.nbt.stream.NbtInputStream;
 
-import fr.bretzel.quake.arena.Game;
-import fr.bretzel.quake.arena.GameManager;
-import fr.bretzel.quake.arena.SignEvent;
-import fr.bretzel.quake.arena.SignReader;
+import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.game.GameManager;
+import fr.bretzel.quake.game.SignReader;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -83,7 +81,7 @@ public class Quake extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
             Player player = (Player) sender;
-            Game game = gameManager.getArenaByPlayer(player);
+            Game game = gameManager.getGameByPlayer(player);
             player.teleport(game.getRespawn().get(new Random().nextInt(game.getRespawn().size())));
             return true;
         }

@@ -1,4 +1,4 @@
-package fr.bretzel.quake.arena;
+package fr.bretzel.quake.game;
 
 import com.evilco.mc.nbt.TagCompound;
 import com.evilco.mc.nbt.TagInteger;
@@ -8,9 +8,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-import fr.bretzel.quake.arena.api.IArena;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,7 +22,7 @@ import java.util.*;
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class Game implements IArena {
+public class Game {
 
     private LinkedList<Location> respawn = new LinkedList<>();
     private Location firstLocation;
@@ -39,6 +37,8 @@ public class Game implements IArena {
     private boolean view = false;
     private int maxPlayer = 16;
     private int minPlayer = 2;
+    private int maxKill = 25;
+    private State state = State.WAITING;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -87,10 +87,25 @@ public class Game implements IArena {
         quake.gameManager.getGameLinkedList().add(this);
     }
 
+    public int getMaxKill() {
+        return maxKill;
+    }
+
+    public void setMaxKill(int maxKill) {
+        this.maxKill = maxKill;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
     public File getFile() {
         return file;
     }
-
 
     public void setFile(File file) {
         this.file = file;
@@ -112,7 +127,6 @@ public class Game implements IArena {
         this.minPlayer = minPlayer;
     }
 
-    @Override
     public void setFirstLocation(Location location) {
         this.firstLocation = location;
     }
@@ -150,27 +164,22 @@ public class Game implements IArena {
         getRespawn().add(location);
     }
 
-    @Override
     public void setSecondLocation(Location location) {
         this.secondLocation = location;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    @Override
     public String getName() {
         return this.name;
     }
 
-    @Override
     public Location getFirstLocation() {
         return this.firstLocation;
     }
 
-    @Override
     public Location getSecondLocation() {
         return this.secondLocation;
     }

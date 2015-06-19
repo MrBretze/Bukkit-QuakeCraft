@@ -1,4 +1,4 @@
-package fr.bretzel.quake.arena;
+package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -43,7 +44,7 @@ public class GameManager implements Listener {
         }
     }
 
-    public void registerArena(Player creator, String name, Location loc1, Location loc2) {
+    public void registerGame(Player creator, String name, Location loc1, Location loc2) {
         if(loc1 == null) {
             creator.sendMessage(ChatColor.RED + "The first is not set !");
             return;
@@ -53,7 +54,7 @@ public class GameManager implements Listener {
             return;
         }
         if(containsGame(name)) {
-            creator.sendMessage(ChatColor.RED + "The arena is already exist !");
+            creator.sendMessage(ChatColor.RED + "The game is already exist !");
             return;
         } else {
             Game game = new Game(loc1, loc2, name);
@@ -107,13 +108,12 @@ public class GameManager implements Listener {
         return gameLinkedList;
     }
 
-    public Game getArenaByPlayer(Player player) {
+    public Game getGameByPlayer(Player player) {
         for(Game a : getGameLinkedList()) {
             if(a.getPlayerList().contains(player.getUniqueId())) {
                 return a;
             }
         }
-
         return null;
     }
 
@@ -137,8 +137,8 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if(getArenaByPlayer(player) != null) {
-            Game game = getArenaByPlayer(player);
+        if(getGameByPlayer(player) != null) {
+            Game game = getGameByPlayer(player);
             if(!game.getBlocks().contains(event.getTo().getBlock())) {
                 Vector vector = player.getEyeLocation().getDirection().normalize().multiply(-0.3);
                 vector.setY(0);
@@ -147,7 +147,15 @@ public class GameManager implements Listener {
         }
     }
 
-    public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
+    @EventHandler
+    public void PlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Game game = getGameByPlayer(player);
+        if(game == null) {
+            player.teleport(getLobby());
+        }
+    }
+     public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
         this.gameLinkedList = gameLinkedList;
     }
 

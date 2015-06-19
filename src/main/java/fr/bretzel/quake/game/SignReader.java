@@ -1,4 +1,4 @@
-package fr.bretzel.quake.arena;
+package fr.bretzel.quake.game;
 
 import com.evilco.mc.nbt.TagCompound;
 import com.evilco.mc.nbt.TagString;

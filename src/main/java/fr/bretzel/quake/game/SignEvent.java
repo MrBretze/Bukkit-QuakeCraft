@@ -1,4 +1,4 @@
-package fr.bretzel.quake.arena;
+package fr.bretzel.quake.game;
 
 
 import fr.bretzel.quake.Quake;
@@ -57,7 +57,7 @@ public class SignEvent implements Listener {
                             for(UUID uuid : game.getPlayerList()) {
                                 Player p = Bukkit.getPlayer(uuid);
                                 if(p.isOnline()) {
-                                    p.sendMessage(ChatColor.AQUA + p.getDisplayName() + ChatColor.YELLOW + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() +
+                                    p.sendMessage(ChatColor.AQUA + player.getDisplayName() + ChatColor.YELLOW + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() +
                                             ChatColor.YELLOW + "/" + ChatColor.AQUA + game.getMaxPlayer() + ChatColor.YELLOW + ")");
                                 }
                             }
@@ -128,6 +128,7 @@ public class SignEvent implements Listener {
                 sign.setLine(1, ChatColor.AQUA + game.getName());
                 sign.setLine(2, getInfoPlayer(game));
                 sign.setLine(3, CLICK_TO_JOIN);
+                sign.update();
             }
         }
     }
