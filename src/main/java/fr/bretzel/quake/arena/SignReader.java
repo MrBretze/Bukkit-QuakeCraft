@@ -41,6 +41,8 @@ public class SignReader {
     public static TagCompound write(Sign sign, String name) {
         TagCompound compound = new TagCompound(name);
         try {
+            sign = (Sign) sign.getLocation().getWorld().getBlockAt(sign.getLocation()).getState();
+
             compound.setTag(new TagString("line1", sign.getLine(0)));
             compound.setTag(new TagString("line2", sign.getLine(1)));
             compound.setTag(new TagString("line3", sign.getLine(2)));

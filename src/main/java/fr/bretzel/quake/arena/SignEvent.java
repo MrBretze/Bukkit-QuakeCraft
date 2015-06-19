@@ -101,19 +101,19 @@ public class SignEvent implements Listener {
                     Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, true));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    game.addSign(sign);
                     event.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft");
                     event.setLine(1, ChatColor.AQUA + lines[2]);
                     event.setLine(2, getInfoPlayer(game));
                     event.setLine(3, CLICK_TO_JOIN);
+                    game.addSign(sign);
                 } else if(lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null) {
                     Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, false));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    game.addSign(sign);
                     event.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft");
                     event.setLine(1, ChatColor.AQUA + lines[2]);
                     event.setLine(2, CLICK_TO_QUIT);
+                    game.addSign(sign);
                 } else {
                     return;
                 }
