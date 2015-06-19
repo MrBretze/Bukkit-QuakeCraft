@@ -81,6 +81,9 @@ public class GameManager implements Listener {
     }
 
     public Location getLobby() {
+        if(lobby == null) {
+            return Bukkit.getWorlds().get(0).getSpawnLocation();
+        }
         return lobby;
     }
 

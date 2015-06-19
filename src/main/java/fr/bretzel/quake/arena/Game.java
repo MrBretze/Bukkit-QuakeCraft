@@ -13,6 +13,7 @@ import fr.bretzel.quake.arena.api.IArena;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -33,7 +34,7 @@ public class Game implements IArena {
     private TagCompound compound;
     private File file;
     private List<UUID> playerList = new ArrayList<>();
-    private LinkedList<Location> signList = new LinkedList<>();
+    private LinkedList<Sign> signList = new LinkedList<>();
     private boolean view = false;
     private int maxPlayer = 16;
     private int minPlayer = 2;
@@ -189,16 +190,20 @@ public class Game implements IArena {
         return compound;
     }
 
-    public LinkedList<Location> getSignList() {
+    public LinkedList<Sign> getSignList() {
         return signList;
     }
 
-    public void setSignList(LinkedList<Location> signList) {
+    public void setSignList(LinkedList<Sign> signList) {
         this.signList = signList;
     }
 
-    public void addSign(Location location) {
-        this.signList.add(location);
+    public void addSign(Sign sign) {
+        this.signList.add(sign);
+    }
+
+    public void removeSign(Sign sign) {
+        this.signList.remove(sign);
     }
 
     public void view(boolean view) {
@@ -281,12 +286,12 @@ public class Game implements IArena {
         }
 
         int k = 0;
-        if(getRespawn().size() > 0) {
+        if(getSignList().size() > 0) {
 
             TagCompound signs = new TagCompound("signs");
 
-            for(Location location : getSignList()) {
-                signs.setTag(new TagString(String.valueOf(k), Util.toStringLocation(location)));
+            for(Sign sign : getSignList()) {
+                signs.setTag(SignReader.write(sign, String.valueOf(k)));
                 k++;
             }
 

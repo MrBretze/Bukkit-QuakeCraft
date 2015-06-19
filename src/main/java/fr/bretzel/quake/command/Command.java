@@ -3,6 +3,7 @@ package fr.bretzel.quake.command;
 import com.google.common.collect.ImmutableList;
 
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.Util;
 import fr.bretzel.quake.arena.Game;
 import fr.bretzel.quake.arena.GameManager;
 import fr.bretzel.quake.player.PlayerInfo;
@@ -44,7 +45,7 @@ public class Command implements CommandExecutor, TabCompleter {
                                 return true;
                             }
                         } else {
-                            player.sendMessage(ChatColor.RED + "You dont have the permission for this command.");
+                            player.sendMessage(ChatColor.RED + "You don't have the permission for this command.");
                             return true;
                         }
                     } else if (args[0].equalsIgnoreCase("edit")) {
@@ -144,6 +145,12 @@ public class Command implements CommandExecutor, TabCompleter {
                             player.sendMessage(ChatColor.RED + "Usage: /quake player <player> <join | quit>");
                             return true;
                         }
+                    } else if (args[0].equalsIgnoreCase("setlobby")) {
+                        manager.setLobby(player.getLocation());
+                        Quake.quake.getConfig().set("lobby", Util.toStringLocation(player.getLocation()));
+                        Quake.quake.saveConfig();
+                        player.sendMessage(ChatColor.GREEN + "The lobby has been set to your location !");
+                        return true;
                     } else {
                         player.sendMessage(ChatColor.RED + "Usage: /quake <create | edit | delete>");
                         return true;
@@ -153,7 +160,7 @@ public class Command implements CommandExecutor, TabCompleter {
                     return true;
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "You dont have the permission for this command.");
+                sender.sendMessage(ChatColor.RED + "You don't have the permission for this command.");
                 return true;
             }
         } else {

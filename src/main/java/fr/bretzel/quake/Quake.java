@@ -6,6 +6,7 @@ import com.evilco.mc.nbt.stream.NbtInputStream;
 import fr.bretzel.quake.arena.Game;
 import fr.bretzel.quake.arena.GameManager;
 import fr.bretzel.quake.arena.SignEvent;
+import fr.bretzel.quake.arena.SignReader;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Location;
@@ -67,6 +68,8 @@ public class Quake extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        saveConfig();
+
         for(PlayerInfo playerInfo : playerInfos) {
             playerInfo.save();
         }
@@ -147,15 +150,8 @@ public class Quake extends JavaPlugin implements Listener {
                     TagCompound signs = compound.getCompound("signs");
                     int u = signs.getInteger("size");
                     for (int i = 0; i < u; i++) {
-                        Location location = Util.toLocationString(signs.getString(String.valueOf(i)));
-                        if (location.getBlock().getType() == Material.WALL_SIGN || location.getBlock().getType() == Material.SIGN_POST) {
-                            Sign sign = (Sign) location.getBlock().getState();
-                            if(sign.getLine(2) == SignEvent.CLICK_TO_QUIT) {
-                                gameManager.getSignEvent().registerSign(game, "quit", sign);
-                            } else {
-                                gameManager.getSignEvent().registerSign(game, "join", sign);
-                            }
-                        }
+                        Sign sign = SignReader.read(signs.getCompound(String.valueOf(i)));
+                        game.addSign(sign);
                     }
                 }
 
