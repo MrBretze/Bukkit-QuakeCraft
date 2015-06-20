@@ -57,8 +57,8 @@ public class SignEvent implements Listener {
                             for(UUID uuid : game.getPlayerList()) {
                                 Player p = Bukkit.getPlayer(uuid);
                                 if(p.isOnline()) {
-                                    p.sendMessage(ChatColor.AQUA + player.getDisplayName() + ChatColor.YELLOW + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() +
-                                            ChatColor.YELLOW + "/" + ChatColor.AQUA + game.getMaxPlayer() + ChatColor.YELLOW + ")");
+                                    p.sendMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.YELLOW + " has joined (" + ChatColor.BLUE + game.getPlayerList().size() +
+                                            ChatColor.YELLOW + "/" + ChatColor.BLUE + game.getMaxPlayer() + ChatColor.YELLOW + ")");
                                 }
                             }
                             actualiseJoinSignForGame(game);
@@ -101,18 +101,18 @@ public class SignEvent implements Listener {
                     Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, true));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    event.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft");
-                    event.setLine(1, ChatColor.AQUA + lines[2]);
+                    event.setLine(0, CLICK_TO_JOIN);
+                    event.setLine(1, ChatColor.BLUE + lines[2]);
                     event.setLine(2, getInfoPlayer(game));
-                    event.setLine(3, CLICK_TO_JOIN);
+                    event.setLine(3, game.getState().getName());
                     game.addSign(sign);
                 } else if(lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null) {
                     Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, false));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    event.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft");
-                    event.setLine(1, ChatColor.AQUA + lines[2]);
-                    event.setLine(2, CLICK_TO_QUIT);
+                    event.setLine(0, CLICK_TO_QUIT);
+                    event.setLine(1, ChatColor.BLUE + lines[2]);
+                    event.setLine(2, "");
                     game.addSign(sign);
                 } else {
                     return;
@@ -124,10 +124,10 @@ public class SignEvent implements Listener {
     public void actualiseJoinSignForGame(Game game) {
         for(Sign sign : game.getSignList()) {
             if(sign.getMetadata("join").get(0).asBoolean()) {
-                sign.setLine(0, ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft");
-                sign.setLine(1, ChatColor.AQUA + game.getName());
+                sign.setLine(0, CLICK_TO_JOIN);
+                sign.setLine(1, ChatColor.BLUE + game.getName());
                 sign.setLine(2, getInfoPlayer(game));
-                sign.setLine(3, CLICK_TO_JOIN);
+                sign.setLine(3, game.getState().getName());
                 sign.update();
             }
         }
@@ -149,9 +149,9 @@ public class SignEvent implements Listener {
 
     public String getInfoPlayer(Game game) {
         StringBuilder builder = new StringBuilder();
-        builder.append(ChatColor.AQUA + "" + game.getPlayerList().size())
+        builder.append(ChatColor.BLUE + "" + game.getPlayerList().size())
                 .append(ChatColor.WHITE + "/")
-                .append(ChatColor.AQUA + "" + game.getMaxPlayer());
+                .append(ChatColor.BLUE + "" + game.getMaxPlayer());
         return builder.toString();
     }
 

@@ -151,10 +151,22 @@ public class GameManager implements Listener {
     public void PlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         Game game = getGameByPlayer(player);
-        if(game == null) {
+        if (game == null) {
             player.teleport(getLobby());
         }
     }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Game game = getGameByPlayer(player);
+        if (game != null) {
+            if(game.getState() == State.WAITING) {
+                game.getPlayerList().remove(player.getUniqueId());
+            }
+        }
+    }
+
      public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
         this.gameLinkedList = gameLinkedList;
     }
