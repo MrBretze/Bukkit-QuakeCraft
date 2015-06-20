@@ -3,6 +3,8 @@ package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.Quake;
 
+import fr.bretzel.quake.game.event.PlayerJoinGame;
+import fr.bretzel.quake.game.event.PlayerLeaveGame;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -54,17 +56,12 @@ public class SignEvent implements Listener {
                         if(isJoin) {
                             player.teleport(game.getSpawn());
                             game.addPlayer(player);
-                            for(UUID uuid : game.getPlayerList()) {
-                                Player p = Bukkit.getPlayer(uuid);
-                                if(p.isOnline()) {
-                                    p.sendMessage(ChatColor.BLUE + player.getDisplayName() + ChatColor.YELLOW + " has joined (" + ChatColor.BLUE + game.getPlayerList().size() +
-                                            ChatColor.YELLOW + "/" + ChatColor.BLUE + game.getMaxPlayer() + ChatColor.YELLOW + ")");
-                                }
-                            }
+                            Bukkit.getPluginManager().callEvent(new PlayerJoinGame(player, game));
                             actualiseJoinSignForGame(game);
                         } else if(!isJoin) {
                             player.teleport(getManager().getLobby());
                             game.getPlayerList().remove(player.getUniqueId());
+                            Bukkit.getPluginManager().callEvent(new PlayerLeaveGame(player, game));
                             actualiseJoinSignForGame(game);
                         } else {
                             break;
