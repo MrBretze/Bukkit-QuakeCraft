@@ -2,6 +2,7 @@ package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
+import fr.bretzel.quake.game.event.GameCreate;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Bukkit;
@@ -59,6 +60,7 @@ public class GameManager implements Listener {
         } else {
             Game game = new Game(loc1, loc2, name);
             gameLinkedList.add(game);
+            Bukkit.getPluginManager().callEvent(new GameCreate(game, creator));
             creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
         }
     }
