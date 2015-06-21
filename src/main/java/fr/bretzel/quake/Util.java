@@ -1,6 +1,7 @@
 package fr.bretzel.quake;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -137,6 +138,16 @@ public class Util {
                 .append(location.getPitch() + "");
 
         return builder.toString();
+    }
+
+    public static ChatColor getChatColorByInt(int i) {
+        if(i >= 10) {
+            return ChatColor.GREEN;
+        } else if(i > 5 && i < 10) {
+            return ChatColor.GOLD;
+        } else {
+            return ChatColor.RED;
+        }
     }
 
     public static Location toLocationString(String string) {

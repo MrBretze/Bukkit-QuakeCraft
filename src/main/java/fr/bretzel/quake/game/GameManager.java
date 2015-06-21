@@ -1,6 +1,7 @@
 package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.QuakeTask;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.event.GameCreate;
 import fr.bretzel.quake.game.event.PlayerJoinGame;
@@ -20,7 +21,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.UUID;
 
 /**
  * Created by MrBretzel on 12/06/2015.
@@ -29,6 +32,7 @@ import java.util.LinkedList;
 public class GameManager implements Listener {
 
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
+    private HashMap<Game, QuakeTask> gameQuakeTaskHashMap = new HashMap<>();
     private Quake quake;
     public SignEvent signEvent;
     private Location lobby;
@@ -94,6 +98,14 @@ public class GameManager implements Listener {
             return Bukkit.getWorlds().get(0).getSpawnLocation();
         }
         return lobby;
+    }
+
+    public HashMap<Game, QuakeTask> getQuakeTaskHashMap() {
+        return gameQuakeTaskHashMap;
+    }
+
+    public QuakeTask getTaskByGame(Game game) {
+        return getQuakeTaskHashMap().get(game);
     }
 
     public void setLobby(Location lobby) {
@@ -190,12 +202,34 @@ public class GameManager implements Listener {
             event.setCancelled(true);
         } else {
             int playerInGame = game.getPlayerList().size() + 1;
-            if(playerInGame == game.getMaxPlayer()) {
-                game.setState(State.STARTED);
-                this.signEvent.actualiseJoinSignForGame(game);
+            QuakeTask quakeTask;
+            if(playerInGame >= game.getMinPlayer()) {
+                quakeTask = new QuakeTask(Quake.quake, 20L, 20L, game) {
+
+                    int minSecQuake = 15;
+
+                    @Override
+                    public void run() {
+                        if(minSecQuake > 0) {
+                            for(UUID id : getGame().getPlayerList()) {
+                                Player p = Bukkit.getPlayer(id);
+                                if(p.isOnline()) {
+                                    p.sendMessage(ChatColor.AQUA + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
+                                }
+                            }
+                            minSecQuake--;
+                        }
+                        if(minSecQuake <= 0) {
+                            cancel();
+                        }
+                    }
+                };
+                getQuakeTaskHashMap().put(game, quakeTask);
             }
         }
     }
+
+
 
     private void rightClick(Player player, PlayerInteractEvent event) {
         PlayerInfo info = Quake.getPlayerInfo(player);

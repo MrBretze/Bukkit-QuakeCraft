@@ -38,6 +38,7 @@ public class Game {
     private int maxPlayer = 16;
     private int minPlayer = 2;
     private int maxKill = 25;
+    private int secLaunch = 15;
     private State state = State.WAITING;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
@@ -81,6 +82,14 @@ public class Game {
         } catch (IOException e) {
             e.fillInStackTrace();
         }
+    }
+
+    public int getSecLaunch() {
+        return secLaunch;
+    }
+
+    public void setSecLaunch(int secLaunch) {
+        this.secLaunch = secLaunch;
     }
 
     public Game(Quake quake) {
