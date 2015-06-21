@@ -8,6 +8,7 @@ import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,11 +17,11 @@ import java.util.List;
 
 public class Util {
 
-    public static List<Location> getLocationByDirection(Player player, int range, double distance) {
+    public static LinkedList<Location> getLocationByDirection(Player player, int range, double distance) {
         if(distance == 0.0D) {
             distance = 1.0D;
         }
-        List<Location> list = new ArrayList<>();
+        LinkedList<Location> list = new LinkedList<>();
         Location playerEyes = player.getEyeLocation();
         Vector direction = playerEyes.getDirection().normalize();
         Location f = playerEyes.clone();

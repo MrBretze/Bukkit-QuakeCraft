@@ -1,10 +1,13 @@
 package fr.bretzel.quake.game;
 
+import fr.bretzel.quake.Chrono;
+import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.QuakeTask;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.event.GameCreate;
 import fr.bretzel.quake.game.event.PlayerJoinGame;
+import fr.bretzel.quake.game.event.PlayerLeaveGame;
+import fr.bretzel.quake.inventory.BasicGun;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Bukkit;
@@ -22,6 +25,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -32,7 +36,8 @@ import java.util.UUID;
 public class GameManager implements Listener {
 
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
-    private HashMap<Game, QuakeTask> gameQuakeTaskHashMap = new HashMap<>();
+    private HashMap<Game, GameTask> gameQuakeTaskHashMap = new HashMap<>();
+    private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private Quake quake;
     public SignEvent signEvent;
     private Location lobby;
@@ -100,11 +105,11 @@ public class GameManager implements Listener {
         return lobby;
     }
 
-    public HashMap<Game, QuakeTask> getQuakeTaskHashMap() {
+    public HashMap<Game, GameTask> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;
     }
 
-    public QuakeTask getTaskByGame(Game game) {
+    public GameTask getTaskByGame(Game game) {
         return getQuakeTaskHashMap().get(game);
     }
 
@@ -128,6 +133,18 @@ public class GameManager implements Listener {
         return gameLinkedList;
     }
 
+    public LinkedHashMap<UUID, Chrono> getUuidToChrono() {
+        return uuidToChrono;
+    }
+
+    public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
+        this.gameLinkedList = gameLinkedList;
+    }
+
+    public Chrono getChronoByUUID(UUID id) {
+        return getUuidToChrono().get(id);
+    }
+
     public Game getGameByPlayer(Player player) {
         for(Game a : getGameLinkedList()) {
             if(a.getPlayerList().contains(player.getUniqueId())) {
@@ -141,14 +158,26 @@ public class GameManager implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Action action = event.getAction();
         Player player = event.getPlayer();
+        PlayerInfo pi = Quake.getPlayerInfo(player);
 
-        if(player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE) {
+        if(player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
             switch (action) {
                 case LEFT_CLICK_BLOCK:
                     leftClick(player, event);
                     break;
                 case RIGHT_CLICK_BLOCK:
                     rightClick(player, event);
+                    break;
+            }
+        }
+
+        if(player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
+            switch (action) {
+                case LEFT_CLICK_BLOCK:
+                    player.sendMessage(ChatColor.RED + "NOOOOOOOP");
+                    break;
+                case RIGHT_CLICK_BLOCK:
+                    pi.shoot();
                     break;
             }
         }
@@ -173,6 +202,24 @@ public class GameManager implements Listener {
         Game game = getGameByPlayer(player);
         if (game == null) {
             player.teleport(getLobby());
+        } else {
+            Chrono c = getChronoByUUID(player.getUniqueId());
+            if(c != null) {
+                c.stop();
+                int minute = c.getMinute();
+                int heure = c.getHeure();
+                if(heure > 0) {
+                    game.getPlayerList().remove(player.getUniqueId());
+                    player.teleport(getLobby());
+                }
+                if(minute > 2) {
+                    game.getPlayerList().remove(player.getUniqueId());
+                    player.teleport(getLobby());
+                }
+            } else {
+                game.getPlayerList().remove(player.getUniqueId());
+                player.teleport(getLobby());
+            }
         }
     }
 
@@ -183,13 +230,13 @@ public class GameManager implements Listener {
         if (game != null) {
             if(game.getState() == State.WAITING) {
                 game.getPlayerList().remove(player.getUniqueId());
+            } else {
+                Chrono chrono = new Chrono();
+                chrono.start();
+                getUuidToChrono().put(player.getUniqueId(), chrono);
             }
             signEvent.actualiseJoinSignForGame(game);
         }
-    }
-
-     public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
-        this.gameLinkedList = gameLinkedList;
     }
 
     @EventHandler
@@ -197,39 +244,65 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         Game game = event.getGame();
 
-        if (game.getState() == State.STARTED) {
-            player.sendMessage(ChatColor.RED + "The game is already started !");
-            event.setCancelled(true);
-        } else {
-            int playerInGame = game.getPlayerList().size() + 1;
-            QuakeTask quakeTask;
-            if(playerInGame >= game.getMinPlayer()) {
-                quakeTask = new QuakeTask(Quake.quake, 20L, 20L, game) {
-
-                    int minSecQuake = 15;
-
+        if (game.getState() == State.WAITING) {
+            if(game.getPlayerList().size() + 1 > game.getMaxPlayer()) {
+                player.sendMessage(ChatColor.RED + "The game is full !");
+                event.setCancelled(true);
+                return;
+            } else if (game.getPlayerList().size() + 1 == game.getMinPlayer()) {
+                GameTask gameTaks = new GameTask(Quake.quake, 20L, 20L, game) {
+                    int minSecQuake = getGame().getSecLaunch();
                     @Override
                     public void run() {
-                        if(minSecQuake > 0) {
-                            for(UUID id : getGame().getPlayerList()) {
+                        if (minSecQuake > 0) {
+                            for (UUID id : getGame().getPlayerList()) {
                                 Player p = Bukkit.getPlayer(id);
-                                if(p.isOnline()) {
+                                if (p.isOnline()) {
                                     p.sendMessage(ChatColor.AQUA + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
                                 }
                             }
                             minSecQuake--;
                         }
-                        if(minSecQuake <= 0) {
+                        if (minSecQuake <= 0) {
+                            getGame().setState(State.STARTED);
+                            Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
+                            for(UUID id : getGame().getPlayerList()) {
+                                Player p = Bukkit.getPlayer(id);
+                                if(p.isOnline()) {
+                                    PlayerInfo info = Quake.getPlayerInfo(p);
+                                    info.give(new BasicGun(info));
+                                }
+                            }
                             cancel();
                         }
                     }
                 };
-                getQuakeTaskHashMap().put(game, quakeTask);
+                getQuakeTaskHashMap().put(game, gameTaks);
+                return;
+            } else if(game.getPlayerList().size() + 1 <= game.getMaxPlayer()) {
+                return;
+            } else {
+                player.sendMessage(ChatColor.DARK_RED + "Une erreur ses produite !");
+                player.sendMessage(ChatColor.DARK_RED + "L'évènement PlayerJoinGame et annuler !");
+                player.sendMessage(ChatColor.DARK_RED + "Report: ");
+                player.sendMessage(ChatColor.RED + game.getName() + ", " + game.getMaxPlayer() + ", " + game.getPlayerList() + ", " + game.getState().name() + ", " + game.getRespawn() + ", " + game.getFirstLocation()
+                        + ", " + game.getSecondLocation());
+                event.setCancelled(true);
+                return;
             }
+        } else if(game.getState() == State.STARTED) {
+            player.sendMessage(ChatColor.RED + "The game has bin started !");
+            event.setCancelled(true);
+            return;
         }
     }
 
-
+    @EventHandler
+    public void onPlayerQuitGameEvent(PlayerLeaveGame event) {
+        Game game = event.getGame();
+        Player player = event.getPlayer();
+        game.getPlayerList().remove(player.getUniqueId());
+    }
 
     private void rightClick(Player player, PlayerInteractEvent event) {
         PlayerInfo info = Quake.getPlayerInfo(player);

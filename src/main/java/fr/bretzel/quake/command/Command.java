@@ -123,6 +123,7 @@ public class Command implements CommandExecutor, TabCompleter {
                                         }
                                     } else if(args[2].equalsIgnoreCase("quit")) {
                                         if(manager.getGameByPlayer(target) != null) {
+                                            manager.signEvent.actualiseJoinSignForGame(manager.getGameByPlayer(target));
                                             manager.getGameByPlayer(target).getPlayerList().remove(target.getUniqueId());
                                             player.sendMessage(ChatColor.GREEN + "Player has left the game !");
                                             return true;

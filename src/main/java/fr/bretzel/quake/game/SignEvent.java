@@ -118,6 +118,7 @@ public class SignEvent implements Listener {
                     event.setLine(0, CLICK_TO_QUIT);
                     event.setLine(1, ChatColor.BLUE + lines[2]);
                     event.setLine(2, "");
+                    event.setLine(3, "");
                     game.addSign(sign);
                     return;
                 } else {
@@ -130,7 +131,9 @@ public class SignEvent implements Listener {
     public void actualiseJoinSignForGame(Game game) {
         for(Sign sign : game.getSignList()) {
             if(sign.getMetadata("join").get(0).asBoolean()) {
+                String name = sign.getMetadata("name").get(0).asString();
                 sign.setLine(0, CLICK_TO_JOIN);
+                sign.setLine(1, ChatColor.BLUE + name);
                 sign.setLine(2, getInfoPlayer(game));
                 sign.setLine(3, game.getState().getName());
                 sign.update();

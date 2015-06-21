@@ -10,15 +10,21 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 
 import fr.bretzel.quake.ParticleEffect;
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.SchootTask;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 
+import fr.bretzel.quake.game.GameManager;
+import fr.bretzel.quake.game.event.PlayerShoot;
+import fr.bretzel.quake.inventory.BasicGun;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -27,19 +33,13 @@ import java.io.*;
 public class PlayerInfo {
 
     private Player player;
-
     private ParticleEffect effect = ParticleEffect.FIREWORKS_SPARK;
-
     private double reload = 1.5;
-
     private Game game;
-
     private TagCompound compound;
-
     private Location firstLocation = null;
-
     private Location secondLocation = null;
-
+    private boolean shoot = true;
     private File file;
 
     public PlayerInfo(Player player) {
@@ -147,9 +147,52 @@ public class PlayerInfo {
         this.secondLocation = secondLocation;
     }
 
+    public boolean isInGame() {
+        return Quake.gameManager.getGameByPlayer(getPlayer()) == null ? false : true;
+    }
+
+    public void give(BasicGun basicGun) {
+        getPlayer().getInventory().clear();
+        getPlayer().getInventory().setItem(0, basicGun.getStack());
+    }
+
+    public boolean isShoot() {
+        return shoot;
+    }
+
+    public void setShoot(boolean shoot) {
+        this.shoot = shoot;
+    }
+
+    public void shoot() {
+        PlayerShoot shoot = new PlayerShoot(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()));
+        Bukkit.getPluginManager().callEvent(shoot);
+        if(shoot.isCancelled()) {
+            return;
+        }
+
+        if(!isShoot()) {
+            setShoot(true);
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new SchootTask(this.clone()) {
+                @Override
+                public void run() {
+                    getInfo().setShoot(false);
+                }
+            }, (long) (getReloadTime() * 20));
+            LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
+            for(Location l : locs) {
+                getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);
+            }
+            List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 200);
+            for(Player player : pList) {
+                player.setHealth(0D);
+            }
+        }
+    }
+
     public PlayerInfo clone() {
         try {
-            return (PlayerInfo)super.clone();
+            return (PlayerInfo) super.clone();
         } catch (CloneNotSupportedException var2) {
             throw new Error(var2);
         }
