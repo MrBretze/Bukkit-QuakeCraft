@@ -5,6 +5,7 @@ import fr.bretzel.quake.Quake;
 
 import fr.bretzel.quake.game.event.PlayerJoinGame;
 import fr.bretzel.quake.game.event.PlayerLeaveGame;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,8 +20,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-
-import java.util.UUID;
 
 /**
  * Created by MrBretzel on 19/06/2015.
@@ -49,20 +48,26 @@ public class SignEvent implements Listener {
                 case RIGHT_CLICK_BLOCK:
                     Block block = event.getClickedBlock();
 
-                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game")) {
+                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
                         Sign sign = getSignByLocation(block.getLocation());
                         boolean isJoin = sign.getMetadata("join").get(0).asBoolean();
                         Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
                         if(isJoin) {
+                            PlayerJoinGame e = new PlayerJoinGame(player, game);
+                            Bukkit.getPluginManager().callEvent(e);
+                            if(e.isCancelled()) {
+                                return;
+                            }
                             player.teleport(game.getSpawn());
                             game.addPlayer(player);
-                            Bukkit.getPluginManager().callEvent(new PlayerJoinGame(player, game));
                             actualiseJoinSignForGame(game);
+                            break;
                         } else if(!isJoin) {
+                            Bukkit.getPluginManager().callEvent(new PlayerLeaveGame(player, game));
                             player.teleport(getManager().getLobby());
                             game.getPlayerList().remove(player.getUniqueId());
-                            Bukkit.getPluginManager().callEvent(new PlayerLeaveGame(player, game));
                             actualiseJoinSignForGame(game);
+                            break;
                         } else {
                             break;
                         }
@@ -94,23 +99,27 @@ public class SignEvent implements Listener {
         if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
             if(lines[0].equals("[quake]")) {
                 Sign sign = (Sign) block.getState();
-                if(lines[1].equals("join") && getManager().getGameByName(lines[2]) != null) {
-                    Game game = getManager().getGameByName(lines[2]);
+                if(lines[1].equals("join") && getManager().getGameByName(lines[3]) != null) {
+                    Game game = getManager().getGameByName(lines[3]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, true));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
+                    sign.setMetadata("name", new FixedMetadataValue(Quake.quake, lines[2]));
                     event.setLine(0, CLICK_TO_JOIN);
                     event.setLine(1, ChatColor.BLUE + lines[2]);
                     event.setLine(2, getInfoPlayer(game));
                     event.setLine(3, game.getState().getName());
                     game.addSign(sign);
-                } else if(lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null) {
-                    Game game = getManager().getGameByName(lines[2]);
+                    return;
+                } else if(lines[1].equals("quit") && getManager().getGameByName(lines[3]) != null) {
+                    Game game = getManager().getGameByName(lines[3]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, false));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
+                    sign.setMetadata("name", new FixedMetadataValue(Quake.quake, lines[2]));
                     event.setLine(0, CLICK_TO_QUIT);
                     event.setLine(1, ChatColor.BLUE + lines[2]);
                     event.setLine(2, "");
                     game.addSign(sign);
+                    return;
                 } else {
                     return;
                 }
@@ -122,7 +131,6 @@ public class SignEvent implements Listener {
         for(Sign sign : game.getSignList()) {
             if(sign.getMetadata("join").get(0).asBoolean()) {
                 sign.setLine(0, CLICK_TO_JOIN);
-                sign.setLine(1, ChatColor.BLUE + game.getName());
                 sign.setLine(2, getInfoPlayer(game));
                 sign.setLine(3, game.getState().getName());
                 sign.update();

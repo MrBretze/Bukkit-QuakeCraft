@@ -56,10 +56,11 @@ public class Command implements CommandExecutor, TabCompleter {
                                     if(args[2].equalsIgnoreCase("setspawn")) {
                                         game.setSpawn(player.getLocation());
                                         player.sendMessage(ChatColor.GREEN + "The new spawn for " + game.getName() + " has been set tou your position !");
-
+                                        return true;
                                     } else if (args[2].equalsIgnoreCase("addrespawn")) {
                                         game.addRespawn(player.getLocation().add(0.0, 1, 0.0).clone());
                                         player.sendMessage(ChatColor.GREEN + "The respawn point has been set tout your position");
+                                        return true;
                                     } else if(args[2].equalsIgnoreCase("view")) {
                                         if(game.getRespawn().isEmpty()) {
                                             player.sendMessage(ChatColor.GREEN + "The respawn has been not set for the game !");
@@ -92,7 +93,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         }
                     } else if (args[0].equalsIgnoreCase("delete")) {
                         /*
-                         TODO:
+                         *TODO:
                         */
                         return true;
                     } else if(args[0].equalsIgnoreCase("player")) {

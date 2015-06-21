@@ -3,6 +3,7 @@ package fr.bretzel.quake.game;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.event.GameCreate;
+import fr.bretzel.quake.game.event.PlayerJoinGame;
 import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.Vector;
 
 import java.util.LinkedList;
@@ -60,7 +62,11 @@ public class GameManager implements Listener {
         } else {
             Game game = new Game(loc1, loc2, name);
             gameLinkedList.add(game);
-            Bukkit.getPluginManager().callEvent(new GameCreate(game, creator));
+            GameCreate event = new GameCreate(game, creator);
+            Bukkit.getPluginManager().callEvent(event);
+            if(event.isCancelled()) {
+                return;
+            }
             creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
         }
     }
@@ -159,18 +165,36 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Game game = getGameByPlayer(player);
         if (game != null) {
             if(game.getState() == State.WAITING) {
                 game.getPlayerList().remove(player.getUniqueId());
             }
+            signEvent.actualiseJoinSignForGame(game);
         }
     }
 
      public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
         this.gameLinkedList = gameLinkedList;
+    }
+
+    @EventHandler
+    public void onPlayerJoinGame(PlayerJoinGame event) {
+        Player player = event.getPlayer();
+        Game game = event.getGame();
+
+        if (game.getState() == State.STARTED) {
+            player.sendMessage(ChatColor.RED + "The game is already started !");
+            event.setCancelled(true);
+        } else {
+            int playerInGame = game.getPlayerList().size() + 1;
+            if(playerInGame == game.getMaxPlayer()) {
+                game.setState(State.STARTED);
+                this.signEvent.actualiseJoinSignForGame(game);
+            }
+        }
     }
 
     private void rightClick(Player player, PlayerInteractEvent event) {
