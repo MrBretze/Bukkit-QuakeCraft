@@ -6,7 +6,7 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.player.PlayerInfo;
+import fr.bretzel.quake.PlayerInfo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

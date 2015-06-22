@@ -1,4 +1,4 @@
-package fr.bretzel.quake.player;
+package fr.bretzel.quake;
 
 import com.evilco.mc.nbt.TagCompound;
 import com.evilco.mc.nbt.TagDouble;
@@ -8,14 +8,10 @@ import com.evilco.mc.nbt.error.UnexpectedTagTypeException;
 import com.evilco.mc.nbt.stream.NbtInputStream;
 import com.evilco.mc.nbt.stream.NbtOutputStream;
 
-import fr.bretzel.quake.ParticleEffect;
-import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.SchootTask;
-import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 
-import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.game.event.PlayerShoot;
+import fr.bretzel.quake.game.event.PlayerShootEvent;
+import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.BasicGun;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -165,7 +161,7 @@ public class PlayerInfo {
     }
 
     public void shoot() {
-        PlayerShoot shoot = new PlayerShoot(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()));
+        PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()));
         Bukkit.getPluginManager().callEvent(shoot);
         if(shoot.isCancelled()) {
             return;
@@ -173,12 +169,8 @@ public class PlayerInfo {
 
         if(!isShoot()) {
             setShoot(true);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new SchootTask(this.clone()) {
-                @Override
-                public void run() {
-                    getInfo().setShoot(false);
-                }
-            }, (long) (getReloadTime() * 20));
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this.clone()), (long) (getReloadTime() * 20));
+
             LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
             for(Location l : locs) {
                 getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);

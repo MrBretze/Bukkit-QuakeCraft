@@ -9,12 +9,12 @@ import org.bukkit.event.HandlerList;
  * Created by MrBretzel on 20/06/2015.
  */
 
-public class PlayerLeaveGame extends Event {
+public class PlayerLeaveGameEvent extends Event {
 
     private Player player;
     private Game game;
 
-    public PlayerLeaveGame(Player player, Game game) {
+    public PlayerLeaveGameEvent(Player player, Game game) {
         setGame(game);
         setPlayer(player);
     }

@@ -4,11 +4,11 @@ import fr.bretzel.quake.Chrono;
 import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-import fr.bretzel.quake.game.event.GameCreate;
-import fr.bretzel.quake.game.event.PlayerJoinGame;
-import fr.bretzel.quake.game.event.PlayerLeaveGame;
-import fr.bretzel.quake.inventory.BasicGun;
-import fr.bretzel.quake.player.PlayerInfo;
+import fr.bretzel.quake.game.event.GameCreateEvent;
+import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
+import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
+import fr.bretzel.quake.game.task.GameStart;
+import fr.bretzel.quake.PlayerInfo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,10 +36,12 @@ import java.util.UUID;
 public class GameManager implements Listener {
 
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
-    private HashMap<Game, GameTask> gameQuakeTaskHashMap = new HashMap<>();
+    private HashMap<Game, GameStart> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
+    private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private Quake quake;
     public SignEvent signEvent;
+    public int maxMinute = 5;
     private Location lobby;
 
     public GameManager(Quake quake) {
@@ -68,16 +70,15 @@ public class GameManager implements Listener {
         if(containsGame(name)) {
             creator.sendMessage(ChatColor.RED + "The game is already exist !");
             return;
-        } else {
-            Game game = new Game(loc1, loc2, name);
-            gameLinkedList.add(game);
-            GameCreate event = new GameCreate(game, creator);
-            Bukkit.getPluginManager().callEvent(event);
-            if(event.isCancelled()) {
-                return;
-            }
-            creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
         }
+        Game game = new Game(loc1, loc2, name);
+        gameLinkedList.add(game);
+        GameCreateEvent event = new GameCreateEvent(game, creator);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) {
+            return;
+        }
+        creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
     }
 
     public Game getGameByName(String name) {
@@ -105,8 +106,16 @@ public class GameManager implements Listener {
         return lobby;
     }
 
-    public HashMap<Game, GameTask> getQuakeTaskHashMap() {
+    public HashMap<Game, GameStart> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;
+    }
+
+    public LinkedHashMap<Game, Chrono> getGameChrono() {
+        return gameChrono;
+    }
+
+    public Chrono getChronoGame(Game game) {
+        return getGameChrono().get(game);
     }
 
     public GameTask getTaskByGame(Game game) {
@@ -240,7 +249,7 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoinGame(PlayerJoinGame event) {
+    public void onPlayerJoinGame(PlayerJoinGameEvent event) {
         Player player = event.getPlayer();
         Game game = event.getGame();
 
@@ -250,40 +259,21 @@ public class GameManager implements Listener {
                 event.setCancelled(true);
                 return;
             } else if (game.getPlayerList().size() + 1 == game.getMinPlayer()) {
-                GameTask gameTaks = new GameTask(Quake.quake, 20L, 20L, game) {
-                    int minSecQuake = getGame().getSecLaunch();
-                    @Override
-                    public void run() {
-                        if (minSecQuake > 0) {
-                            for (UUID id : getGame().getPlayerList()) {
-                                Player p = Bukkit.getPlayer(id);
-                                if (p.isOnline()) {
-                                    p.sendMessage(ChatColor.AQUA + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
-                                }
-                            }
-                            minSecQuake--;
-                        }
-                        if (minSecQuake <= 0) {
-                            getGame().setState(State.STARTED);
-                            Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
-                            for(UUID id : getGame().getPlayerList()) {
-                                Player p = Bukkit.getPlayer(id);
-                                if(p.isOnline()) {
-                                    PlayerInfo info = Quake.getPlayerInfo(p);
-                                    info.give(new BasicGun(info));
-                                }
-                            }
-                            cancel();
-                        }
-                    }
-                };
-                getQuakeTaskHashMap().put(game, gameTaks);
+                GameStart gameStart = new GameStart(Quake.quake, 20L, 20L, game);
+                getQuakeTaskHashMap().put(game, gameStart);
                 return;
             } else if(game.getPlayerList().size() + 1 <= game.getMaxPlayer()) {
+                for(UUID id : game.getPlayerList()) {
+                    Player p = Bukkit.getPlayer(id);
+                    if(p.isOnline()) {
+                        player.sendMessage(p.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                        + ChatColor.BLUE + ")");
+                    }
+                }
                 return;
             } else {
                 player.sendMessage(ChatColor.DARK_RED + "Une erreur ses produite !");
-                player.sendMessage(ChatColor.DARK_RED + "L'évènement PlayerJoinGame et annuler !");
+                player.sendMessage(ChatColor.DARK_RED + "L'évènement PlayerJoinGameEvent et annuler !");
                 player.sendMessage(ChatColor.DARK_RED + "Report: ");
                 player.sendMessage(ChatColor.RED + game.getName() + ", " + game.getMaxPlayer() + ", " + game.getPlayerList() + ", " + game.getState().name() + ", " + game.getRespawn() + ", " + game.getFirstLocation()
                         + ", " + game.getSecondLocation());
@@ -298,10 +288,21 @@ public class GameManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerQuitGameEvent(PlayerLeaveGame event) {
+    public void onPlayerQuitGameEvent(PlayerLeaveGameEvent event) {
         Game game = event.getGame();
         Player player = event.getPlayer();
-        game.getPlayerList().remove(player.getUniqueId());
+        if (game.getState() == State.STARTED) {
+            if(game.getPlayerList().size() - 1 == 0) {
+                game.reset();
+            }
+        }
+        for(UUID id : game.getPlayerList()) {
+            Player p = Bukkit.getPlayer(id);
+            if(p.isOnline()) {
+                p.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                        + ChatColor.BLUE + ")");
+            }
+        }
     }
 
     private void rightClick(Player player, PlayerInteractEvent event) {

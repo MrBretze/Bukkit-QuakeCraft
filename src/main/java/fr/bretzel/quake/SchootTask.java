@@ -1,7 +1,5 @@
 package fr.bretzel.quake;
 
-import fr.bretzel.quake.player.PlayerInfo;
-
 /**
  * Created by MrBretzel on 21/06/2015.
  */

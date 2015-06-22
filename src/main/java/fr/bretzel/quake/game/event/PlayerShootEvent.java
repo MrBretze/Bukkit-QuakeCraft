@@ -12,14 +12,14 @@ import org.bukkit.event.HandlerList;
  * Created by MrBretzel on 20/06/2015.
  */
 
-public class PlayerShoot extends Event implements Cancellable {
+public class PlayerShootEvent extends Event implements Cancellable {
 
     private Player player;
     private Game game;
     private int kill = 0;
     private boolean cancelled;
 
-    public PlayerShoot(Player player, Game game) {
+    public PlayerShootEvent(Player player, Game game) {
         setGame(game);
         setPlayer(player);
         setKill(Util.getPlayerListInDirection(Util.getLocationByDirection(player, 200, 0.5), player, 0.5).size());

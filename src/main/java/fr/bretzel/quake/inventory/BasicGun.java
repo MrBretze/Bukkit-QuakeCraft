@@ -1,7 +1,7 @@
 package fr.bretzel.quake.inventory;
 
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.player.PlayerInfo;
+import fr.bretzel.quake.PlayerInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,20 +13,19 @@ import org.bukkit.inventory.meta.ItemMeta;
  * Created by MrBretzel on 21/06/2015.
  */
 
-public class BasicGun {
+public class BasicGun extends Gun {
 
     private Material material;
     private ItemStack stack;
     private String name;
     private double reload;
     private Player player;
-    private PlayerInfo playerInfo;
 
     public BasicGun(PlayerInfo info) {
+        super(info);
         setPlayer(info.getPlayer());
         setMaterial(Material.WOOD_HOE);
         setName(ChatColor.GREEN + "Basic Railgun");
-        setPlayerInfo(info);
         setReload(info.getReloadTime());
 
         ItemStack stack = new ItemStack(getMaterial());
@@ -50,14 +49,6 @@ public class BasicGun {
 
     public void setPlayer(Player player) {
         this.player = player;
-    }
-
-    public PlayerInfo getPlayerInfo() {
-        return playerInfo;
-    }
-
-    public void setPlayerInfo(PlayerInfo playerInfo) {
-        this.playerInfo = playerInfo;
     }
 
     public ItemStack getStack() {

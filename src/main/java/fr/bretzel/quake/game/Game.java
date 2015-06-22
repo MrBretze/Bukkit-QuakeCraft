@@ -9,8 +9,11 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -51,32 +54,20 @@ public class Game {
         }
 
         File mk = new File(Quake.quake.getDataFolder(), File.separator + "game" + File.separator);
-
         mk.mkdir();
-
         setFile(new File(mk, getName() + ".dat"));
-
         try {
             if (getFile().exists()) {
                 NbtInputStream stream = new NbtInputStream(new FileInputStream(getFile()));
-
                 setCompound(((TagCompound)stream.readTag()));
-
                 stream.close();
             } else {
-
                 getFile().createNewFile();
-
                 calculeSpawnBase();
-
                 setCompound(new TagCompound(getName()));
-
                 getCompound().setTag(new TagString("name", getName()));
-
                 NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(getFile()));
-
                 stream.write(getCompound());
-
                 stream.close();
             }
         } catch (IOException e) {
@@ -229,8 +220,8 @@ public class Game {
         this.view = view;
         if(view == true) {
             for(Location location : getRespawn()) {
-                location.getWorld().getBlockAt(location).setType(Material.STAINED_CLAY);
-                location.getWorld().getBlockAt(location.add(0.0, 1.0, 0.0)).setType(Material.STAINED_CLAY);
+                location.getWorld().getBlockAt(location).setType(Material.BEACON);
+
             }
         } else {
             for(Location location : getRespawn()) {
@@ -278,6 +269,19 @@ public class Game {
         int z = (z1 + z2) / 2;
 
         setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
+    }
+
+    public void reset() {
+        for(UUID uuid : getPlayerList()) {
+            Player p = Bukkit.getPlayer(uuid);
+            if(p.isOnline()) {
+                p.sendMessage(ChatColor.RED + "This game has bin annulled !");
+                p.teleport(Quake.gameManager.getLobby());
+            }
+        }
+        getPlayerList().clear();
+        setState(State.WAITING);
+        Quake.gameManager.signEvent.actualiseJoinSignForGame(this.clone());
     }
 
     public void save() {
@@ -366,17 +370,11 @@ public class Game {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-
         builder.append("{");
-
         builder.append(getFirstLocation().toString() + ", ");
-
         builder.append(getSecondLocation().toString() + ", ");
-
         builder.append("ArenaName: " + getName());
-
         builder.append("}");
-
         return builder.toString();
     }
 }

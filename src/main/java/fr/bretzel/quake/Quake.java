@@ -6,9 +6,9 @@ import com.evilco.mc.nbt.stream.NbtInputStream;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.game.SignReader;
-import fr.bretzel.quake.player.PlayerInfo;
 
 import org.bukkit.Location;
+import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -81,8 +81,8 @@ public class Quake extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
             Player player = (Player) sender;
-            Game game = gameManager.getGameByPlayer(player);
-            player.teleport(game.getRespawn().get(new Random().nextInt(game.getRespawn().size())));
+            Location location = player.getLocation().subtract(0.0, 1.0, 0.0);
+            BeaconUtil.setActive((Beacon) location.getBlock().getState(), true);
             return true;
         }
         return true;
