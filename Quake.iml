@@ -26,5 +26,6 @@
     <orderEntry type="library" exported="" name="Gradle: junit:junit:4.10" level="project" />
     <orderEntry type="library" exported="" name="Gradle: javax.persistence:persistence-api:1.0" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
+    <orderEntry type="library" name="craftbukkit-1.8.7-R0.1-SNAPSHOT-latest" level="project" />
   </component>
 </module>

@@ -8,7 +8,6 @@ import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.game.SignReader;
 
 import org.bukkit.Location;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -17,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,9 +80,15 @@ public class Quake extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
-            Player player = (Player) sender;
-            Location location = player.getLocation().subtract(0.0, 1.0, 0.0);
-            BeaconUtil.setActive((Beacon) location.getBlock().getState(), true);
+            final Player player = (Player) sender;
+            player.setHealth(0);
+            BukkitRunnable runnable = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Util.respawn(player);
+                }
+            };
+            runnable.runTaskLater(Quake.quake, 20L);
             return true;
         }
         return true;

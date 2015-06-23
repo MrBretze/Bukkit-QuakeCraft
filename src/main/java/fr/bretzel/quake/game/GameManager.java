@@ -7,9 +7,11 @@ import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
+import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStart;
 import fr.bretzel.quake.PlayerInfo;
 
+import fr.bretzel.quake.game.task.MainTask;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,10 +20,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
@@ -43,6 +48,7 @@ public class GameManager implements Listener {
     public SignEvent signEvent;
     public int maxMinute = 5;
     private Location lobby;
+    private MainTask mainTask;
 
     public GameManager(Quake quake) {
         this.quake = quake;
@@ -56,6 +62,10 @@ public class GameManager implements Listener {
         } else {
             lobby = Util.toLocationString(quake.getConfig().getString("lobby"));
         }
+
+        this.mainTask = new MainTask(this);
+
+        mainTask.runTaskTimerAsynchronously(Quake.quake, 5L, 5L);
     }
 
     public void registerGame(Player creator, String name, Location loc1, Location loc2) {
@@ -217,14 +227,12 @@ public class GameManager implements Listener {
                 c.stop();
                 int minute = c.getMinute();
                 int heure = c.getHeure();
-                if(heure > 0) {
+                if(heure > 0 || minute > 2) {
                     game.getPlayerList().remove(player.getUniqueId());
                     player.teleport(getLobby());
                 }
-                if(minute > 2) {
-                    game.getPlayerList().remove(player.getUniqueId());
-                    player.teleport(getLobby());
-                }
+                getUuidToChrono().remove(player.getUniqueId(), c);
+                getUuidToChrono().remove(player.getUniqueId());
             } else {
                 game.getPlayerList().remove(player.getUniqueId());
                 player.teleport(getLobby());
@@ -254,7 +262,7 @@ public class GameManager implements Listener {
         Game game = event.getGame();
 
         if (game.getState() == State.WAITING) {
-            if(game.getPlayerList().size() + 1 > game.getMaxPlayer()) {
+            if (game.getPlayerList().size() + 1 > game.getMaxPlayer()) {
                 player.sendMessage(ChatColor.RED + "The game is full !");
                 event.setCancelled(true);
                 return;
@@ -262,14 +270,9 @@ public class GameManager implements Listener {
                 GameStart gameStart = new GameStart(Quake.quake, 20L, 20L, game);
                 getQuakeTaskHashMap().put(game, gameStart);
                 return;
-            } else if(game.getPlayerList().size() + 1 <= game.getMaxPlayer()) {
-                for(UUID id : game.getPlayerList()) {
-                    Player p = Bukkit.getPlayer(id);
-                    if(p.isOnline()) {
-                        player.sendMessage(p.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+            } else if (game.getPlayerList().size() + 1 <= game.getMaxPlayer()) {
+                game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
-                    }
-                }
                 return;
             } else {
                 player.sendMessage(ChatColor.DARK_RED + "Une erreur ses produite !");
@@ -296,12 +299,55 @@ public class GameManager implements Listener {
                 game.reset();
             }
         }
-        for(UUID id : game.getPlayerList()) {
-            Player p = Bukkit.getPlayer(id);
-            if(p.isOnline()) {
-                p.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
-                        + ChatColor.BLUE + ")");
+
+        game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                + ChatColor.BLUE + ")");
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        final Player player = event.getEntity();
+        final Game game = getGameByPlayer(player);
+        if(game != null) {
+            if(game.getState() == State.STARTED) {
+                if(player.hasMetadata("killer")) {
+                    String k = player.getMetadata("killer").get(0).asString();
+                    game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
+                }
             }
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Util.respawn(player);
+                }
+            }.runTaskLater(Quake.quake, 20L);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerHasDamage(EntityDamageEvent event) {
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if(getGameByPlayer(player) != null) {
+                if(event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+                    event.setCancelled(true);
+                }
+            } else {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerShoot(PlayerShootEvent event) {
+        Game game = event.getGame();
+
+        if(event.getKill() == 2) {
+            game.broadcastMessage(ChatColor.RED + "Double kill !");
+        } else if(event.getKill() == 3) {
+            game.broadcastMessage(ChatColor.RED + "Triple kill !");
+        } else if(event.getKill() > 3) {
+            game.broadcastMessage(ChatColor.RED + "Multiple kill !");
         }
     }
 

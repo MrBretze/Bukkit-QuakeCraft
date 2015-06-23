@@ -17,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -169,14 +170,18 @@ public class PlayerInfo {
 
         if(!isShoot()) {
             setShoot(true);
+
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this.clone()), (long) (getReloadTime() * 20));
 
             LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
             for(Location l : locs) {
                 getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);
             }
+
             List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 200);
+
             for(Player player : pList) {
+                player.setMetadata("killer", new FixedMetadataValue(Quake.quake, player.getDisplayName()));
                 player.setHealth(0D);
             }
         }

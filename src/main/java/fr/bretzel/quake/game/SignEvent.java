@@ -158,7 +158,7 @@ public class SignEvent implements Listener {
     public String getInfoPlayer(Game game) {
         StringBuilder builder = new StringBuilder();
         builder.append(ChatColor.BLUE + "" + game.getPlayerList().size())
-                .append(ChatColor.WHITE + "/")
+                .append(ChatColor.DARK_GRAY + "/")
                 .append(ChatColor.BLUE + "" + game.getMaxPlayer());
         return builder.toString();
     }

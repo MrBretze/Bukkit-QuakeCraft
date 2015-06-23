@@ -17,6 +17,7 @@ import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.*;
 import java.util.*;
@@ -37,7 +38,8 @@ public class Game {
     private File file;
     private List<UUID> playerList = new ArrayList<>();
     private LinkedList<Sign> signList = new LinkedList<>();
-    private boolean view = false;
+    private Random random = new Random();
+    private boolean respawnview = false;
     private int maxPlayer = 16;
     private int minPlayer = 2;
     private int maxKill = 25;
@@ -192,6 +194,17 @@ public class Game {
         this.blocks = blocks;
     }
 
+    public Block getBlockByLocation(Location location) {
+        Block b = null;
+        for(Block block : getBlocks()) {
+            if(block.getWorld() == location.getWorld() && block.getX() == location.getBlockX() && block.getY() == location.getBlockY() && block.getZ() == location.getBlockZ()) {
+                b = block;
+                break;
+            }
+        }
+        return b;
+    }
+
     public void addBlock(Block block) {
         getBlocks().add(block);
     }
@@ -216,31 +229,60 @@ public class Game {
         this.signList.remove(sign);
     }
 
+    public void broadcastMessage(String msg) {
+        for (UUID id : getPlayerList()) {
+            Player p = Bukkit.getPlayer(id);
+            if(p.isOnline()) {
+                p.sendMessage(msg);
+            }
+        }
+    }
+
     public void view(boolean view) {
-        this.view = view;
         if(view == true) {
+            this.respawnview = true;
             for(Location location : getRespawn()) {
                 location.getWorld().getBlockAt(location).setType(Material.BEACON);
-
+                for (int xPoint = location.getBlockX() - 1; xPoint <= location.getBlockX() + 1 ; xPoint++) {
+                    for (int zPoint = location.getBlockZ() - 1 ; zPoint <= location.getBlockZ() + 1; zPoint++) {
+                        Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
+                        for(UUID id : getPlayerList()) {
+                            Player player = Bukkit.getPlayer(id);
+                            if(player.isOnline()) {
+                                player.sendBlockChange(l, Material.IRON_BLOCK, (byte) 0);
+                            }
+                        }
+                    }
+                }
             }
         } else {
+            this.respawnview = false;
             for(Location location : getRespawn()) {
-                location.getWorld().getBlockAt(location).setType(Material.AIR);
-                location.getWorld().getBlockAt(location.add(0.0, 1.0, 0.0)).setType(Material.AIR);
+                for (int xPoint = location.getBlockX() - 1; xPoint <= location.getBlockX() + 1 ; xPoint++) {
+                    for (int zPoint = location.getBlockZ() - 1 ; zPoint <= location.getBlockZ() + 1; zPoint++) {
+                        Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
+                        for(UUID id : getPlayerList()) {
+                            Player player = Bukkit.getPlayer(id);
+                            if(player.isOnline()) {
+                                player.sendBlockChange(l, getBlockByLocation(l).getType(), getBlockByLocation(l).getData());
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     public void view() {
-        if(this.view = false) {
-            view(true);
-        } else {
+        if(this.respawnview) {
             view(false);
+        } else {
+            view(true);
         }
     }
 
     public boolean isView() {
-        return view;
+        return respawnview;
     }
 
     public void setCompound(TagCompound compound) {
@@ -282,6 +324,19 @@ public class Game {
         getPlayerList().clear();
         setState(State.WAITING);
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this.clone());
+    }
+
+    public void respawn(Player p) {
+        Location location = getRespawn().get(random.nextInt(getRespawn().size()));
+        if(p.getWorld().getNearbyEntities(location, 10, 5, 10).size() <= 0) {
+            p.teleport(location);
+            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, 5));
+        } else if(p.hasMetadata("respawn") && p.getMetadata("respawn").get(0).asInt() > 0) {
+            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, p.getMetadata("respawn").get(0).asInt() - 1));
+            respawn(p);
+        } else {
+            p.teleport(getRespawn().get(random.nextInt(getRespawn().size())));
+        }
     }
 
     public void save() {

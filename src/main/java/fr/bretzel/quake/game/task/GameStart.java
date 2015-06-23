@@ -8,6 +8,7 @@ import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameStartEvent;
 import fr.bretzel.quake.inventory.BasicGun;
 import fr.bretzel.quake.PlayerInfo;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,12 +31,7 @@ public class GameStart extends GameTask {
     @Override
     public void run() {
         if (minSecQuake > 0) {
-            for (UUID id : getGame().getPlayerList()) {
-                Player p = Bukkit.getPlayer(id);
-                if (p.isOnline()) {
-                    p.sendMessage(ChatColor.AQUA + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
-                }
-            }
+            getGame().broadcastMessage(ChatColor.BLUE + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
             minSecQuake--;
         }
         if (minSecQuake <= 0) {
@@ -50,6 +46,7 @@ public class GameStart extends GameTask {
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
                 if(p.isOnline()) {
+                    getGame().respawn(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
                 }

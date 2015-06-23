@@ -7,6 +7,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -154,5 +157,32 @@ public class Util {
     public static Location toLocationString(String string) {
         String[] strings = string.split(";");
         return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]), Float.valueOf(strings[4]), Float.valueOf(strings[5]));
+    }
+
+    public static void respawn(Player player) {
+        try {
+            Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            Object con = nmsPlayer.getClass().getDeclaredField("playerConnection").get(nmsPlayer);
+
+            Class<?> EntityPlayer = Class.forName(nmsPlayer.getClass().getPackage().getName() + ".EntityPlayer");
+
+            Field minecraftServer = con.getClass().getDeclaredField("minecraftServer");
+            minecraftServer.setAccessible(true);
+            Object mcserver = minecraftServer.get(con);
+
+            Object playerlist = mcserver.getClass().getDeclaredMethod("getPlayerList").invoke(mcserver);
+            Method moveToWorld = playerlist.getClass().getMethod("moveToWorld", EntityPlayer, int.class, boolean.class);
+            moveToWorld.invoke(playerlist, nmsPlayer, 0, false);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 }

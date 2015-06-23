@@ -49,9 +49,7 @@ public class SignReader {
             compound.setTag(new TagString("line4", sign.getLine(3)));
 
             compound.setTag(new TagString("join", String.valueOf(sign.getMetadata("join").get(0).asBoolean())));
-
             compound.setTag(new TagString("game", sign.getMetadata("game").get(0).asString()));
-
             compound.setTag(new TagString("name", sign.getMetadata("name").get(0).asString()));
 
             compound.setTag(new TagString("location", Util.toStringLocation(sign.getLocation())));
