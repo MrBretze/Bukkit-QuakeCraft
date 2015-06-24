@@ -235,7 +235,6 @@ public class GameManager implements Listener {
                     game.getPlayerList().remove(player.getUniqueId());
                     player.teleport(getLobby());
                 }
-                getUuidToChrono().remove(player.getUniqueId(), c);
                 getUuidToChrono().remove(player.getUniqueId());
             } else {
                 game.getPlayerList().remove(player.getUniqueId());

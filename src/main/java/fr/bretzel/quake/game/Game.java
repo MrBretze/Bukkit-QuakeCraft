@@ -232,7 +232,7 @@ public class Game {
     public void broadcastMessage(String msg) {
         for (UUID id : getPlayerList()) {
             Player p = Bukkit.getPlayer(id);
-            if(p.isOnline()) {
+            if(p != null && p.isOnline()) {
                 p.sendMessage(msg);
             }
         }
@@ -248,7 +248,7 @@ public class Game {
                         Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
                         for(UUID id : getPlayerList()) {
                             Player player = Bukkit.getPlayer(id);
-                            if(player.isOnline()) {
+                            if(player != null && player.isOnline()) {
                                 player.sendBlockChange(l, Material.IRON_BLOCK, (byte) 0);
                             }
                         }
@@ -263,7 +263,7 @@ public class Game {
                         Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
                         for(UUID id : getPlayerList()) {
                             Player player = Bukkit.getPlayer(id);
-                            if(player.isOnline()) {
+                            if(player != null && player.isOnline()) {
                                 player.sendBlockChange(l, getBlockByLocation(l).getType(), getBlockByLocation(l).getData());
                             }
                         }
