@@ -1,13 +1,10 @@
 package fr.bretzel.quake.game.task;
 
-import fr.bretzel.quake.GameTask;
-import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.Util;
+import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameStartEvent;
 import fr.bretzel.quake.inventory.BasicGun;
-import fr.bretzel.quake.PlayerInfo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -49,6 +46,9 @@ public class GameStart extends GameTask {
                     getGame().respawn(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
+                    Chrono chrono = new Chrono();
+                    chrono.start();
+                    Quake.gameManager.getGameChrono().put(getGame(), chrono);
                 }
             }
             cancel();

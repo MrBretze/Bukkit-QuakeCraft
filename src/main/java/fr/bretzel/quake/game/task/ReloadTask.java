@@ -14,6 +14,6 @@ public class ReloadTask extends SchootTask {
 
     @Override
     public void run() {
-        getInfo().setShoot(false);
+        getInfo().setShoot(true);
     }
 }

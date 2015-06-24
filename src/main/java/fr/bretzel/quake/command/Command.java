@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     private GameManager manager = Quake.gameManager;
 
-    private List<String> MAIN = ImmutableList.of("create", "edit", "player", "delete", "setlobby");
+    private List<String> MAIN = ImmutableList.of("create", "edit", "player", "delete", "setlobby", "stop");
 
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
@@ -153,6 +154,19 @@ public class Command implements CommandExecutor, TabCompleter {
                         Quake.quake.saveConfig();
                         player.sendMessage(ChatColor.GREEN + "The lobby has been set to your location !");
                         return true;
+                    } else if (args[0].equalsIgnoreCase("stop")) {
+                        if(args.length > 1) {
+                            Game game = manager.getGameByName(args[1]);
+                            if(game != null) {
+                                game.stop();
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Could not found the game !");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Usage: /quake stop <game>");
+                            return true;
+                        }
                     } else {
                         player.sendMessage(ChatColor.RED + "Usage: /quake <create | edit | delete>");
                         return true;

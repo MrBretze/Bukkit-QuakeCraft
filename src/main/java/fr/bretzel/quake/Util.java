@@ -1,10 +1,9 @@
 package fr.bretzel.quake;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
@@ -13,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by MrBretzel on 11/06/2015.
@@ -183,6 +183,91 @@ public class Util {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void shootFirework(Location l) {
+        Firework fw = l.getWorld().spawn(l.clone().add(0.0D, 0.7D, 0.0D),Firework.class);
+        FireworkMeta fm = fw.getFireworkMeta();
+        Random r = new Random();
+        int fType = r.nextInt(5) + 1;
+        FireworkEffect.Type type = FireworkEffect.Type.BALL;
+        switch (fType) {
+            case 1:
+                type = FireworkEffect.Type.BALL;
+                break;
+            case 2:
+                type = FireworkEffect.Type.BALL_LARGE;
+                break;
+            case 3:
+                type = FireworkEffect.Type.BURST;
+                break;
+            case 4:
+                type = FireworkEffect.Type.CREEPER;
+                break;
+            case 5:
+                type = FireworkEffect.Type.STAR;
+        }
+
+        int c1i = r.nextInt(17) + 1;
+        int c2i = r.nextInt(17) + 1;
+        Color c1 = getColor (c1i);
+        Color c2 = getColor (c2i);
+        FireworkEffect effect = FireworkEffect.builder()
+                .flicker(r.nextBoolean()).withColor(c1).withFade(c2)
+                .with(type).trail(r.nextBoolean()).build();
+        fm.addEffect(effect);
+
+        try {
+            Field f = fm.getClass().getDeclaredField("power");
+            f.setAccessible(true);
+            f.set(fm, -2);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        fw.setFireworkMeta(fm);
+    }
+
+    private static Color getColor(int c){
+        switch (c){
+            default:
+            case 1:
+                return Color.AQUA;
+            case 2:
+                return Color.BLACK;
+            case 3:
+                return Color.BLUE;
+            case 4:
+                return Color.FUCHSIA;
+            case 5:
+                return Color.GRAY;
+            case 6:
+                return Color.GREEN;
+            case 7:
+                return Color.LIME;
+            case 8:
+                return Color.MAROON;
+            case 9:
+                return Color.NAVY;
+            case 10:
+                return Color.OLIVE;
+            case 11:
+                return Color.ORANGE;
+            case 12:
+                return Color.PURPLE;
+            case 13:
+                return Color.RED;
+            case 14:
+                return Color.SILVER;
+            case 15:
+                return Color.TEAL;
+            case 16:
+                return Color.WHITE;
+            case 17:
+                return Color.YELLOW;
         }
     }
 }

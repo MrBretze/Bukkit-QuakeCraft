@@ -11,6 +11,7 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 import fr.bretzel.quake.game.Game;
 
 import fr.bretzel.quake.game.event.PlayerShootEvent;
+import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.BasicGun;
 import org.bukkit.Bukkit;
@@ -37,6 +38,7 @@ public class PlayerInfo {
     private Location firstLocation = null;
     private Location secondLocation = null;
     private boolean shoot = true;
+    private boolean dash = true;
     private File file;
 
     public PlayerInfo(Player player) {
@@ -161,6 +163,22 @@ public class PlayerInfo {
         this.shoot = shoot;
     }
 
+    public boolean isDash() {
+        return dash;
+    }
+
+    public void setDash(boolean dash) {
+        this.dash = dash;
+    }
+
+    public void dash() {
+        if(isDash()) {
+            setDash(false);
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 20));
+            getPlayer().setVelocity(getPlayer().getLocation().getDirection().multiply(2));
+        }
+    }
+
     public void shoot() {
         PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()));
         Bukkit.getPluginManager().callEvent(shoot);
@@ -168,30 +186,25 @@ public class PlayerInfo {
             return;
         }
 
-        if(!isShoot()) {
-            setShoot(true);
+        Game game = Quake.gameManager.getGameByPlayer(getPlayer());
 
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this.clone()), (long) (getReloadTime() * 20));
+        if(isShoot()) {
+            setShoot(false);
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (getReloadTime() * 20));
 
             LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
+
             for(Location l : locs) {
                 getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);
             }
 
-            List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 200);
+            List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 0.59D);
 
             for(Player player : pList) {
-                player.setMetadata("killer", new FixedMetadataValue(Quake.quake, player.getDisplayName()));
-                player.setHealth(0D);
+                player.setMetadata("killer", new FixedMetadataValue(Quake.quake, getPlayer().getDisplayName()));
+                Util.shootFirework(player.getLocation());
+                game.respawn(player);
             }
-        }
-    }
-
-    public PlayerInfo clone() {
-        try {
-            return (PlayerInfo) super.clone();
-        } catch (CloneNotSupportedException var2) {
-            throw new Error(var2);
         }
     }
 

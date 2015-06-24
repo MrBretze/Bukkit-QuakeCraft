@@ -317,13 +317,27 @@ public class Game {
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
             if(p.isOnline()) {
-                p.sendMessage(ChatColor.RED + "This game has bin annulled !");
+                p.sendMessage(ChatColor.RED + "This game has been annulled !");
                 p.teleport(Quake.gameManager.getLobby());
             }
         }
         getPlayerList().clear();
         setState(State.WAITING);
-        Quake.gameManager.signEvent.actualiseJoinSignForGame(this.clone());
+        Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
+    }
+
+    public void stop() {
+        for(UUID uuid : getPlayerList()) {
+            Player p = Bukkit.getPlayer(uuid);
+            if(p.isOnline()) {
+                p.sendMessage(ChatColor.RED + "The game has been stopped !");
+                p.teleport(Quake.gameManager.getLobby());
+                p.getInventory().clear();
+            }
+        }
+        getPlayerList().clear();
+        setState(State.WAITING);
+        Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
     }
 
     public void respawn(Player p) {
@@ -336,6 +350,11 @@ public class Game {
             respawn(p);
         } else {
             p.teleport(getRespawn().get(random.nextInt(getRespawn().size())));
+            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, 5));
+        }
+        if(p.hasMetadata("killer")) {
+            String k = p.getMetadata("killer").get(0).asString();
+            broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
         }
     }
 
@@ -413,15 +432,6 @@ public class Game {
         }
 
     }
-
-    public Game clone() {
-        try {
-            return (Game)super.clone();
-        } catch (CloneNotSupportedException var2) {
-            throw new Error(var2);
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

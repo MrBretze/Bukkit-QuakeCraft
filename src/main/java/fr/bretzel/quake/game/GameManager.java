@@ -12,10 +12,7 @@ import fr.bretzel.quake.game.task.GameStart;
 import fr.bretzel.quake.PlayerInfo;
 
 import fr.bretzel.quake.game.task.MainTask;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,10 +26,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by MrBretzel on 12/06/2015.
@@ -44,6 +38,7 @@ public class GameManager implements Listener {
     private HashMap<Game, GameStart> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
+    private Random random = new Random();
     private Quake quake;
     public SignEvent signEvent;
     public int maxMinute = 5;
@@ -191,13 +186,22 @@ public class GameManager implements Listener {
         }
 
         if(player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
-            switch (action) {
-                case LEFT_CLICK_BLOCK:
-                    player.sendMessage(ChatColor.RED + "NOOOOOOOP");
-                    break;
-                case RIGHT_CLICK_BLOCK:
-                    pi.shoot();
-                    break;
+            Game game = getGameByPlayer(player);
+            if(game.getState() == State.STARTED) {
+                switch (action) {
+                    case LEFT_CLICK_BLOCK:
+                        pi.dash();
+                        break;
+                    case LEFT_CLICK_AIR:
+                        pi.dash();
+                        break;
+                    case RIGHT_CLICK_BLOCK:
+                        pi.shoot();
+                        break;
+                    case RIGHT_CLICK_AIR:
+                        pi.shoot();
+                        break;
+                }
             }
         }
     }
@@ -247,6 +251,13 @@ public class GameManager implements Listener {
         if (game != null) {
             if(game.getState() == State.WAITING) {
                 game.getPlayerList().remove(player.getUniqueId());
+                GameStart start = getQuakeTaskHashMap().get(game);
+                if (start != null) {
+                    if(game.getPlayerList().size() < game.getMinPlayer()) {
+                        start.cancel();
+                        getQuakeTaskHashMap().remove(game);
+                    }
+                }
             } else {
                 Chrono chrono = new Chrono();
                 chrono.start();
@@ -309,18 +320,7 @@ public class GameManager implements Listener {
         final Player player = event.getEntity();
         final Game game = getGameByPlayer(player);
         if(game != null) {
-            if(game.getState() == State.STARTED) {
-                if(player.hasMetadata("killer")) {
-                    String k = player.getMetadata("killer").get(0).asString();
-                    game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
-                }
-            }
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Util.respawn(player);
-                }
-            }.runTaskLater(Quake.quake, 20L);
+
         }
     }
 
@@ -341,7 +341,8 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerShoot(PlayerShootEvent event) {
         Game game = event.getGame();
-
+        Player player = event.getPlayer();
+        player.getWorld().playSound(player.getLocation(), Sound.FIREWORK_LARGE_BLAST, random.nextFloat(), random.nextFloat());
         if(event.getKill() == 2) {
             game.broadcastMessage(ChatColor.RED + "Double kill !");
         } else if(event.getKill() == 3) {

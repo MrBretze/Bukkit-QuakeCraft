@@ -3,6 +3,7 @@ package fr.bretzel.quake.game.task;
 import fr.bretzel.quake.Chrono;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
+
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -23,7 +24,7 @@ public class MainTask extends BukkitRunnable {
             if (c != null) {
                 c.pause();
                 if(c.getMinute() > manager.maxMinute || c.getHeure() > 0) {
-                    game.reset();
+                    game.stop();
                     c.stop();
                     manager.getGameChrono().remove(game);
                     return;
