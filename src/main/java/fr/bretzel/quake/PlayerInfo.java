@@ -174,8 +174,8 @@ public class PlayerInfo {
     public void dash() {
         if(isDash()) {
             setDash(false);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 20));
-            getPlayer().setVelocity(getPlayer().getLocation().getDirection().multiply(2));
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
+            getPlayer().setVelocity(getPlayer().getLocation().getDirection().multiply(1.5));
         }
     }
 
@@ -202,7 +202,7 @@ public class PlayerInfo {
 
             for(Player player : pList) {
                 player.setMetadata("killer", new FixedMetadataValue(Quake.quake, getPlayer().getDisplayName()));
-                Util.shootFirework(player.getLocation());
+                Util.shootFirework(player.getEyeLocation());
                 game.respawn(player);
             }
         }

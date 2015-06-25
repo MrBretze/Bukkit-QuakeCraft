@@ -316,7 +316,7 @@ public class Game {
     public void reset() {
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
-            if(p.isOnline()) {
+            if(p != null && p.isOnline()) {
                 p.sendMessage(ChatColor.RED + "This game has been annulled !");
                 p.teleport(Quake.gameManager.getLobby());
             }
@@ -329,7 +329,7 @@ public class Game {
     public void stop() {
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
-            if(p.isOnline()) {
+            if(p != null && p.isOnline()) {
                 p.sendMessage(ChatColor.RED + "The game has been stopped !");
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();

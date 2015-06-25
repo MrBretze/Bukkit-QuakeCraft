@@ -25,6 +25,7 @@ public class GameStart extends GameTask {
 
     int minSecQuake = getGame().getSecLaunch();
 
+
     @Override
     public void run() {
         if (minSecQuake > 0) {
@@ -42,7 +43,7 @@ public class GameStart extends GameTask {
             Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
-                if(p.isOnline()) {
+                if(p!= null || p.isOnline()) {
                     getGame().respawn(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));

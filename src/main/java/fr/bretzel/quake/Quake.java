@@ -7,6 +7,7 @@ import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.game.SignReader;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -31,12 +32,10 @@ import java.util.*;
 public class Quake extends JavaPlugin implements Listener {
 
     public static PluginManager manager;
-
     public static GameManager gameManager;
-
     public static Quake quake;
-
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
+    private boolean useVault = false;
 
     @Override
     public void onEnable() {
@@ -62,6 +61,8 @@ public class Quake extends JavaPlugin implements Listener {
         saveResource("config.yml", false);
 
         reloadConfig();
+
+        setupEconomy();
     }
 
     @Override
@@ -74,6 +75,12 @@ public class Quake extends JavaPlugin implements Listener {
 
         for(Game game : gameManager.getGameLinkedList()) {
             game.save();
+        }
+    }
+
+    public void setupEconomy() {
+        if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
+            this.useVault = true;
         }
     }
 

@@ -188,19 +188,10 @@ public class GameManager implements Listener {
         if(player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
             Game game = getGameByPlayer(player);
             if(game.getState() == State.STARTED) {
-                switch (action) {
-                    case LEFT_CLICK_BLOCK:
-                        pi.dash();
-                        break;
-                    case LEFT_CLICK_AIR:
-                        pi.dash();
-                        break;
-                    case RIGHT_CLICK_BLOCK:
-                        pi.shoot();
-                        break;
-                    case RIGHT_CLICK_AIR:
-                        pi.shoot();
-                        break;
+                if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+                    pi.dash();
+                } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                    pi.shoot();
                 }
             }
         }
@@ -272,26 +263,15 @@ public class GameManager implements Listener {
         Game game = event.getGame();
 
         if (game.getState() == State.WAITING) {
-            if (game.getPlayerList().size() + 1 > game.getMaxPlayer()) {
-                player.sendMessage(ChatColor.RED + "The game is full !");
-                event.setCancelled(true);
-                return;
-            } else if (game.getPlayerList().size() + 1 == game.getMinPlayer()) {
+            int players = game.getPlayerList().size() + 1;
+            if(players == game.getMinPlayer()) {
                 GameStart gameStart = new GameStart(Quake.quake, 20L, 20L, game);
                 getQuakeTaskHashMap().put(game, gameStart);
-                return;
-            } else if (game.getPlayerList().size() + 1 <= game.getMaxPlayer()) {
-                game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
-                return;
             } else {
-                player.sendMessage(ChatColor.DARK_RED + "Une erreur ses produite !");
-                player.sendMessage(ChatColor.DARK_RED + "L'évènement PlayerJoinGameEvent et annuler !");
-                player.sendMessage(ChatColor.DARK_RED + "Report: ");
-                player.sendMessage(ChatColor.RED + game.getName() + ", " + game.getMaxPlayer() + ", " + game.getPlayerList() + ", " + game.getState().name() + ", " + game.getRespawn() + ", " + game.getFirstLocation()
-                        + ", " + game.getSecondLocation());
-                event.setCancelled(true);
-                return;
+                game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                        + ChatColor.BLUE + ")");
             }
         } else if(game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");
@@ -309,18 +289,9 @@ public class GameManager implements Listener {
                 game.reset();
             }
         }
-
-        game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + game.getPlayerList().size() + 1 + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+        int players = game.getPlayerList().size() + 1;
+        game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                 + ChatColor.BLUE + ")");
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        final Player player = event.getEntity();
-        final Game game = getGameByPlayer(player);
-        if(game != null) {
-
-        }
     }
 
     @EventHandler
