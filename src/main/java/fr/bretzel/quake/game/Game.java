@@ -9,11 +9,11 @@ import com.evilco.mc.nbt.stream.NbtOutputStream;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 
+import fr.bretzel.quake.reader.SignReader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Beacon;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -34,7 +34,6 @@ public class Game {
     private Location spawn;
     private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
-    private TagCompound compound;
     private File file;
     private List<UUID> playerList = new ArrayList<>();
     private LinkedList<Sign> signList = new LinkedList<>();
@@ -77,16 +76,16 @@ public class Game {
         }
     }
 
+    private Game(Quake quake) {
+        quake.gameManager.getGameLinkedList().add(this);
+    }
+
     public int getSecLaunch() {
         return secLaunch;
     }
 
     public void setSecLaunch(int secLaunch) {
         this.secLaunch = secLaunch;
-    }
-
-    public Game(Quake quake) {
-        quake.gameManager.getGameLinkedList().add(this);
     }
 
     public int getMaxKill() {
@@ -209,10 +208,6 @@ public class Game {
         getBlocks().add(block);
     }
 
-    public TagCompound getCompound() {
-        return compound;
-    }
-
     public LinkedList<Sign> getSignList() {
         return signList;
     }
@@ -283,10 +278,6 @@ public class Game {
 
     public boolean isView() {
         return respawnview;
-    }
-
-    public void setCompound(TagCompound compound) {
-        this.compound = compound;
     }
 
     public Location getSpawn() {

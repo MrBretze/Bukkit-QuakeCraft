@@ -312,7 +312,6 @@ public class GameManager implements Listener {
     public void onPlayerShoot(PlayerShootEvent event) {
         Game game = event.getGame();
         Player player = event.getPlayer();
-        player.getWorld().playSound(player.getLocation(), Sound.FIREWORK_LARGE_BLAST, random.nextFloat(), random.nextFloat());
         if(event.getKill() == 2) {
             game.broadcastMessage(ChatColor.RED + "Double kill !");
         } else if(event.getKill() == 3) {

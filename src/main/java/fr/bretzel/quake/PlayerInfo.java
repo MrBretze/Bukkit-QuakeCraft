@@ -1,28 +1,24 @@
 package fr.bretzel.quake;
 
-import com.evilco.mc.nbt.TagCompound;
-import com.evilco.mc.nbt.TagDouble;
-import com.evilco.mc.nbt.TagString;
-import com.evilco.mc.nbt.error.TagNotFoundException;
-import com.evilco.mc.nbt.error.UnexpectedTagTypeException;
-import com.evilco.mc.nbt.stream.NbtInputStream;
-import com.evilco.mc.nbt.stream.NbtOutputStream;
-
+import fr.bretzel.nbt.NBTCompressedStreamTools;
+import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
-
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.BasicGun;
+import fr.bretzel.quake.reader.PlayerInfoReader;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -34,12 +30,12 @@ public class PlayerInfo {
     private ParticleEffect effect = ParticleEffect.FIREWORKS_SPARK;
     private double reload = 1.5;
     private Game game;
-    private TagCompound compound;
     private Location firstLocation = null;
     private Location secondLocation = null;
     private boolean shoot = true;
     private boolean dash = true;
     private File file;
+    private Random random = new Random();
 
     public PlayerInfo(Player player) {
         setPlayer(player);
@@ -51,31 +47,16 @@ public class PlayerInfo {
         setFile(new File(mk, player.getUniqueId().toString() + ".dat"));
 
         try {
-
-        if(getFile().exists()) {
-
-            NbtInputStream stream = new NbtInputStream(new FileInputStream(getFile()));
-
-            compound = (TagCompound) stream.readTag();
-
-        } else {
-
-            getFile().createNewFile();
-
-            compound = new TagCompound(getPlayer().getUniqueId().toString());
-
-            NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(getFile()));
-
-            compound.setTag(new TagString("effect", getEffect().name()));
-
-            stream.write(compound);
-
-            stream.close();
-        }
-
+            if(!getFile().exists()) {
+                getFile().createNewFile();
+                NBTTagCompound compound = new NBTTagCompound();
+                compound.setDouble("reload", getReloadTime());
+                NBTCompressedStreamTools.wrhite(compound, new FileOutputStream(getFile()));
+            }
         } catch (Exception e) {
             e.fillInStackTrace();
         }
+        PlayerInfoReader.read(this);
     }
 
     public File getFile() {
@@ -114,16 +95,8 @@ public class PlayerInfo {
         this.player = player;
     }
 
-    public void setReloadTime(long reload) {
+    public void setReloadTime(double reload) {
         this.reload = reload;
-    }
-
-    public TagCompound getCompound() {
-        return compound;
-    }
-
-    public void setCompound(TagCompound compound) {
-        this.compound = compound;
     }
 
     public Location getFirstLocation() {
@@ -147,7 +120,7 @@ public class PlayerInfo {
     }
 
     public boolean isInGame() {
-        return Quake.gameManager.getGameByPlayer(getPlayer()) == null ? false : true;
+        return Quake.gameManager.getGameByPlayer(getPlayer()) != null;
     }
 
     public void give(BasicGun basicGun) {
@@ -193,7 +166,7 @@ public class PlayerInfo {
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (getReloadTime() * 20));
 
             LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
-
+            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_LARGE_BLAST, random.nextFloat(), random.nextFloat());
             for(Location l : locs) {
                 getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);
             }
@@ -208,42 +181,12 @@ public class PlayerInfo {
         }
     }
 
-    private void init() {
-        try {
-            String loc = compound.getString("location1");
-
-            if(!loc.equals(null) && !loc.isEmpty()) {
-                setFirstLocation(Util.toLocationString(loc));
-                loc = compound.getString("location2");
-            }
-
-            if(!loc.equals(null) && !loc.isEmpty()) {
-                setFirstLocation(Util.toLocationString(loc));
-            }
-
-        } catch (UnexpectedTagTypeException e) {
-            e.printStackTrace();
-        } catch (TagNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void save() {
-        if(compound != null) {
-            compound.setTag(new TagDouble("reload", getReloadTime()));
-
-            compound.setTag(new TagString("effect", getEffect().name()));
-
-            try {
-                NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(this.file));
-                stream.write(compound);
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Bukkit.broadcastMessage(ChatColor.RED + "Error the compound was null !");
+        NBTTagCompound c = PlayerInfoReader.write(this);
+        try {
+            NBTCompressedStreamTools.wrhite(c, new FileOutputStream(getFile()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
     }
 }
