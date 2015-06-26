@@ -101,7 +101,8 @@ public class Quake extends JavaPlugin implements Listener {
     private void initGame(File file) {
         for (File f : file.listFiles()) {
             try {
-                GameReader.read(NBTCompressedStreamTools.read(new FileInputStream(f)), f);
+                Game game = GameReader.read(NBTCompressedStreamTools.read(new FileInputStream(f)), f);
+                gameManager.getGameLinkedList().add(game);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
