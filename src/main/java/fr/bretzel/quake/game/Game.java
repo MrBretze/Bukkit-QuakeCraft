@@ -1,15 +1,11 @@
 package fr.bretzel.quake.game;
 
-import com.evilco.mc.nbt.TagCompound;
-import com.evilco.mc.nbt.TagInteger;
-import com.evilco.mc.nbt.TagString;
-import com.evilco.mc.nbt.stream.NbtInputStream;
-import com.evilco.mc.nbt.stream.NbtOutputStream;
-
+import fr.bretzel.nbt.NBTCompressedStreamTools;
+import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 
-import fr.bretzel.quake.reader.SignReader;
+import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -54,31 +50,23 @@ public class Game {
             addBlock(block);
         }
 
+        calculeSpawnBase();
+
         File mk = new File(Quake.quake.getDataFolder(), File.separator + "game" + File.separator);
         mk.mkdir();
         setFile(new File(mk, getName() + ".dat"));
         try {
-            if (getFile().exists()) {
-                NbtInputStream stream = new NbtInputStream(new FileInputStream(getFile()));
-                setCompound(((TagCompound)stream.readTag()));
-                stream.close();
-            } else {
+            if (!getFile().exists()) {
                 getFile().createNewFile();
-                calculeSpawnBase();
-                setCompound(new TagCompound(getName()));
-                getCompound().setTag(new TagString("name", getName()));
-                NbtOutputStream stream = new NbtOutputStream(new FileOutputStream(getFile()));
-                stream.write(getCompound());
-                stream.close();
+                NBTTagCompound compound = new NBTTagCompound();
+                NBTCompressedStreamTools.wrhite(compound, new FileOutputStream(getFile()));
             }
         } catch (IOException e) {
             e.fillInStackTrace();
         }
     }
 
-    private Game(Quake quake) {
-        quake.gameManager.getGameLinkedList().add(this);
-    }
+    public Game(){}
 
     public int getSecLaunch() {
         return secLaunch;
@@ -350,79 +338,13 @@ public class Game {
     }
 
     public void save() {
-
-        if(!getName().equals(null) && !getName().isEmpty()) {
-            getCompound().setTag(new TagString("name", getName()));
-        }
-
-        getCompound().setTag(new TagString("location1", Util.toStringLocation(getFirstLocation())));
-        getCompound().setTag(new TagString("location2", Util.toStringLocation(getSecondLocation())));
-
-        int l = 0;
-        if(getRespawn().size() > 0) {
-
-            TagCompound respawn = new TagCompound("respawn");
-
-            for(Location location : getRespawn()) {
-                respawn.setTag(new TagString(String.valueOf(l), Util.toStringLocation(location)));
-                l++;
-            }
-
-            respawn.setTag(new TagInteger("size", l));
-
-            getCompound().setTag(respawn);
-        }
-
-        int k = 0;
-        if(getSignList().size() > 0) {
-
-            TagCompound signs = new TagCompound("signs");
-
-            for(Sign sign : getSignList()) {
-                signs.setTag(SignReader.write(sign, String.valueOf(k)));
-                k++;
-            }
-
-            signs.setTag(new TagInteger("size", k));
-
-            getCompound().setTag(signs);
-        }
-
-        if(!getPlayerList().isEmpty()) {
-            TagCompound players = new TagCompound("players");
-
-            int h = 0;
-            for(UUID id : getPlayerList()) {
-                players.setTag(new TagString(String.valueOf(h), id.toString()));
-                h++;
-            }
-
-            players.setTag(new TagInteger("size", h));
-
-            getCompound().setTag(players);
-        } else {
-            TagCompound players = new TagCompound("players");
-
-            players.setTag(new TagInteger("size", 0));
-
-            getCompound().setTag(players);
-        }
-
-        getCompound().setTag(new TagString("spawn", Util.toStringLocation(getSpawn())));
-
         try {
-            NbtOutputStream outputStream = new NbtOutputStream(new FileOutputStream(getFile()));
-
-            outputStream.write(getCompound());
-
-            outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            NBTCompressedStreamTools.wrhite(GameReader.write(this), new FileOutputStream(getFile()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

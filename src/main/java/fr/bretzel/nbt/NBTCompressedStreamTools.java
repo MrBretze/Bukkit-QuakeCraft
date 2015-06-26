@@ -53,7 +53,7 @@ public class NBTCompressedStreamTools {
         }
     }
 
-    public static void a(NBTTagCompound nbttagcompound, DataOutput dataoutput) throws IOException {
+    public static void wrhite(NBTTagCompound nbttagcompound, DataOutput dataoutput) throws IOException {
         a((NBTBase) nbttagcompound, dataoutput);
     }
 

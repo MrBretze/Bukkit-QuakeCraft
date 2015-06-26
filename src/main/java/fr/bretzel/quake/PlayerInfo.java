@@ -51,6 +51,7 @@ public class PlayerInfo {
                 getFile().createNewFile();
                 NBTTagCompound compound = new NBTTagCompound();
                 compound.setDouble("reload", getReloadTime());
+                compound.setString("effect", getEffect().getName());
                 NBTCompressedStreamTools.wrhite(compound, new FileOutputStream(getFile()));
             }
         } catch (Exception e) {

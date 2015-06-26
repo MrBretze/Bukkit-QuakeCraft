@@ -16,7 +16,7 @@ public class PlayerInfoReader {
 
     public static NBTTagCompound write (PlayerInfo playerInfo) {
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setString("effect", playerInfo.getEffect().name());
+        compound.setString("effect", playerInfo.getEffect().getName());
         compound.setDouble("reload", playerInfo.getReloadTime());
         return compound;
     }
