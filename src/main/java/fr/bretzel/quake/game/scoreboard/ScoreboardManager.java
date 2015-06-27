@@ -3,6 +3,7 @@ package fr.bretzel.quake.game.scoreboard;
 import fr.bretzel.quake.game.Game;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -29,6 +30,7 @@ public class ScoreboardManager {
         } else {
             objective = scoreboard.getObjective(objname);
         }
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public Game getGame() {
@@ -113,5 +115,29 @@ public class ScoreboardManager {
 
     public void resetLine(int index) {
         resetLine(getOfflinePlayers().get(index));
+    }
+
+    public Objective getObjective() {
+        return objective;
+    }
+
+    public void setObjective(Objective objective) {
+        this.objective = objective;
+    }
+
+    public void setObjectiveName(String objname) {
+        this.objname = objname;
+    }
+
+    public String getObjectiveName() {
+        return objname;
+    }
+
+    public void setScoreboard(Scoreboard scoreboard) {
+        this.scoreboard = scoreboard;
+    }
+
+    public Scoreboard getScoreboard() {
+        return scoreboard;
     }
 }

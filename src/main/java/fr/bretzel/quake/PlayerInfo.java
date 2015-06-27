@@ -4,9 +4,10 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
+import fr.bretzel.quake.game.scoreboard.ScoreboardManager;
 import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.ReloadTask;
-import fr.bretzel.quake.inventory.BasicGun;
+import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
 
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -124,9 +126,9 @@ public class PlayerInfo {
         return Quake.gameManager.getGameByPlayer(getPlayer()) != null;
     }
 
-    public void give(BasicGun basicGun) {
+    public void give(Gun gun) {
         getPlayer().getInventory().clear();
-        getPlayer().getInventory().setItem(0, basicGun.getStack());
+        getPlayer().getInventory().setItem(0, gun.getStack());
     }
 
     public boolean isShoot() {
@@ -145,11 +147,17 @@ public class PlayerInfo {
         this.dash = dash;
     }
 
+    public void setBoard(ScoreboardManager manager) {
+        getPlayer().setScoreboard(manager.getScoreboard());
+    }
+
     public void dash() {
         if(isDash()) {
             setDash(false);
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
-            getPlayer().setVelocity(getPlayer().getLocation().getDirection().multiply(1.5));
+            Vector v = getPlayer().getEyeLocation().getDirection().multiply(1.5D);
+            v.setY(0.7D);
+            getPlayer().setVelocity(v);
         }
     }
 
@@ -183,9 +191,8 @@ public class PlayerInfo {
     }
 
     public void save() {
-        NBTTagCompound c = PlayerInfoReader.write(this);
         try {
-            NBTCompressedStreamTools.wrhite(c, new FileOutputStream(getFile()));
+            NBTCompressedStreamTools.wrhite(PlayerInfoReader.write(this), new FileOutputStream(getFile()));
         } catch (IOException e) {
             e.printStackTrace();
         }

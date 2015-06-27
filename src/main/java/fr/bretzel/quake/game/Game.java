@@ -5,6 +5,7 @@ import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 
+import fr.bretzel.quake.game.scoreboard.ScoreboardManager;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,6 +41,7 @@ public class Game {
     private int maxKill = 25;
     private int secLaunch = 15;
     private State state = State.WAITING;
+    private ScoreboardManager scoreboardManager;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -64,9 +66,12 @@ public class Game {
         } catch (IOException e) {
             e.fillInStackTrace();
         }
+        setScoreboardManager(new ScoreboardManager(this));
     }
 
-    public Game(){}
+    public Game(){
+        setScoreboardManager(new ScoreboardManager(this));
+    }
 
     public int getSecLaunch() {
         return secLaunch;
@@ -138,6 +143,14 @@ public class Game {
         if(!getPlayerList().contains(uuid)) {
             getPlayerList().add(uuid);
         }
+    }
+
+    public ScoreboardManager getScoreboardManager() {
+        return scoreboardManager;
+    }
+
+    public void setScoreboardManager(ScoreboardManager scoreboardManager) {
+        this.scoreboardManager = scoreboardManager;
     }
 
     public LinkedList<Location> getRespawn() {

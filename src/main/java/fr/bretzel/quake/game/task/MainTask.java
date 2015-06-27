@@ -3,6 +3,7 @@ package fr.bretzel.quake.game.task;
 import fr.bretzel.quake.Chrono;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
+import fr.bretzel.quake.game.State;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,16 +21,24 @@ public class MainTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Game game : manager.getGameLinkedList()) {
-            Chrono c = manager.getChronoGame(game);
-            if (c != null) {
-                c.pause();
-                if(c.getMinute() > manager.maxMinute || c.getHeure() > 0) {
-                    game.stop();
-                    c.stop();
-                    manager.getGameChrono().remove(game);
-                    return;
+            if(game.getState() == State.STARTED) {
+                Chrono chrono = manager.getChronoGame(game);
+                if(chrono == null) {
+                    chrono = new Chrono();
+                    chrono.start();
+                    manager.getGameChrono().put(game, chrono);
+                    break;
+                } else {
+                    chrono.pause();
+                    chrono.resume();
+                    if (chrono.getMinute() >= manager.getMaxMinute() || chrono.getHeure() >= 1) {
+                        game.stop();
+                        chrono.stop();
+                        manager.getGameChrono().remove(game);
+                        break;
+                    }
+                    chrono.start();
                 }
-                c.start();
             }
         }
     }

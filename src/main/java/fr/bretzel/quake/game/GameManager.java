@@ -41,7 +41,7 @@ public class GameManager implements Listener {
     private Random random = new Random();
     private Quake quake;
     public SignEvent signEvent;
-    public int maxMinute = 5;
+    public int maxMinute = 10;
     private Location lobby;
     private MainTask mainTask;
 
@@ -60,7 +60,7 @@ public class GameManager implements Listener {
 
         this.mainTask = new MainTask(this);
 
-        mainTask.runTaskTimerAsynchronously(Quake.quake, 5L, 5L);
+        mainTask.runTaskTimer(Quake.quake, 5L, 5L);
     }
 
     public void registerGame(Player creator, String name, Location loc1, Location loc2) {
@@ -306,6 +306,10 @@ public class GameManager implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    public int getMaxMinute() {
+        return maxMinute;
     }
 
     @EventHandler

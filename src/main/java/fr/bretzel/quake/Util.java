@@ -187,7 +187,7 @@ public class Util {
     }
 
     public static void shootFirework(Location l) {
-        Firework fw = l.getWorld().spawn(l.clone().add(0.0D, 0.7D, 0.0D),Firework.class);
+        Firework fw = l.getWorld().spawn(l.clone().add(0.0D, 0.7D, 0.0D), Firework.class);
         FireworkMeta fm = fw.getFireworkMeta();
         Random r = new Random();
         int fType = r.nextInt(5) + 1;
@@ -217,17 +217,7 @@ public class Util {
                 .flicker(r.nextBoolean()).withColor(c1).withFade(c2)
                 .with(type).trail(r.nextBoolean()).build();
         fm.addEffect(effect);
-
-        try {
-            Field f = fm.getClass().getDeclaredField("power");
-            f.setAccessible(true);
-            f.set(fm, -2);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
+        fm.setPower(-1);
         fw.setFireworkMeta(fm);
     }
 
