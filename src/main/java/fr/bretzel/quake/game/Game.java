@@ -4,8 +4,7 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-
-import fr.bretzel.quake.game.scoreboard.ScoreboardManager;
+import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,7 +15,9 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -41,7 +42,7 @@ public class Game {
     private int maxKill = 25;
     private int secLaunch = 15;
     private State state = State.WAITING;
-    private ScoreboardManager scoreboardManager;
+    private ScoreboardAPI scoreboardManager;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -66,11 +67,11 @@ public class Game {
         } catch (IOException e) {
             e.fillInStackTrace();
         }
-        setScoreboardManager(new ScoreboardManager(this));
+        setScoreboardManager(new ScoreboardAPI(ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft"));
     }
 
     public Game(){
-        setScoreboardManager(new ScoreboardManager(this));
+        setScoreboardManager(new ScoreboardAPI(ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft"));
     }
 
     public int getSecLaunch() {
@@ -121,10 +122,6 @@ public class Game {
         this.minPlayer = minPlayer;
     }
 
-    public void setFirstLocation(Location location) {
-        this.firstLocation = location;
-    }
-
     public List<UUID> getPlayerList() {
         return playerList;
     }
@@ -145,11 +142,11 @@ public class Game {
         }
     }
 
-    public ScoreboardManager getScoreboardManager() {
+    public ScoreboardAPI getScoreboardManager() {
         return scoreboardManager;
     }
 
-    public void setScoreboardManager(ScoreboardManager scoreboardManager) {
+    public void setScoreboardManager(ScoreboardAPI scoreboardManager) {
         this.scoreboardManager = scoreboardManager;
     }
 
@@ -161,29 +158,32 @@ public class Game {
         this.respawn = respawn;
     }
 
-
     public void addRespawn(Location location) {
         getRespawn().add(location);
-    }
-
-    public void setSecondLocation(Location location) {
-        this.secondLocation = location;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getName() {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Location getFirstLocation() {
         return this.firstLocation;
     }
 
+    public void setFirstLocation(Location location) {
+        this.firstLocation = location;
+    }
+
     public Location getSecondLocation() {
         return this.secondLocation;
+    }
+
+    public void setSecondLocation(Location location) {
+        this.secondLocation = location;
     }
 
     public LinkedList<Block> getBlocks() {

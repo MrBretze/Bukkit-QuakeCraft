@@ -1,33 +1,21 @@
 package fr.bretzel.quake.game.scoreboard;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * Created by MrBretzel on 24/06/2015.
+ * Created by MrBretzel on 27/06/2015.
  */
-
-public class OfflinePlayer implements org.bukkit.OfflinePlayer {
+public class FakeOfflinePlayer implements OfflinePlayer {
 
     private String name;
-    private String displayName = "";
-    private UUID id;
 
-    private OfflinePlayer(String name) {
+    public FakeOfflinePlayer(String name) {
         this.name = name;
-        this.displayName = name;
-        this.id = UUID.randomUUID();
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     @Override
@@ -37,12 +25,12 @@ public class OfflinePlayer implements org.bukkit.OfflinePlayer {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public UUID getUniqueId() {
-        return id;
+        return null;
     }
 
     @Override

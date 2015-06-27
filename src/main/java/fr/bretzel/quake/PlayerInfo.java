@@ -4,12 +4,10 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
-import fr.bretzel.quake.game.scoreboard.ScoreboardManager;
 import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -17,7 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -74,52 +74,52 @@ public class PlayerInfo {
         return game;
     }
 
-    public double getReloadTime() {
-        return reload;
-    }
-
-    public ParticleEffect getEffect() {
-        return effect;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
     public void setGame(Game game) {
         this.game = game;
     }
 
-    public void setEffect(ParticleEffect effect) {
-        this.effect = effect;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
+    public double getReloadTime() {
+        return reload;
     }
 
     public void setReloadTime(double reload) {
         this.reload = reload;
     }
 
+    public ParticleEffect getEffect() {
+        return effect;
+    }
+
+    public void setEffect(ParticleEffect effect) {
+        this.effect = effect;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Location getFirstLocation() {
         return firstLocation;
-    }
-
-    public Location getSecondLocation() {
-        return secondLocation;
-    }
-
-    public void setReload(long reload) {
-        this.reload = reload;
     }
 
     public void setFirstLocation(Location firstLocation) {
         this.firstLocation = firstLocation;
     }
 
+    public Location getSecondLocation() {
+        return secondLocation;
+    }
+
     public void setSecondLocation(Location secondLocation) {
         this.secondLocation = secondLocation;
+    }
+
+    public void setReload(long reload) {
+        this.reload = reload;
     }
 
     public boolean isInGame() {
