@@ -1,13 +1,11 @@
 package fr.bretzel.quake.command;
 
 import com.google.common.collect.ImmutableList;
-
+import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.PlayerInfo;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
@@ -17,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -76,12 +73,21 @@ public class Command implements CommandExecutor, TabCompleter {
                                                 return true;
                                             }
                                         }
+                                    } else if (args[2].equalsIgnoreCase("setdisplayname")) {
+                                        if (args.length > 3) {
+                                            game.setDisplayName(args[3]);
+                                            manager.signEvent.actualiseJoinSignForGame(game);
+                                            player.sendMessage(ChatColor.GREEN + "The display name has bin set to " + game.getName());
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " setdisplayname ");
+                                            return true;
+                                        }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | view>");
+                                        player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | setdisplayname | view | setdisplayname>");
                                         return true;
                                     }
                                 } else {
-                                    player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | view>");
+                                    player.sendMessage(ChatColor.RED + "Usage: /quake edit " + game.getName() + " <setspawn | addrespawn | setdisplayname | view | setdisplayname>");
                                     return true;
                                 }
                             } else {
@@ -190,8 +196,33 @@ public class Command implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender commandSender, org.bukkit.command.Command command, String label, String[] args) {
         if(args.length == 1) {
             return (List) StringUtil.copyPartialMatches(args[0], MAIN, new ArrayList<>());
+        } else if (args.length == 2) {
+            if (args[1].equalsIgnoreCase("edit")) {
+
+            } else if (args[1].equalsIgnoreCase("player")) {
+                ArrayList playerList = new ArrayList();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    playerList.add(p.getName());
+                }
+                return (List) StringUtil.copyPartialMatches(args[1], playerList, new ArrayList<>());
+            } else if (args[1].equalsIgnoreCase("delete")) {
+                ArrayList gameList = new ArrayList();
+                for (Game game : Quake.gameManager.getGameLinkedList()) {
+                    gameList.add(game.getName());
+                }
+                return (List) StringUtil.copyPartialMatches(args[1], gameList, new ArrayList<>());
+            } else if (args[1].equalsIgnoreCase("stop")) {
+                ArrayList gameList = new ArrayList();
+                for (Game game : Quake.gameManager.getGameLinkedList()) {
+                    gameList.add(game.getName());
+                }
+                return (List) StringUtil.copyPartialMatches(args[1], gameList, new ArrayList<>());
+            } else {
+                return ImmutableList.of();
+            }
         } else {
             return ImmutableList.of();
         }
+        return ImmutableList.of();
     }
 }

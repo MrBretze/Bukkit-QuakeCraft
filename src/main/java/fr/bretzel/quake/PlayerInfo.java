@@ -36,6 +36,7 @@ public class PlayerInfo {
     private Location secondLocation = null;
     private boolean shoot = true;
     private boolean dash = true;
+    private int playerkill = 0;
     private File file;
     private Random random = new Random();
 
@@ -147,10 +148,6 @@ public class PlayerInfo {
         this.dash = dash;
     }
 
-    public void setBoard(ScoreboardManager manager) {
-        getPlayer().setScoreboard(manager.getScoreboard());
-    }
-
     public void dash() {
         if(isDash()) {
             setDash(false);
@@ -186,8 +183,20 @@ public class PlayerInfo {
                 player.setMetadata("killer", new FixedMetadataValue(Quake.quake, getPlayer().getDisplayName()));
                 Util.shootFirework(player.getEyeLocation());
                 game.respawn(player);
+                int killer = game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).getScore() + 1;
+                game.getScoreboardManager().getScoreboard().resetScores(getPlayer().getName());
+                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(killer);
             }
+            setPlayerkill(getPlayerkill() + pList.size());
         }
+    }
+
+    public int getPlayerkill() {
+        return playerkill;
+    }
+
+    public void setPlayerkill(int playerkill) {
+        this.playerkill = playerkill;
     }
 
     public void save() {

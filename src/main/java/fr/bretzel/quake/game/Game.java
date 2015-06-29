@@ -2,6 +2,7 @@ package fr.bretzel.quake.game;
 
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
+import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
@@ -12,8 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,12 +43,14 @@ public class Game {
     private int maxKill = 25;
     private int secLaunch = 15;
     private State state = State.WAITING;
-    private ScoreboardAPI scoreboardManager;
+    private ScoreboardAPI scoreboardManager = null;
+    private String displayName;
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
         setSecondLocation(secondLocation);
         setName(name);
+        setDisplayName(name);
 
         for(Block block : Util.blocksFromTwoPoints(getFirstLocation(), getSecondLocation())) {
             addBlock(block);
@@ -67,11 +70,10 @@ public class Game {
         } catch (IOException e) {
             e.fillInStackTrace();
         }
-        setScoreboardManager(new ScoreboardAPI(ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft"));
+        setScoreboardManager(new ScoreboardAPI(this));
     }
 
-    public Game(){
-        setScoreboardManager(new ScoreboardAPI(ChatColor.RED + "" + ChatColor.BOLD + "QuakeCraft"));
+    public Game() {
     }
 
     public int getSecLaunch() {
@@ -140,6 +142,14 @@ public class Game {
         if(!getPlayerList().contains(uuid)) {
             getPlayerList().add(uuid);
         }
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String dysplayName) {
+        this.displayName = dysplayName;
     }
 
     public ScoreboardAPI getScoreboardManager() {
@@ -325,6 +335,10 @@ public class Game {
                 p.sendMessage(ChatColor.RED + "The game has been stopped !");
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
+                p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+                if (p.hasMetadata("killer")) {
+                    p.removeMetadata("killer", Quake.quake);
+                }
             }
         }
         getPlayerList().clear();
@@ -334,19 +348,36 @@ public class Game {
 
     public void respawn(Player p) {
         Location location = getRespawn().get(random.nextInt(getRespawn().size()));
-        if(p.getWorld().getNearbyEntities(location, 10, 5, 10).size() <= 0) {
-            p.teleport(location);
-            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, 5));
-        } else if(p.hasMetadata("respawn") && p.getMetadata("respawn").get(0).asInt() > 0) {
-            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, p.getMetadata("respawn").get(0).asInt() - 1));
-            respawn(p);
+        PlayerInfo info = Quake.getPlayerInfo(p);
+        int pSize = 0;
+        int tentative;
+        if (Quake.gameManager.getRespawnTentative().get(p) == null) {
+            tentative = 0;
         } else {
-            p.teleport(getRespawn().get(random.nextInt(getRespawn().size())));
-            p.setMetadata("respawn", new FixedMetadataValue(Quake.quake, 5));
+            tentative = Quake.gameManager.getRespawnTentative().get(p);
         }
-        if(p.hasMetadata("killer")) {
-            String k = p.getMetadata("killer").get(0).asString();
-            broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
+        if (tentative >= 5) {
+            p.teleport(location);
+            if (p.hasMetadata("killer") && info.isInGame()) {
+                String k = p.getMetadata("killer").get(0).asString();
+                broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
+            }
+        } else {
+            for (Entity e : p.getWorld().getNearbyEntities(location, 10, 10, 10)) {
+                if (e instanceof Player) {
+                    pSize++;
+                }
+            }
+            if (pSize == 0) {
+                p.teleport(location);
+                if (p.hasMetadata("killer") && info.isInGame()) {
+                    String k = p.getMetadata("killer").get(0).asString();
+                    broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
+                }
+            } else {
+                respawn(p);
+                Quake.gameManager.getRespawnTentative().put(p, tentative + 1);
+            }
         }
     }
 
@@ -360,12 +391,6 @@ public class Game {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{");
-        builder.append(getFirstLocation().toString() + ", ");
-        builder.append(getSecondLocation().toString() + ", ");
-        builder.append("ArenaName: " + getName());
-        builder.append("}");
-        return builder.toString();
+        return "{" + getFirstLocation().toString() + ", " + getSecondLocation().toString() + ", " + "ArenaName: " + getName() + "}";
     }
 }

@@ -3,7 +3,6 @@ package fr.bretzel.quake.reader;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
-
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -27,7 +26,6 @@ public class SignReader {
 
             sign.setMetadata("join", new FixedMetadataValue(Quake.quake, Boolean.valueOf(compound.getString("join"))));
             sign.setMetadata("game", new FixedMetadataValue(Quake.quake, String.valueOf(compound.getString("game"))));
-            sign.setMetadata("name", new FixedMetadataValue(Quake.quake, String.valueOf(compound.getString("name"))));
 
             sign.update();
         } catch (Exception e) {
@@ -48,7 +46,6 @@ public class SignReader {
 
             compound.setBoolean("join", sign.getMetadata("join").get(0).asBoolean());
             compound.setString("game", sign.getMetadata("game").get(0).asString());
-            compound.setString("name", sign.getMetadata("name").get(0).asString());
 
             compound.setString("location", Util.toStringLocation(sign.getLocation()));
         } catch (Exception e) {

@@ -36,5 +36,8 @@ public class PlayerInfoReader {
         if (compound.hasKey("reload")) {
             player.setReloadTime(compound.getDouble("reload"));
         }
+        if (compound.hasKey("playerkill")) {
+            player.setPlayerkill(compound.getInt("playerkill"));
+        }
     }
 }

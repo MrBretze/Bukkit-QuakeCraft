@@ -1,14 +1,6 @@
 package fr.bretzel.nbt;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -20,7 +12,7 @@ public class NBTCompressedStreamTools {
         NBTTagCompound nbttagcompound;
 
         try {
-            nbttagcompound = read((DataInput) datainputstream, NBTReadLimiter.a);
+            nbttagcompound = read(datainputstream, NBTReadLimiter.a);
         } finally {
             datainputstream.close();
         }
@@ -32,7 +24,7 @@ public class NBTCompressedStreamTools {
         DataOutputStream dataoutputstream = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(outputstream)));
 
         try {
-            a(nbttagcompound, (DataOutput) dataoutputstream);
+            a(nbttagcompound, dataoutputstream);
         } finally {
             dataoutputstream.close();
         }
@@ -54,7 +46,7 @@ public class NBTCompressedStreamTools {
     }
 
     public static void wrhite(NBTTagCompound nbttagcompound, DataOutput dataoutput) throws IOException {
-        a((NBTBase) nbttagcompound, dataoutput);
+        a(nbttagcompound, dataoutput);
     }
 
     private static void a(NBTBase nbtbase, DataOutput dataoutput) throws IOException {

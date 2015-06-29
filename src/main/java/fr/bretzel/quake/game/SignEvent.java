@@ -2,10 +2,8 @@ package fr.bretzel.quake.game;
 
 
 import fr.bretzel.quake.Quake;
-
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -27,10 +25,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class SignEvent implements Listener {
 
-    private GameManager manager;
-
     public static String CLICK_TO_QUIT = ChatColor.RED + "Click to quit !";
     public static String CLICK_TO_JOIN = ChatColor.GREEN + "Click to join !";
+    private GameManager manager;
 
     public SignEvent(GameManager gameManager) {
         setManager(gameManager);
@@ -61,12 +58,17 @@ public class SignEvent implements Listener {
                             player.teleport(game.getSpawn());
                             game.addPlayer(player);
                             actualiseJoinSignForGame(game);
+                            game.getScoreboardManager().getObjective().getScore(getInfoPlayer(game)).setScore(7);
                             break;
                         } else if(!isJoin) {
                             Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(player, game));
+                            if (event.isCancelled()) {
+                                return;
+                            }
                             player.teleport(getManager().getLobby());
                             game.getPlayerList().remove(player.getUniqueId());
                             actualiseJoinSignForGame(game);
+                            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                             break;
                         } else {
                             break;
@@ -99,24 +101,22 @@ public class SignEvent implements Listener {
         if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
             if(lines[0].equals("[quake]")) {
                 Sign sign = (Sign) block.getState();
-                if(lines[1].equals("join") && getManager().getGameByName(lines[3]) != null) {
-                    Game game = getManager().getGameByName(lines[3]);
+                if (lines[1].equals("join") && getManager().getGameByName(lines[2]) != null) {
+                    Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, true));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    sign.setMetadata("name", new FixedMetadataValue(Quake.quake, lines[2]));
                     event.setLine(0, CLICK_TO_JOIN);
-                    event.setLine(1, ChatColor.BLUE + lines[2]);
+                    event.setLine(1, ChatColor.BLUE + game.getDisplayName());
                     event.setLine(2, getInfoPlayer(game));
                     event.setLine(3, game.getState().getName());
                     game.addSign(sign);
                     return;
-                } else if(lines[1].equals("quit") && getManager().getGameByName(lines[3]) != null) {
-                    Game game = getManager().getGameByName(lines[3]);
+                } else if (lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null) {
+                    Game game = getManager().getGameByName(lines[2]);
                     sign.setMetadata("join", new FixedMetadataValue(Quake.quake, false));
                     sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
-                    sign.setMetadata("name", new FixedMetadataValue(Quake.quake, lines[2]));
                     event.setLine(0, CLICK_TO_QUIT);
-                    event.setLine(1, ChatColor.BLUE + lines[2]);
+                    event.setLine(1, ChatColor.BLUE + game.getDisplayName());
                     event.setLine(2, "");
                     event.setLine(3, "");
                     game.addSign(sign);
@@ -131,9 +131,8 @@ public class SignEvent implements Listener {
     public void actualiseJoinSignForGame(Game game) {
         for(Sign sign : game.getSignList()) {
             if(sign.getMetadata("join").get(0).asBoolean()) {
-                String name = sign.getMetadata("name").get(0).asString();
                 sign.setLine(0, CLICK_TO_JOIN);
-                sign.setLine(1, ChatColor.BLUE + name);
+                sign.setLine(1, ChatColor.BLUE + game.getDisplayName());
                 sign.setLine(2, getInfoPlayer(game));
                 sign.setLine(3, game.getState().getName());
                 sign.update();
@@ -156,11 +155,7 @@ public class SignEvent implements Listener {
     }
 
     public String getInfoPlayer(Game game) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(ChatColor.BLUE + "" + game.getPlayerList().size())
-                .append(ChatColor.DARK_GRAY + "/")
-                .append(ChatColor.BLUE + "" + game.getMaxPlayer());
-        return builder.toString();
+        return (ChatColor.BLUE + "" + game.getPlayerList().size()) + ChatColor.DARK_GRAY + "/" + ChatColor.BLUE + "" + game.getMaxPlayer();
     }
 
     public GameManager getManager() {

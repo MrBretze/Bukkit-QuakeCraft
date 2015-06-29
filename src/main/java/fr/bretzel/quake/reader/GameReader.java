@@ -3,7 +3,7 @@ package fr.bretzel.quake.reader;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
-
+import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -50,6 +50,7 @@ public class GameReader {
         compound.setString("location1", Util.toStringLocation(game.getFirstLocation()));
         compound.setString("location2", Util.toStringLocation(game.getSecondLocation()));
         compound.setString("spawn", Util.toStringLocation(game.getSpawn()));
+        compound.setString("displayName", game.getDisplayName());
 
         return compound;
     }
@@ -57,7 +58,10 @@ public class GameReader {
     public static Game read (NBTTagCompound compound, File file) {
         Game game = new Game();
 
+        System.out.print("Init new game by file: " + file.toString());
+
         game.setName(file.getName().replace(".dat", ""));
+        game.setFile(file);
         game.setFirstLocation(Util.toLocationString(compound.getString("location1")));
         game.setSecondLocation(Util.toLocationString(compound.getString("location2")));
         game.setSpawn(Util.toLocationString(compound.getString("spawn")));
@@ -66,22 +70,33 @@ public class GameReader {
             game.addBlock(b);
         }
 
+        System.out.print("Init signs");
+
         if (compound.hasKey("signs")) {
             NBTTagCompound s = compound.getCompound("signs");
             int size = s.getInt("size");
-            if(s.hasKey(String.valueOf(0))) {
-                for(int i = 0; i >= size; i++) {
+            int vsize = size - 1;
+            System.out.print("Init signs size:" + size);
+            if (size > 0) {
+                for (int i = 0; i <= vsize; i++) {
+                    System.out.print("Init signs: " + i);
                     game.addSign(SignReader.read(s.getCompound(String.valueOf(i))));
                 }
             }
         }
 
+        System.out.print("Init respawn");
         if (compound.hasKey("respawns")) {
             NBTTagCompound s = compound.getCompound("respawns");
             int size = s.getInt("size");
-            if(s.hasKey(String.valueOf(0))) {
-                for(int i = 0; i >= size; i++) {
-                    game.addRespawn(Util.toLocationString(s.getString(String.valueOf(i))));
+            int vsize = size - 1;
+            System.out.print("Init respawn size: " + size);
+            if (size > 0) {
+                for (int i = 0; i <= vsize; i++) {
+                    System.out.print("Init respawn: " + i);
+                    if (size != size - 1) {
+                        game.addRespawn(Util.toLocationString(s.getString(String.valueOf(i))));
+                    }
                 }
             }
         }
@@ -89,12 +104,20 @@ public class GameReader {
         if (compound.hasKey("players")) {
             NBTTagCompound s = compound.getCompound("players");
             int size = s.getInt("size");
-            if(s.hasKey(String.valueOf(0))) {
-                for(int i = 0; i >= size; i++) {
-                    game.addPlayer(UUID.fromString(s.getString(String.valueOf(i))));
+            int vsize = size - 1;
+            if (size > 0) {
+                for (int i = 0; i < vsize; i++) {
+                    try {
+                        game.addPlayer(UUID.fromString(s.getString(String.valueOf(i))));
+                    } catch (IllegalArgumentException e) {
+                        e.fillInStackTrace();
+                    }
                 }
             }
         }
+
+        game.setDisplayName(compound.getString("displayName"));
+        game.setScoreboardManager(new ScoreboardAPI(game));
         return game;
     }
 

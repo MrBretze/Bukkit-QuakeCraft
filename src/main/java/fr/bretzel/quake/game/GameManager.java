@@ -1,29 +1,25 @@
 package fr.bretzel.quake.game;
 
-import fr.bretzel.quake.Chrono;
-import fr.bretzel.quake.GameTask;
-import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.Util;
+import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStart;
-import fr.bretzel.quake.PlayerInfo;
-
 import fr.bretzel.quake.game.task.MainTask;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -34,21 +30,22 @@ import java.util.*;
 
 public class GameManager implements Listener {
 
+    public SignEvent signEvent;
+    public int maxMinute = 10;
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
     private HashMap<Game, GameStart> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
+    private HashMap<Player, Integer> respawnTentative = new HashMap<>();
     private Random random = new Random();
     private Quake quake;
-    public SignEvent signEvent;
-    public int maxMinute = 10;
     private Location lobby;
     private MainTask mainTask;
 
     public GameManager(Quake quake) {
         this.quake = quake;
 
-        quake.manager.registerEvents(this, quake);
+        Quake.manager.registerEvents(this, quake);
 
         this.signEvent = new SignEvent(this);
 
@@ -111,6 +108,14 @@ public class GameManager implements Listener {
         return lobby;
     }
 
+    public void setLobby(Location lobby) {
+        this.lobby = lobby;
+    }
+
+    public HashMap<Player, Integer> getRespawnTentative() {
+        return respawnTentative;
+    }
+
     public HashMap<Game, GameStart> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;
     }
@@ -125,10 +130,6 @@ public class GameManager implements Listener {
 
     public GameTask getTaskByGame(Game game) {
         return getQuakeTaskHashMap().get(game);
-    }
-
-    public void setLobby(Location lobby) {
-        this.lobby = lobby;
     }
 
     public SignEvent getSignEvent() {
@@ -147,12 +148,12 @@ public class GameManager implements Listener {
         return gameLinkedList;
     }
 
-    public LinkedHashMap<UUID, Chrono> getUuidToChrono() {
-        return uuidToChrono;
-    }
-
     public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
         this.gameLinkedList = gameLinkedList;
+    }
+
+    public LinkedHashMap<UUID, Chrono> getUuidToChrono() {
+        return uuidToChrono;
     }
 
     public Chrono getChronoByUUID(UUID id) {
@@ -269,10 +270,16 @@ public class GameManager implements Listener {
                 getQuakeTaskHashMap().put(game, gameStart);
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
+                player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                        + ChatColor.BLUE + ")");
             } else {
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
+                player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
+                        + ChatColor.BLUE + ")");
             }
+            player.setScoreboard(game.getScoreboardManager().getScoreboard());
+            game.getScoreboardManager().getScoreboard().resetScores(signEvent.getInfoPlayer(game));
         } else if(game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");
             event.setCancelled(true);
@@ -289,7 +296,7 @@ public class GameManager implements Listener {
                 game.reset();
             }
         }
-        int players = game.getPlayerList().size() + 1;
+        int players = game.getPlayerList().size() - 1;
         game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                 + ChatColor.BLUE + ")");
     }
@@ -317,11 +324,11 @@ public class GameManager implements Listener {
         Game game = event.getGame();
         Player player = event.getPlayer();
         if(event.getKill() == 2) {
-            game.broadcastMessage(ChatColor.RED + "Double kill !");
+            game.broadcastMessage(ChatColor.RED + "§lDouble kill !");
         } else if(event.getKill() == 3) {
-            game.broadcastMessage(ChatColor.RED + "Triple kill !");
+            game.broadcastMessage(ChatColor.RED + "§lTriple kill !");
         } else if(event.getKill() > 3) {
-            game.broadcastMessage(ChatColor.RED + "Multiple kill !");
+            game.broadcastMessage(ChatColor.RED + "§lMultiple kill !");
         }
     }
 

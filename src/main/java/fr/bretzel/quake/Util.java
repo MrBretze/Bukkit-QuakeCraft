@@ -2,13 +2,19 @@ package fr.bretzel.quake;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Firework;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,9 +73,9 @@ public class Util {
                     double px = h.getX();
                     double py = h.getY();
                     double pz = h.getZ();
-                    boolean dX = Math.abs(l.getX() - px) < 0.7D * distance;
+                    boolean dX = Math.abs(l.getX() - px) < 0.9D * distance;
                     boolean dY = Math.abs(l.getY() - py) < 1.6D * distance;
-                    boolean dZ = Math.abs(l.getZ() - pz) < 0.7D * distance;
+                    boolean dZ = Math.abs(l.getZ() - pz) < 0.9D * distance;
 
                     if(dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
                         entities.add(e);
@@ -217,8 +223,9 @@ public class Util {
                 .flicker(r.nextBoolean()).withColor(c1).withFade(c2)
                 .with(type).trail(r.nextBoolean()).build();
         fm.addEffect(effect);
-        fm.setPower(-1);
+        fm.setPower(0);
         fw.setFireworkMeta(fm);
+        fw.detonate();
     }
 
     private static Color getColor(int c){
@@ -258,6 +265,45 @@ public class Util {
                 return Color.WHITE;
             case 17:
                 return Color.YELLOW;
+        }
+    }
+
+    public static void download(URL address, File localFileName) {
+        OutputStream out = null;
+        URLConnection conn;
+        InputStream in = null;
+
+        if (!localFileName.exists()) {
+            try {
+                localFileName.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            URL url = address;
+            out = new BufferedOutputStream(new FileOutputStream(localFileName));
+            conn = url.openConnection();
+            in = conn.getInputStream();
+            byte[] buffer = new byte[1024];
+
+            int numRead;
+            while ((numRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, numRead);
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ioe) {
+            }
         }
     }
 }

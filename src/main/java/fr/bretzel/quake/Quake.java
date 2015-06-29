@@ -5,20 +5,19 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.reader.GameReader;
-
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Created by MrBretzel on 09/06/2015.
@@ -30,6 +29,17 @@ public class Quake extends JavaPlugin implements Listener {
     public static GameManager gameManager;
     public static Quake quake;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
+
+    public static PlayerInfo getPlayerInfo(Player player) {
+        for (PlayerInfo pi : playerInfos) {
+            if (pi.getPlayer() == player) {
+                return pi;
+            }
+        }
+        PlayerInfo info = new PlayerInfo(player);
+        playerInfos.add(info);
+        return info;
+    }
 
     @Override
     public void onEnable() {
@@ -73,29 +83,12 @@ public class Quake extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
-            final Player player = (Player) sender;
-            player.setHealth(0);
-            BukkitRunnable runnable = new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Util.respawn(player);
-                }
-            };
-            runnable.runTaskLater(Quake.quake, 20L);
+            for (Game game : gameManager.getGameLinkedList()) {
+                Bukkit.broadcastMessage(game.getRespawn().size() + "");
+            }
             return true;
         }
         return true;
-    }
-
-    public static PlayerInfo getPlayerInfo(Player player) {
-        for(PlayerInfo pi : playerInfos) {
-            if(pi.getPlayer() == player) {
-                return pi;
-            }
-        }
-        PlayerInfo info = new PlayerInfo(player);
-        playerInfos.add(info);
-        return info;
     }
 
     private void initGame(File file) {
