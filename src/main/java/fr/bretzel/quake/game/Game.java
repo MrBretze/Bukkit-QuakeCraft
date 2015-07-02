@@ -15,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -315,19 +316,6 @@ public class Game {
         setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
     }
 
-    public void reset() {
-        for(UUID uuid : getPlayerList()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if(p != null && p.isOnline()) {
-                p.sendMessage(ChatColor.RED + "This game has been annulled !");
-                p.teleport(Quake.gameManager.getLobby());
-            }
-        }
-        getPlayerList().clear();
-        setState(State.WAITING);
-        Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
-    }
-
     public void stop() {
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
@@ -335,12 +323,23 @@ public class Game {
                 p.sendMessage(ChatColor.RED + "The game has been stopped !");
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
+                p.setWalkSpeed(0.2F);
                 p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                 if (p.hasMetadata("killer")) {
                     p.removeMetadata("killer", Quake.quake);
                 }
             }
         }
+
+        getScoreboardManager().getObjective().unregister();
+        getScoreboardManager().setObjective(getScoreboardManager().getScoreboard().registerNewObjective("quake", "dummy"));
+        getScoreboardManager().getObjective().getScore("§r").setScore(10);
+        getScoreboardManager().getObjective().getScore(getDisplayName()).setScore(9);
+        getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
+        getScoreboardManager().getObjective().getScore(Quake.gameManager.signEvent.getInfoPlayer(this)).setScore(7);
+        getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
+        getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
+
         getPlayerList().clear();
         setState(State.WAITING);
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);

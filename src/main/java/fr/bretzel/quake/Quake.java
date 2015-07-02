@@ -5,7 +5,6 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.reader.GameReader;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -83,9 +82,8 @@ public class Quake extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
-            for (Game game : gameManager.getGameLinkedList()) {
-                Bukkit.broadcastMessage(game.getRespawn().size() + "");
-            }
+            Player player = (Player) sender;
+            Util.shootFirework(player.getEyeLocation());
             return true;
         }
         return true;

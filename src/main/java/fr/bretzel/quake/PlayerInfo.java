@@ -174,7 +174,7 @@ public class PlayerInfo {
             LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
             getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_LARGE_BLAST, random.nextFloat(), random.nextFloat());
             for(Location l : locs) {
-                getEffect().display(0.0F, 0.0F, 0.0f, 0.0F, 1, l, 200);
+                new ParticleEffect.ParticlePacket(getEffect(), 0.0f, 0.0f, 0.0f, 0.0F, 1, true, null).sendTo(l, 200);
             }
 
             List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 0.59D);

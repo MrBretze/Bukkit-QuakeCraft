@@ -3,10 +3,8 @@ package fr.bretzel.quake;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
 import java.io.*;
@@ -132,22 +130,11 @@ public class Util {
 
     public static String toText(String s){
         int charCode = Integer.parseInt(s, 2);
-
-        String str = new Character((char)charCode).toString();
-
-        return str;
+        return Character.toString((char) charCode);
     }
 
     public static String toStringLocation(Location location) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(location.getWorld().getName() + ";")
-                .append(location.getBlockX() + ";")
-                .append(location.getBlockY() + ";")
-                .append(location.getBlockZ() + ";")
-                .append(location.getYaw() + ";")
-                .append(location.getPitch() + "");
-
-        return builder.toString();
+        return (location.getWorld().getName() + ";") + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ() + ";" + location.getYaw() + ";" + location.getPitch() + "";
     }
 
     public static ChatColor getChatColorByInt(int i) {
@@ -165,7 +152,7 @@ public class Util {
         return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]), Float.valueOf(strings[4]), Float.valueOf(strings[5]));
     }
 
-    public static void respawn(Player player) {
+    public static void respawn(Player player) throws InvocationTargetException {
         try {
             Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
             Object con = nmsPlayer.getClass().getDeclaredField("playerConnection").get(nmsPlayer);
@@ -179,25 +166,16 @@ public class Util {
             Object playerlist = mcserver.getClass().getDeclaredMethod("getPlayerList").invoke(mcserver);
             Method moveToWorld = playerlist.getClass().getMethod("moveToWorld", EntityPlayer, int.class, boolean.class);
             moveToWorld.invoke(playerlist, nmsPlayer, 0, false);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
 
     public static void shootFirework(Location l) {
-        Firework fw = l.getWorld().spawn(l.clone().add(0.0D, 0.7D, 0.0D), Firework.class);
-        FireworkMeta fm = fw.getFireworkMeta();
+        FireworkEffectPlayer pEffect = new FireworkEffectPlayer();
         Random r = new Random();
         int fType = r.nextInt(5) + 1;
-        FireworkEffect.Type type = FireworkEffect.Type.BALL;
+        FireworkEffect.Type type = null;
         switch (fType) {
             case 1:
                 type = FireworkEffect.Type.BALL;
@@ -215,57 +193,14 @@ public class Util {
                 type = FireworkEffect.Type.STAR;
         }
 
-        int c1i = r.nextInt(17) + 1;
-        int c2i = r.nextInt(17) + 1;
-        Color c1 = getColor (c1i);
-        Color c2 = getColor (c2i);
-        FireworkEffect effect = FireworkEffect.builder()
-                .flicker(r.nextBoolean()).withColor(c1).withFade(c2)
-                .with(type).trail(r.nextBoolean()).build();
-        fm.addEffect(effect);
-        fm.setPower(0);
-        fw.setFireworkMeta(fm);
-        fw.detonate();
+        Color c1 = getColor(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+        Color c2 = getColor(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+        FireworkEffect effect = FireworkEffect.builder().withColor(c1).withFade(c2).flicker(r.nextBoolean()).trail(r.nextBoolean()).with(type).build();
+        pEffect.playFirework(l.getWorld(), l, effect);
     }
 
-    private static Color getColor(int c){
-        switch (c){
-            default:
-            case 1:
-                return Color.AQUA;
-            case 2:
-                return Color.BLACK;
-            case 3:
-                return Color.BLUE;
-            case 4:
-                return Color.FUCHSIA;
-            case 5:
-                return Color.GRAY;
-            case 6:
-                return Color.GREEN;
-            case 7:
-                return Color.LIME;
-            case 8:
-                return Color.MAROON;
-            case 9:
-                return Color.NAVY;
-            case 10:
-                return Color.OLIVE;
-            case 11:
-                return Color.ORANGE;
-            case 12:
-                return Color.PURPLE;
-            case 13:
-                return Color.RED;
-            case 14:
-                return Color.SILVER;
-            case 15:
-                return Color.TEAL;
-            case 16:
-                return Color.WHITE;
-            case 17:
-                return Color.YELLOW;
-        }
+    private static Color getColor(int r, int v, int b) {
+        return Color.fromRGB(r, v, b);
     }
 
     public static void download(URL address, File localFileName) {

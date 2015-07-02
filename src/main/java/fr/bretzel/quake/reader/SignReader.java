@@ -24,8 +24,8 @@ public class SignReader {
             sign.setLine(2, compound.getString("line3"));
             sign.setLine(3, compound.getString("line4"));
 
-            sign.setMetadata("join", new FixedMetadataValue(Quake.quake, Boolean.valueOf(compound.getString("join"))));
-            sign.setMetadata("game", new FixedMetadataValue(Quake.quake, String.valueOf(compound.getString("game"))));
+            sign.setMetadata("join", new FixedMetadataValue(Quake.quake, compound.getBoolean("join")));
+            sign.setMetadata("game", new FixedMetadataValue(Quake.quake, compound.getString("game")));
 
             sign.update();
         } catch (Exception e) {

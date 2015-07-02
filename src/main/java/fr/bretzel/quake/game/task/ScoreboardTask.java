@@ -15,7 +15,7 @@ public class ScoreboardTask extends GameTask {
 
     int w = 2;
     private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
-    private String[] wait = new String[]{"Waitng...", "Waitng..", "Waitng."};
+    private String[] wait = {"Waitng...", "Waitng..", "Waitng."};
 
     public ScoreboardTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
@@ -40,13 +40,18 @@ public class ScoreboardTask extends GameTask {
         getGame().getScoreboardManager().getObjective().setDisplayName(scroller.next());
 
         if (getGame().getState() == State.WAITING) {
-            String w = this.wait[this.w];
-            String lW = this.wait[this.w--];
-            if (this.w == 0) {
-                this.w = 2;
+            String n;
+            String l;
+
+            l = wait[w];
+            if (w < 1) {
+                w = 2;
             }
-            getGame().getScoreboardManager().getScoreboard().resetScores(lW);
-            getGame().getScoreboardManager().getObjective().getScore(w).setScore(5);
+            w--;
+            n = wait[w];
+
+            getGame().getScoreboardManager().getScoreboard().resetScores(l);
+            getGame().getScoreboardManager().getObjective().getScore(n).setScore(5);
         }
     }
 }

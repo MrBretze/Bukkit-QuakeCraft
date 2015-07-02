@@ -38,7 +38,7 @@ public class ScoreboardAPI {
 
         getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        task = new ScoreboardTask(Quake.quake, 5, 5, getGame());
+        task = new ScoreboardTask(Quake.quake, 2, 2, getGame());
     }
 
     public Game getGame() {

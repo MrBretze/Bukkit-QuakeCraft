@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -280,6 +281,7 @@ public class GameManager implements Listener {
             }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
             game.getScoreboardManager().getScoreboard().resetScores(signEvent.getInfoPlayer(game));
+            player.setWalkSpeed(0.4F);
         } else if(game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");
             event.setCancelled(true);
@@ -293,7 +295,7 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         if (game.getState() == State.STARTED) {
             if(game.getPlayerList().size() - 1 == 0) {
-                game.reset();
+                game.stop();
             }
         }
         int players = game.getPlayerList().size() - 1;
@@ -329,6 +331,15 @@ public class GameManager implements Listener {
             game.broadcastMessage(ChatColor.RED + "§lTriple kill !");
         } else if(event.getKill() > 3) {
             game.broadcastMessage(ChatColor.RED + "§lMultiple kill !");
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {
+        Player player = (Player) event.getEntity();
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        if (info.isInGame()) {
+            event.setCancelled(true);
         }
     }
 
