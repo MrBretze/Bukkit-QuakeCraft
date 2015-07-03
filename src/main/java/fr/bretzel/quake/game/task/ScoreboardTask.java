@@ -4,6 +4,7 @@ import fr.bretzel.quake.ColorScroller;
 import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
+
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ScoreboardTask extends GameTask {
 
     int w = 2;
+    int wainting = 40;
     private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
     private String[] wait = {"Waitng...", "Waitng..", "Waitng."};
 
@@ -39,19 +41,21 @@ public class ScoreboardTask extends GameTask {
 
         getGame().getScoreboardManager().getObjective().setDisplayName(scroller.next());
 
-        if (getGame().getState() == State.WAITING) {
+        if (getGame().getState() == State.WAITING && wainting == 0) {
+            this.wainting = 40;
             String n;
             String l;
-
             l = wait[w];
-            if (w < 1) {
-                w = 2;
+
+            if((w <= -1)) {
+                this.w = 2;
             }
-            w--;
+
             n = wait[w];
 
             getGame().getScoreboardManager().getScoreboard().resetScores(l);
             getGame().getScoreboardManager().getObjective().getScore(n).setScore(5);
         }
+        this.wainting--;
     }
 }
