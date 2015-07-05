@@ -1,12 +1,28 @@
+/**
+ * Copyright 2015 Loïc Nussbaumer
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License. See accompanying
+ * LICENSE file.
+ */
 package fr.bretzel.quake.game;
 
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
-import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -46,6 +62,7 @@ public class Game {
     private State state = State.WAITING;
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
+    private LinkedHashMap<Player, Integer> playerKills = new LinkedHashMap<>();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -292,6 +309,17 @@ public class Game {
         return respawnview;
     }
 
+    public int getKill(Player player) {
+        return playerKills.get(player);
+    }
+
+    public void addKill(Player player, int kill) {
+        int i = playerKills.get(player);
+        i += kill;
+        playerKills.remove(player);
+        playerKills.put(player, i);
+    }
+
     public Location getSpawn() {
         return spawn;
     }
@@ -347,20 +375,18 @@ public class Game {
 
     public void respawn(Player p) {
         Location location = getRespawn().get(random.nextInt(getRespawn().size()));
-        PlayerInfo info = Quake.getPlayerInfo(p);
         int pSize = 0;
         int tentative;
         if (Quake.gameManager.getRespawnTentative().get(p) == null) {
             tentative = 0;
+            Quake.gameManager.getRespawnTentative().put(p, 0);
         } else {
             tentative = Quake.gameManager.getRespawnTentative().get(p);
         }
-        if (tentative >= 5) {
+        if (tentative <= 5) {
             p.teleport(location);
-            if (p.hasMetadata("killer") && info.isInGame()) {
-                String k = p.getMetadata("killer").get(0).asString();
-                broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
-            }
+            Quake.gameManager.getRespawnTentative().put(p, 0);
+            Quake.gameManager.getRespawnTentative().remove(p);
         } else {
             for (Entity e : p.getWorld().getNearbyEntities(location, 10, 10, 10)) {
                 if (e instanceof Player) {
@@ -369,12 +395,11 @@ public class Game {
             }
             if (pSize == 0) {
                 p.teleport(location);
-                if (p.hasMetadata("killer") && info.isInGame()) {
-                    String k = p.getMetadata("killer").get(0).asString();
-                    broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " Has been sprayed by " + ChatColor.RESET + k);
-                }
+                Quake.gameManager.getRespawnTentative().remove(p);
+                Quake.gameManager.getRespawnTentative().put(p, 0);
             } else {
                 respawn(p);
+                Quake.gameManager.getRespawnTentative().remove(p);
                 Quake.gameManager.getRespawnTentative().put(p, tentative + 1);
             }
         }

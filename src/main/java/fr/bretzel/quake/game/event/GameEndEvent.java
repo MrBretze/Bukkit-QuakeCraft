@@ -16,6 +16,7 @@
  */
 package fr.bretzel.quake.game.event;
 
+
 import fr.bretzel.quake.game.Game;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -23,28 +24,19 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * Created by MrBretzel on 20/06/2015.
+ * Created by Loic on 04/07/2015.
  */
 
-public class PlayerJoinGameEvent extends Event implements Cancellable {
+public class GameEndEvent extends Event implements Cancellable {
+
+    private boolean cancel;
 
     private Player player;
     private Game game;
-    private boolean cancelled;
 
-    public PlayerJoinGameEvent(Player player, Game game) {
-        setGame(game);
+    public GameEndEvent(Player player, Game game) {
         setPlayer(player);
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+        setGame(game);
     }
 
     public Game getGame() {
@@ -61,6 +53,16 @@ public class PlayerJoinGameEvent extends Event implements Cancellable {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    @Override
+    public void setCancelled(boolean b) {
+        this.cancel = b;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancel;
     }
 
     private static final HandlerList handlers = new HandlerList();

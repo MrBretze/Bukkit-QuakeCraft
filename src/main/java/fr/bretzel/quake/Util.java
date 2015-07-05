@@ -1,22 +1,33 @@
+/**
+ * Copyright 2015 Loïc Nussbaumer
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License. See accompanying
+ * LICENSE file.
+ */
 package fr.bretzel.quake;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
-import java.io.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by MrBretzel on 11/06/2015.
@@ -71,9 +82,9 @@ public class Util {
                     double px = h.getX();
                     double py = h.getY();
                     double pz = h.getZ();
-                    boolean dX = Math.abs(l.getX() - px) < 0.9D * distance;
+                    boolean dX = Math.abs(l.getX() - px) < 1.0D * distance;
                     boolean dY = Math.abs(l.getY() - py) < 1.6D * distance;
-                    boolean dZ = Math.abs(l.getZ() - pz) < 0.9D * distance;
+                    boolean dZ = Math.abs(l.getZ() - pz) < 1.0D * distance;
 
                     if(dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
                         entities.add(e);
@@ -86,7 +97,7 @@ public class Util {
 
     public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2)
     {
-        List<Block> blocks = new ArrayList<Block>();
+        List<Block> blocks = new ArrayList<>();
 
         int topBlockX = (loc1.getBlockX() < loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
         int bottomBlockX = (loc1.getBlockX() > loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
@@ -112,27 +123,6 @@ public class Util {
         return blocks;
     }
 
-    public static String toBinary(String s) {
-        StringBuilder builder = new StringBuilder();
-        byte[] bytes = s.getBytes();
-
-        for (byte b : bytes) {
-            int val = b;
-            for (int i = 0; i < 8; i++)
-            {
-                builder.append((val & 128) == 0 ? 0 : 1);
-                val <<= 1;
-            }
-            builder.append(' ');
-        }
-        return builder.toString();
-    }
-
-    public static String toText(String s){
-        int charCode = Integer.parseInt(s, 2);
-        return Character.toString((char) charCode);
-    }
-
     public static String toStringLocation(Location location) {
         return (location.getWorld().getName() + ";") + location.getBlockX() + ";" + location.getBlockY() + ";" + location.getBlockZ() + ";" + location.getYaw() + ";" + location.getPitch() + "";
     }
@@ -152,27 +142,7 @@ public class Util {
         return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]), Double.valueOf(strings[2]), Double.valueOf(strings[3]), Float.valueOf(strings[4]), Float.valueOf(strings[5]));
     }
 
-    public static void respawn(Player player) throws InvocationTargetException {
-        try {
-            Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-            Object con = nmsPlayer.getClass().getDeclaredField("playerConnection").get(nmsPlayer);
-
-            Class<?> EntityPlayer = Class.forName(nmsPlayer.getClass().getPackage().getName() + ".EntityPlayer");
-
-            Field minecraftServer = con.getClass().getDeclaredField("minecraftServer");
-            minecraftServer.setAccessible(true);
-            Object mcserver = minecraftServer.get(con);
-
-            Object playerlist = mcserver.getClass().getDeclaredMethod("getPlayerList").invoke(mcserver);
-            Method moveToWorld = playerlist.getClass().getMethod("moveToWorld", EntityPlayer, int.class, boolean.class);
-            moveToWorld.invoke(playerlist, nmsPlayer, 0, false);
-        } catch (NoSuchMethodException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void shootFirework(Location l) {
-        FireworkEffectPlayer pEffect = new FireworkEffectPlayer();
         Random r = new Random();
         int fType = r.nextInt(5) + 1;
         FireworkEffect.Type type = null;
@@ -192,53 +162,87 @@ public class Util {
             case 5:
                 type = FireworkEffect.Type.STAR;
         }
+        FireworkEffect effect = FireworkEffect.builder().withColor(Arrays.asList(getColor(), getColor(), getColor(), getColor())).withFade(Arrays.asList(getColor(), getColor(), getColor(), getColor())).flicker(r.nextBoolean()).trail(r.nextBoolean()).with(type).build();
 
-        Color c1 = getColor(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-        Color c2 = getColor(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-        FireworkEffect effect = FireworkEffect.builder().withColor(c1).withFade(c2).flicker(r.nextBoolean()).trail(r.nextBoolean()).with(type).build();
-        pEffect.playFirework(l.getWorld(), l, effect);
+        Firework firework = l.getWorld().spawn(l, Firework.class);
+        firework.getFireworkMeta().addEffect(effect);
+
+        Object fwHandle = getHandle(firework);
+
+        FireworkMeta data = firework.getFireworkMeta();
+        data.clearEffects();
+        data.setPower(1);
+        data.addEffect(effect);
+        firework.setFireworkMeta(data);
+
+        try {
+            Object packet = getMinecraftServerClass("PacketPlayOutEntityStatus").getConstructor(fwHandle.getClass().getSuperclass(), Byte.TYPE).newInstance(fwHandle, (byte) 17);
+            for(Player p : l.getWorld().getPlayers()) {
+                Object handle = getHandle(p);
+                Object connection = handle.getClass().getDeclaredField("playerConnection").get(handle);
+                Method sendPacket = getMethod(connection.getClass(), "sendPacket");
+                sendPacket.invoke(connection, packet);
+                firework.detonate();
+                firework.remove();
+            }
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | NoSuchFieldException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
+
 
     private static Color getColor(int r, int v, int b) {
         return Color.fromRGB(r, v, b);
     }
 
-    public static void download(URL address, File localFileName) {
-        OutputStream out = null;
-        URLConnection conn;
-        InputStream in = null;
+    private static Color getColor() {
+        Random random = new Random();
+        return Color.fromRGB(random.nextInt(255), random.nextInt(255), random.nextInt(255));
+    }
 
-        if (!localFileName.exists()) {
-            try {
-                localFileName.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
+    private static Object getHandle(Object obj) {
         try {
-            URL url = address;
-            out = new BufferedOutputStream(new FileOutputStream(localFileName));
-            conn = url.openConnection();
-            in = conn.getInputStream();
-            byte[] buffer = new byte[1024];
-
-            int numRead;
-            while ((numRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, numRead);
-            }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ioe) {
-            }
+            return getMethod(obj.getClass(), "getHandle").invoke(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
+    }
+
+    private static Method getMethod(Class<?> clazz, String name, Class<?>... args) {
+        for (Method m : clazz.getMethods())
+            if (m.getName().equals(name)
+                    && (args.length == 0 || ClassListEqual(args,
+                    m.getParameterTypes()))) {
+                m.setAccessible(true);
+                return m;
+            }
+        return null;
+    }
+
+    private static boolean ClassListEqual(Class<?>[] l1, Class<?>[] l2) {
+        boolean equal = true;
+        if (l1.length != l2.length)
+            return false;
+        for (int i = 0; i < l1.length; i++)
+            if (l1[i] != l2[i]) {
+                equal = false;
+                break;
+            }
+        return equal;
+    }
+
+    public static Class<?> getMinecraftServerClass(String name) {
+        try {
+            return Class.forName("net.minecraft.server." + getBukkitVersion() + "." + name);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getBukkitVersion() {
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 }

@@ -1,16 +1,27 @@
+/**
+ * Copyright 2015 Loïc Nussbaumer
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License. See accompanying
+ * LICENSE file.
+ */
 package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.*;
-import fr.bretzel.quake.game.event.GameCreateEvent;
-import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
-import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
-import fr.bretzel.quake.game.event.PlayerShootEvent;
+import fr.bretzel.quake.game.event.*;
 import fr.bretzel.quake.game.task.GameStart;
 import fr.bretzel.quake.game.task.MainTask;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -222,6 +233,7 @@ public class GameManager implements Listener {
             Chrono c = getChronoByUUID(player.getUniqueId());
             if(c != null) {
                 c.stop();
+                c.resume();
                 int minute = c.getMinute();
                 int heure = c.getHeure();
                 if(heure > 0 || minute > 2) {
@@ -281,7 +293,7 @@ public class GameManager implements Listener {
             }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
             game.getScoreboardManager().getScoreboard().resetScores(signEvent.getInfoPlayer(game));
-            player.setWalkSpeed(0.4F);
+            player.setWalkSpeed(0.3F);
         } else if(game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");
             event.setCancelled(true);
@@ -323,14 +335,23 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerShoot(PlayerShootEvent event) {
-        Game game = event.getGame();
         Player player = event.getPlayer();
-        if(event.getKill() == 2) {
-            game.broadcastMessage(ChatColor.RED + "§lDouble kill !");
-        } else if(event.getKill() == 3) {
-            game.broadcastMessage(ChatColor.RED + "§lTriple kill !");
-        } else if(event.getKill() > 3) {
-            game.broadcastMessage(ChatColor.RED + "§lMultiple kill !");
+        Game game = event.getGame();
+        PlayerInfo info = Quake.getPlayerInfo(player);
+
+        if(info.isShoot()) {
+            if(event.getKill() == 2) {
+                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Double kill !");
+            } else if(event.getKill() == 3) {
+                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Triple kill !");
+            } else if(event.getKill() >= 4) {
+                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Multiple kill !");
+            }
+
+            for(Player p : event.getPlayers()) {
+                Util.shootFirework(p.getEyeLocation());
+                game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
+            }
         }
     }
 

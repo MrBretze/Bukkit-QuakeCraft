@@ -43,18 +43,22 @@ public class ScoreboardTask extends GameTask {
 
         if (getGame().getState() == State.WAITING && wainting == 0) {
             this.wainting = 40;
-            String n;
-            String l;
-            l = wait[w];
+            String news;
+            String last;
 
-            if((w <= -1)) {
-                this.w = 2;
+            if(w != -1) {
+                w = 2;
+                last = wait[0];
+            } else {
+                last = wait[w];
             }
 
-            n = wait[w];
+            news = wait[w];
 
-            getGame().getScoreboardManager().getScoreboard().resetScores(l);
-            getGame().getScoreboardManager().getObjective().getScore(n).setScore(5);
+            w--;
+
+            getGame().getScoreboardManager().getScoreboard().resetScores(last);
+            getGame().getScoreboardManager().getObjective().getScore(news).setScore(5);
         }
         this.wainting--;
     }

@@ -1,3 +1,19 @@
+/**
+ * Copyright 2015 Loïc Nussbaumer
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License. See accompanying
+ * LICENSE file.
+ */
 package fr.bretzel.quake;
 
 import fr.bretzel.nbt.NBTCompressedStreamTools;
@@ -12,13 +28,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,6 +51,7 @@ public class PlayerInfo {
     private boolean shoot = true;
     private boolean dash = true;
     private int playerkill = 0;
+    private int coins = 0;
     private File file;
     private Random random = new Random();
 
@@ -152,42 +167,35 @@ public class PlayerInfo {
         if(isDash()) {
             setDash(false);
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
-            Vector v = getPlayer().getEyeLocation().getDirection().multiply(1.5D);
-            v.setY(0.7D);
-            getPlayer().setVelocity(v);
+            Vector pVector = player.getEyeLocation().getDirection();
+            Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
+            getPlayer().setVelocity(vector);
+            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
         }
     }
 
     public void shoot() {
-        PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()));
+        List<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.59D);
+        PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()), locs, Util.getPlayerListInDirection(locs, getPlayer(), 0.59D));
         Bukkit.getPluginManager().callEvent(shoot);
         if(shoot.isCancelled()) {
             return;
         }
-
-        Game game = Quake.gameManager.getGameByPlayer(getPlayer());
-
-        if(isShoot()) {
+        if (isShoot()) {
             setShoot(false);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (getReloadTime() * 20));
-
-            LinkedList<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.5);
-            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_LARGE_BLAST, random.nextFloat(), random.nextFloat());
-            for(Location l : locs) {
-                new ParticleEffect.ParticlePacket(getEffect(), 0.0f, 0.0f, 0.0f, 0.0F, 1, true, null).sendTo(l, 200);
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
+            for(Location location : locs) {
+                new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
             }
-
-            List<Player> pList = Util.getPlayerListInDirection(locs, getPlayer(), 0.59D);
-
-            for(Player player : pList) {
-                player.setMetadata("killer", new FixedMetadataValue(Quake.quake, getPlayer().getDisplayName()));
-                Util.shootFirework(player.getEyeLocation());
-                game.respawn(player);
-                int killer = game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).getScore() + 1;
-                game.getScoreboardManager().getScoreboard().resetScores(getPlayer().getName());
-                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(killer);
+            for(Player p : shoot.getPlayers()) {
+                shoot.getGame().respawn(p);
+                p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+                addCoins(5);
             }
-            setPlayerkill(getPlayerkill() + pList.size());
+            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST2, random.nextFloat(), random.nextFloat());
+            int k = game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).getScore() + 1;
+            game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(k);
+            setPlayerkill(getPlayerkill() + shoot.getKill());
         }
     }
 
@@ -197,6 +205,18 @@ public class PlayerInfo {
 
     public void setPlayerkill(int playerkill) {
         this.playerkill = playerkill;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public void addCoins(int coins) {
+        setCoins(getCoins() + coins);
     }
 
     public void save() {
