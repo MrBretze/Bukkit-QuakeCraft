@@ -16,20 +16,24 @@
  */
 package fr.bretzel.quake.game.task;
 
-import fr.bretzel.quake.SchootTask;
-import fr.bretzel.quake.PlayerInfo;
+import fr.bretzel.quake.GameTask;
+import fr.bretzel.quake.game.Game;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * Created by MrBretzel on 22/06/2015.
+ * Created by Loic on 05/07/2015.
  */
-public class ReloadTask extends SchootTask {
 
-    public ReloadTask(PlayerInfo info) {
-        super(info);
+public class GameEndTask extends GameTask {
+
+    private int firewokSpawnable = 5;
+
+    public GameEndTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
+        super(javaPlugin, l, l1, game);
     }
 
     @Override
     public void run() {
-        getInfo().setShoot(true);
+
     }
 }

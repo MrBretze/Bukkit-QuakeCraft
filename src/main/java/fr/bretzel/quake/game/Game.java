@@ -314,7 +314,10 @@ public class Game {
     }
 
     public void addKill(Player player, int kill) {
-        int i = playerKills.get(player);
+        int i = 0;
+        if(playerKills.containsKey(player)) {
+            i = playerKills.get(player);
+        }
         i += kill;
         playerKills.remove(player);
         playerKills.put(player, i);
@@ -369,6 +372,7 @@ public class Game {
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
         getPlayerList().clear();
+        playerKills.clear();
         setState(State.WAITING);
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
     }

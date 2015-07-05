@@ -28,10 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
 
 import java.util.*;
@@ -49,7 +46,6 @@ public class GameManager implements Listener {
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private HashMap<Player, Integer> respawnTentative = new HashMap<>();
-    private Random random = new Random();
     private Quake quake;
     private Location lobby;
     private MainTask mainTask;
@@ -313,6 +309,7 @@ public class GameManager implements Listener {
         int players = game.getPlayerList().size() - 1;
         game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                 + ChatColor.BLUE + ")");
+        player.setWalkSpeed(0.2F);
     }
 
     @EventHandler
@@ -352,6 +349,15 @@ public class GameManager implements Listener {
                 Util.shootFirework(p.getEyeLocation());
                 game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
             }
+
+            if(game.getKill(player) >= game.getMaxKill()) {
+                GameEndEvent ev = new GameEndEvent(player, game);
+                Quake.manager.callEvent(ev);
+                if(ev.isCancelled()) {
+                    return;
+                }
+
+            }
         }
     }
 
@@ -360,6 +366,16 @@ public class GameManager implements Listener {
         Player player = (Player) event.getEntity();
         PlayerInfo info = Quake.getPlayerInfo(player);
         if (info.isInGame()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeSlotBar(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        if (info.isInGame() && player.getInventory().getHeldItemSlot() != 0) {
+            player.getInventory().setHeldItemSlot(0);
             event.setCancelled(true);
         }
     }

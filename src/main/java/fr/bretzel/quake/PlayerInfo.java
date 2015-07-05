@@ -25,6 +25,7 @@ import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -184,18 +185,21 @@ public class PlayerInfo {
         if (isShoot()) {
             setShoot(false);
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
-            for(Location location : locs) {
+            for (Location location : locs) {
                 new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
             }
-            for(Player p : shoot.getPlayers()) {
-                shoot.getGame().respawn(p);
-                p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
-                addCoins(5);
+            if (shoot.getKill() > 0) {
+                for (Player p : shoot.getPlayers()) {
+                    shoot.getGame().respawn(p);
+                    p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+                }
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST2, random.nextFloat(), random.nextFloat());
+                int k = game.getKill(player) + shoot.getKill();
+                addKill(shoot.getKill());
+                addCoins(5 * shoot.getKill());
+                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(k);
+                setPlayerkill(getPlayerkill() + shoot.getKill());
             }
-            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST2, random.nextFloat(), random.nextFloat());
-            int k = game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).getScore() + 1;
-            game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(k);
-            setPlayerkill(getPlayerkill() + shoot.getKill());
         }
     }
 
@@ -205,6 +209,10 @@ public class PlayerInfo {
 
     public void setPlayerkill(int playerkill) {
         this.playerkill = playerkill;
+    }
+
+    public void addKill(int kill) {
+        setPlayerkill(getPlayerkill() + kill);
     }
 
     public int getCoins() {
