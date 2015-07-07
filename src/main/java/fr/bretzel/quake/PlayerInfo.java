@@ -25,7 +25,6 @@ import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -194,10 +193,15 @@ public class PlayerInfo {
                     p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
                 }
                 getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST2, random.nextFloat(), random.nextFloat());
-                int k = game.getKill(player) + shoot.getKill();
+                int kill;
+                if (Integer.valueOf(game.getKill(getPlayer())) == null) {
+                    kill = shoot.getKill();
+                } else {
+                    kill = game.getKill(getPlayer()) + shoot.getKill();
+                }
                 addKill(shoot.getKill());
                 addCoins(5 * shoot.getKill());
-                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(k);
+                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
                 setPlayerkill(getPlayerkill() + shoot.getKill());
             }
         }

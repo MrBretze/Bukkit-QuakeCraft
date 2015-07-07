@@ -22,7 +22,6 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -62,7 +61,7 @@ public class Game {
     private State state = State.WAITING;
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
-    private LinkedHashMap<Player, Integer> playerKills = new LinkedHashMap<>();
+    private HashMap<UUID, Integer> playerKills = new HashMap<>();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -309,11 +308,19 @@ public class Game {
         return respawnview;
     }
 
-    public int getKill(Player player) {
+    public int getKill(UUID player) {
         return playerKills.get(player);
     }
 
+    public int getKill(Player player) {
+        return getKill(player.getUniqueId());
+    }
+
     public void addKill(Player player, int kill) {
+        addKill(player.getUniqueId(), kill);
+    }
+
+    public void addKill(UUID player, int kill) {
         int i = 0;
         if(playerKills.containsKey(player)) {
             i = playerKills.get(player);
@@ -365,10 +372,11 @@ public class Game {
         getScoreboardManager().getObjective().unregister();
         getScoreboardManager().setObjective(getScoreboardManager().getScoreboard().registerNewObjective("quake", "dummy"));
         getScoreboardManager().getObjective().getScore("§r").setScore(10);
-        getScoreboardManager().getObjective().getScore(getDisplayName()).setScore(9);
+        getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
         getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
         getScoreboardManager().getObjective().getScore(Quake.gameManager.signEvent.getInfoPlayer(this)).setScore(7);
         getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
+        getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
         getPlayerList().clear();

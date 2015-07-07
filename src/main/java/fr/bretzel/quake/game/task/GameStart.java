@@ -22,7 +22,6 @@ import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameStartEvent;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.inventory.BasicGun;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -30,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 
+import java.text.DecimalFormat;
 import java.util.UUID;
 
 /**
@@ -38,8 +38,10 @@ import java.util.UUID;
 
 public class GameStart extends GameTask {
 
-    int minSecQuake = getGame().getSecLaunch();
+    String last = "last";
+    private int minSecQuake = getGame().getSecLaunch();
     private ScoreboardAPI scoreboardAPI = getGame().getScoreboardManager();
+    private DecimalFormat decimalFormat = new DecimalFormat("##");
 
     public GameStart(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
@@ -60,6 +62,27 @@ public class GameStart extends GameTask {
         if (minSecQuake > 0) {
             minSecQuake--;
         }
+
+        StringBuilder format = new StringBuilder();
+
+        if (minSecQuake > 60) {
+            int min = minSecQuake / 60;
+            for (int i = 0; i <= min; i++) {
+                minSecQuake = -60;
+            }
+            format.append(decimalFormat.format(min)).append(":");
+        }
+
+        format.append(decimalFormat.format(minSecQuake));
+
+        if (!last.equalsIgnoreCase("last"))
+            scoreboardAPI.getObjective().getScore(format.toString()).setScore(5);
+
+        scoreboardAPI.getScoreboard().resetScores(this.last);
+
+        scoreboardAPI.getObjective().getScore(format.toString()).setScore(5);
+
+        this.last = format.toString();
 
         if (minSecQuake <= 0 && getGame().getState() == State.WAITING) {
             GameStartEvent event = new GameStartEvent(getGame());

@@ -47,11 +47,11 @@ public class ScoreboardAPI {
         setObjective(getScoreboard().registerNewObjective("quake", "dummy"));
 
         getObjective().getScore("§r").setScore(10);
-        getObjective().getScore(game.getDisplayName()).setScore(9);
+        getObjective().getScore("Map: " + game.getDisplayName()).setScore(9);
         getObjective().getScore("§r§r").setScore(8);
         getObjective().getScore(Quake.gameManager.signEvent.getInfoPlayer(game)).setScore(7);
         getObjective().getScore("§r§r§r").setScore(6);
-
+        getObjective().getScore("Waiting...").setScore(5);
         getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
         task = new ScoreboardTask(Quake.quake, 2, 2, getGame());
