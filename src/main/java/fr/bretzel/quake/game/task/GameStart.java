@@ -75,8 +75,10 @@ public class GameStart extends GameTask {
 
         format.append(decimalFormat.format(minSecQuake));
 
-        if (!last.equalsIgnoreCase("last"))
+        if (!last.equalsIgnoreCase("last")) {
+            scoreboardAPI.getScoreboard().resetScores("Waiting...");
             scoreboardAPI.getObjective().getScore(format.toString()).setScore(5);
+        }
 
         scoreboardAPI.getScoreboard().resetScores(this.last);
 
@@ -106,9 +108,9 @@ public class GameStart extends GameTask {
                     Chrono chrono = new Chrono();
                     chrono.start();
                     Quake.gameManager.getGameChrono().put(getGame(), chrono);
-                    getGame().addKill(p, 0);
+                    getGame().setKill(p.getUniqueId(), 0);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(1);
-                    scoreboardAPI.getObjective().getScore(p.getName()).setScore(0);
+                    scoreboardAPI.getObjective().getScore(p.getName()).setScore(getGame().getKill(p));
                 }
             }
             cancel();

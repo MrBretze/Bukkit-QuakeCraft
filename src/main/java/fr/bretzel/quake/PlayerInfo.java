@@ -25,9 +25,13 @@ import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -45,7 +49,6 @@ public class PlayerInfo {
     private Player player;
     private ParticleEffect effect = ParticleEffect.FIREWORKS_SPARK;
     private double reload = 1.5;
-    private Game game;
     private Location firstLocation = null;
     private Location secondLocation = null;
     private boolean shoot = true;
@@ -84,14 +87,6 @@ public class PlayerInfo {
 
     public void setFile(File file) {
         this.file = file;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
     }
 
     public double getReloadTime() {
@@ -175,13 +170,14 @@ public class PlayerInfo {
     }
 
     public void shoot() {
-        List<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.59D);
-        PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), Quake.gameManager.getGameByPlayer(getPlayer()), locs, Util.getPlayerListInDirection(locs, getPlayer(), 0.59D));
-        Bukkit.getPluginManager().callEvent(shoot);
-        if(shoot.isCancelled()) {
-            return;
-        }
         if (isShoot()) {
+            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
+            List<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.59D);
+            PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), game, locs, Util.getPlayerListInDirection(locs, getPlayer(), 0.59D));
+            Bukkit.getPluginManager().callEvent(shoot);
+            if (shoot.isCancelled()) {
+                return;
+            }
             setShoot(false);
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
             for (Location location : locs) {
@@ -201,6 +197,7 @@ public class PlayerInfo {
                 }
                 addKill(shoot.getKill());
                 addCoins(5 * shoot.getKill());
+                game.addKill(getPlayer(), shoot.getKill());
                 game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
                 setPlayerkill(getPlayerkill() + shoot.getKill());
             }
@@ -229,6 +226,17 @@ public class PlayerInfo {
 
     public void addCoins(int coins) {
         setCoins(getCoins() + coins);
+    }
+
+    public Scoreboard getPlayerScoreboard() {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    §r");
+        objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(10);
+        objective.getScore("§r").setScore(9);
+        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(8);
+        return scoreboard;
     }
 
     public void save() {

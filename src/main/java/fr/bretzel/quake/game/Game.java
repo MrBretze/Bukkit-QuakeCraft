@@ -18,6 +18,7 @@ package fr.bretzel.quake.game;
 
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
+import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
@@ -330,6 +331,13 @@ public class Game {
         playerKills.put(player, i);
     }
 
+    public void setKill(UUID uuid, int kill) {
+        if (playerKills.containsKey(uuid)) {
+            playerKills.remove(uuid);
+        }
+        playerKills.put(uuid, kill);
+    }
+
     public Location getSpawn() {
         return spawn;
     }
@@ -357,15 +365,13 @@ public class Game {
     public void stop() {
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
+            PlayerInfo info = Quake.getPlayerInfo(p);
             if(p != null && p.isOnline()) {
                 p.sendMessage(ChatColor.RED + "The game has been stopped !");
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
                 p.setWalkSpeed(0.2F);
-                p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-                if (p.hasMetadata("killer")) {
-                    p.removeMetadata("killer", Quake.quake);
-                }
+                p.setScoreboard(info.getPlayerScoreboard());
             }
         }
 
