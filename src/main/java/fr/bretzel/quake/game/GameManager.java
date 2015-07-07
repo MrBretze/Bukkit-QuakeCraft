@@ -17,7 +17,10 @@
 package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.*;
-import fr.bretzel.quake.game.event.*;
+import fr.bretzel.quake.game.event.GameCreateEvent;
+import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
+import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
+import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStart;
 import fr.bretzel.quake.game.task.MainTask;
 import org.bukkit.Bukkit;
@@ -257,6 +260,7 @@ public class GameManager implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Game game = getGameByPlayer(player);
+        PlayerInfo info = Quake.getPlayerInfo(player);
         if (game != null) {
             if(game.getState() == State.WAITING) {
                 game.getPlayerList().remove(player.getUniqueId());
@@ -274,6 +278,8 @@ public class GameManager implements Listener {
             }
             signEvent.actualiseJoinSignForGame(game);
         }
+        info.save();
+        Quake.getPlayerInfos().remove(info);
     }
 
     @EventHandler
@@ -361,12 +367,7 @@ public class GameManager implements Listener {
             }
 
             if (Integer.valueOf(game.getKill(player)) != null && game.getKill(player) >= game.getMaxKill()) {
-                GameEndEvent ev = new GameEndEvent(player, game);
-                Quake.manager.callEvent(ev);
-                if(ev.isCancelled()) {
-                    return;
-                }
-
+                game.stop();
             }
         }
     }
@@ -385,8 +386,11 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
         if (info.isInGame()) {
-            player.getInventory().setHeldItemSlot(0);
-            event.setCancelled(true);
+            Game game = getGameByPlayer(player);
+            if (game.getState() == State.STARTED) {
+                player.getInventory().setHeldItemSlot(0);
+                event.setCancelled(true);
+            }
         }
     }
 

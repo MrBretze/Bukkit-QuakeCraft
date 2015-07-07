@@ -363,6 +363,8 @@ public class Game {
     }
 
     public void stop() {
+        setState(State.WAITING);
+
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
             PlayerInfo info = Quake.getPlayerInfo(p);
@@ -380,45 +382,45 @@ public class Game {
         getScoreboardManager().getObjective().getScore("§r").setScore(10);
         getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
         getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
-        getScoreboardManager().getObjective().getScore(Quake.gameManager.signEvent.getInfoPlayer(this)).setScore(7);
         getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
         getPlayerList().clear();
         playerKills.clear();
-        setState(State.WAITING);
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
     }
 
     public void respawn(Player p) {
-        Location location = getRespawn().get(random.nextInt(getRespawn().size()));
-        int pSize = 0;
-        int tentative;
-        if (Quake.gameManager.getRespawnTentative().get(p) == null) {
-            tentative = 0;
-            Quake.gameManager.getRespawnTentative().put(p, 0);
-        } else {
-            tentative = Quake.gameManager.getRespawnTentative().get(p);
-        }
-        if (tentative <= 5) {
-            p.teleport(location);
-            Quake.gameManager.getRespawnTentative().put(p, 0);
-            Quake.gameManager.getRespawnTentative().remove(p);
-        } else {
-            for (Entity e : p.getWorld().getNearbyEntities(location, 10, 10, 10)) {
-                if (e instanceof Player) {
-                    pSize++;
-                }
-            }
-            if (pSize == 0) {
-                p.teleport(location);
-                Quake.gameManager.getRespawnTentative().remove(p);
+        if (getState() == State.STARTED) {
+            Location location = getRespawn().get(random.nextInt(getRespawn().size()));
+            int pSize = 0;
+            int tentative;
+            if (Quake.gameManager.getRespawnTentative().get(p) == null) {
+                tentative = 0;
                 Quake.gameManager.getRespawnTentative().put(p, 0);
             } else {
-                respawn(p);
+                tentative = Quake.gameManager.getRespawnTentative().get(p);
+            }
+            if (tentative <= 5) {
+                p.teleport(location);
+                Quake.gameManager.getRespawnTentative().put(p, 0);
                 Quake.gameManager.getRespawnTentative().remove(p);
-                Quake.gameManager.getRespawnTentative().put(p, tentative + 1);
+            } else {
+                for (Entity e : p.getWorld().getNearbyEntities(location, 10, 10, 10)) {
+                    if (e instanceof Player) {
+                        pSize++;
+                    }
+                }
+                if (pSize == 0) {
+                    p.teleport(location);
+                    Quake.gameManager.getRespawnTentative().remove(p);
+                    Quake.gameManager.getRespawnTentative().put(p, 0);
+                } else {
+                    respawn(p);
+                    Quake.gameManager.getRespawnTentative().remove(p);
+                    Quake.gameManager.getRespawnTentative().put(p, tentative + 1);
+                }
             }
         }
     }

@@ -20,7 +20,6 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.reader.GameReader;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,6 +52,10 @@ public class Quake extends JavaPlugin {
         PlayerInfo info = new PlayerInfo(player);
         playerInfos.add(info);
         return info;
+    }
+
+    public static LinkedList<PlayerInfo> getPlayerInfos() {
+        return playerInfos;
     }
 
     @Override

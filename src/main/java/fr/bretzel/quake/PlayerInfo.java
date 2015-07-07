@@ -19,6 +19,7 @@ package fr.bretzel.quake;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.ReloadTask;
@@ -183,12 +184,12 @@ public class PlayerInfo {
             for (Location location : locs) {
                 new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
             }
-            if (shoot.getKill() > 0) {
+            if (shoot.getKill() > 0 && game.getState() == State.STARTED) {
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().respawn(p);
                     p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
                 }
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST2, random.nextFloat(), random.nextFloat());
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, random.nextFloat(), random.nextFloat());
                 int kill;
                 if (Integer.valueOf(game.getKill(getPlayer())) == null) {
                     kill = shoot.getKill();

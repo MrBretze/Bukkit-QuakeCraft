@@ -106,6 +106,7 @@ public class GameStart extends GameTask {
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
                     Chrono chrono = new Chrono();
+                    p.getInventory().setHeldItemSlot(0);
                     chrono.start();
                     Quake.gameManager.getGameChrono().put(getGame(), chrono);
                     getGame().setKill(p.getUniqueId(), 0);
