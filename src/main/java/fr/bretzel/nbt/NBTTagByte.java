@@ -8,7 +8,8 @@ public class NBTTagByte extends NBTNumber {
 
     private byte data;
 
-    NBTTagByte() {}
+    NBTTagByte() {
+    }
 
     public NBTTagByte(byte b0) {
         this.data = b0;

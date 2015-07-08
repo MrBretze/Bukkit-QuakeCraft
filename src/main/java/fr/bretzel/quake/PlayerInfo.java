@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -69,7 +69,7 @@ public class PlayerInfo {
         setFile(new File(mk, player.getUniqueId().toString() + ".dat"));
 
         try {
-            if(!getFile().exists()) {
+            if (!getFile().exists()) {
                 getFile().createNewFile();
                 NBTTagCompound compound = new NBTTagCompound();
                 compound.setDouble("reload", getReloadTime());
@@ -160,7 +160,7 @@ public class PlayerInfo {
     }
 
     public void dash() {
-        if(isDash()) {
+        if (isDash()) {
             setDash(false);
             Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
             Vector pVector = player.getEyeLocation().getDirection();
@@ -234,9 +234,11 @@ public class PlayerInfo {
         Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    §r");
-        objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(10);
-        objective.getScore("§r").setScore(9);
-        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(8);
+        objective.getScore("§r").setScore(10);
+        objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
+        objective.getScore("§r§r").setScore(8);
+        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
+        objective.getScore("§r§r§r").setScore(6);
         return scoreboard;
     }
 

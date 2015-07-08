@@ -6,5 +6,6 @@ final class NBTReadLimiterUnlimited extends NBTReadLimiter {
         super(i);
     }
 
-    public void a(long i) {}
+    public void a(long i) {
+    }
 }

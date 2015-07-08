@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -57,19 +57,19 @@ public class SignEvent implements Listener {
         Action action = event.getAction();
         Player player = event.getPlayer();
 
-        if(player.hasPermission("quake.event.join")) {
+        if (player.hasPermission("quake.event.join")) {
             switch (action) {
                 case RIGHT_CLICK_BLOCK:
                     Block block = event.getClickedBlock();
 
-                    if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
+                    if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
                         Sign sign = getSignByLocation(block.getLocation());
                         boolean isJoin = sign.getMetadata("join").get(0).asBoolean();
                         Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
-                        if(isJoin) {
+                        if (isJoin) {
                             PlayerJoinGameEvent e = new PlayerJoinGameEvent(player, game);
                             Bukkit.getPluginManager().callEvent(e);
-                            if(e.isCancelled()) {
+                            if (e.isCancelled()) {
                                 return;
                             }
                             player.teleport(game.getSpawn());
@@ -85,7 +85,7 @@ public class SignEvent implements Listener {
                                 game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
                                 break;
                             }
-                        } else if(!isJoin) {
+                        } else if (!isJoin) {
                             Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(player, game));
                             if (event.isCancelled()) {
                                 return;
@@ -108,9 +108,9 @@ public class SignEvent implements Listener {
     public void onBlockBkreakEvent(BlockBreakEvent event) {
         Block block = event.getBlock();
         Player player = event.getPlayer();
-        if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+        if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
             Sign sign = getSignByLocation(block.getLocation());
-            if(sign == null) {
+            if (sign == null) {
                 return;
             }
             Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
@@ -123,8 +123,8 @@ public class SignEvent implements Listener {
         String[] lines = event.getLines();
         Block block = event.getBlock();
 
-        if(block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-            if(lines[0].equals("[quake]")) {
+        if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+            if (lines[0].equals("[quake]")) {
                 Sign sign = (Sign) block.getState();
                 if (lines[1].equals("join") && getManager().getGameByName(lines[2]) != null) {
                     Game game = getManager().getGameByName(lines[2]);
@@ -154,8 +154,8 @@ public class SignEvent implements Listener {
     }
 
     public void actualiseJoinSignForGame(Game game) {
-        for(Sign sign : game.getSignList()) {
-            if(sign.getMetadata("join").get(0).asBoolean()) {
+        for (Sign sign : game.getSignList()) {
+            if (sign.getMetadata("join").get(0).asBoolean()) {
                 sign.setLine(0, CLICK_TO_JOIN);
                 sign.setLine(1, ChatColor.BLUE + game.getDisplayName());
                 sign.setLine(2, getInfoPlayer(game));
@@ -166,9 +166,9 @@ public class SignEvent implements Listener {
     }
 
     public Sign getSignByLocation(Location location) {
-        for(Game game : getManager().getGameLinkedList()) {
-            for(Sign sign : game.getSignList()) {
-                if(sign.getLocation().getWorld() == location.getWorld() &&
+        for (Game game : getManager().getGameLinkedList()) {
+            for (Sign sign : game.getSignList()) {
+                if (sign.getLocation().getWorld() == location.getWorld() &&
                         sign.getLocation().getBlockX() == location.getBlockX() &&
                         sign.getLocation().getBlockY() == location.getBlockY() &&
                         sign.getLocation().getBlockZ() == location.getBlockZ()) {

@@ -12,7 +12,8 @@ public class NBTTagList extends NBTBase {
     private List list = new ArrayList<>();
     private byte type = 0;
 
-    public NBTTagList() {}
+    public NBTTagList() {
+    }
 
     void write(DataOutput dataoutput) throws IOException {
         if (!this.list.isEmpty()) {
@@ -152,7 +153,7 @@ public class NBTTagList extends NBTBase {
     }
 
     public NBTBase g(int i) {
-        return (NBTBase) (i >= 0 && i < this.list.size() ? (NBTBase) this.list.get(i) : new NBTTagEnd());
+        return i >= 0 && i < this.list.size() ? (NBTBase) this.list.get(i) : new NBTTagEnd();
     }
 
     public int size() {

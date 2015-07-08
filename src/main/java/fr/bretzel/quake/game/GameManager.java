@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -34,7 +34,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,7 +64,7 @@ public class GameManager implements Listener {
 
         this.signEvent = new SignEvent(this);
 
-        if(!quake.getConfig().isSet("lobby")) {
+        if (!quake.getConfig().isSet("lobby")) {
             quake.getConfig().set("lobby", Util.toStringLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
         } else {
             lobby = Util.toLocationString(quake.getConfig().getString("lobby"));
@@ -77,7 +76,7 @@ public class GameManager implements Listener {
     }
 
     public void registerGame(Player creator, String name, Location loc1, Location loc2) {
-        if(loc1 == null) {
+        if (loc1 == null) {
             creator.sendMessage(ChatColor.RED + "The first is not set !");
             return;
         }
@@ -85,7 +84,7 @@ public class GameManager implements Listener {
             creator.sendMessage(ChatColor.RED + "The second is not set !");
             return;
         }
-        if(containsGame(name)) {
+        if (containsGame(name)) {
             creator.sendMessage(ChatColor.RED + "The game is already exist !");
             return;
         }
@@ -93,7 +92,7 @@ public class GameManager implements Listener {
         gameLinkedList.add(game);
         GameCreateEvent event = new GameCreateEvent(game, creator);
         Bukkit.getPluginManager().callEvent(event);
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
         creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
@@ -101,8 +100,8 @@ public class GameManager implements Listener {
 
     public Game getGameByName(String name) {
         Game game = null;
-        for(Game a : gameLinkedList) {
-            if(a.getName().equals(name)) {
+        for (Game a : gameLinkedList) {
+            if (a.getName().equals(name)) {
                 game = a;
             }
         }
@@ -118,7 +117,7 @@ public class GameManager implements Listener {
     }
 
     public Location getLobby() {
-        if(lobby == null) {
+        if (lobby == null) {
             return Bukkit.getWorlds().get(0).getSpawnLocation();
         }
         return lobby;
@@ -177,8 +176,8 @@ public class GameManager implements Listener {
     }
 
     public Game getGameByPlayer(Player player) {
-        for(Game a : getGameLinkedList()) {
-            if(a.getPlayerList().contains(player.getUniqueId())) {
+        for (Game a : getGameLinkedList()) {
+            if (a.getPlayerList().contains(player.getUniqueId())) {
                 return a;
             }
         }
@@ -191,7 +190,7 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         PlayerInfo pi = Quake.getPlayerInfo(player);
 
-        if(player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
+        if (player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
             switch (action) {
                 case LEFT_CLICK_BLOCK:
                     leftClick(player, event);
@@ -202,9 +201,9 @@ public class GameManager implements Listener {
             }
         }
 
-        if(player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
+        if (player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
             Game game = getGameByPlayer(player);
-            if(game.getState() == State.STARTED) {
+            if (game.getState() == State.STARTED) {
                 if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                     pi.dash();
                 } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
@@ -217,12 +216,11 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if(getGameByPlayer(player) != null) {
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        if (info.isInGame()) {
             Game game = getGameByPlayer(player);
-            if(!game.getBlocks().contains(event.getTo().getBlock())) {
-                Vector vector = player.getEyeLocation().getDirection().normalize().multiply(-0.3);
-                vector.setY(0);
-                player.teleport(event.getFrom().add(vector));
+            if (!game.getBlocks().contains(event.getTo().getBlock())) {
+                player.teleport(Util.getRollBackLocation(player));
             }
         }
     }
@@ -231,55 +229,58 @@ public class GameManager implements Listener {
     public void PlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        Game game = getGameByPlayer(player);
-        if (game == null) {
-            player.teleport(getLobby());
-            player.setScoreboard(info.getPlayerScoreboard());
-        } else {
+
+        if (info.isInGame()) {
+            Game game = getGameByPlayer(player);
             Chrono c = getChronoByUUID(player.getUniqueId());
-            if(c != null) {
+            if (c != null) {
                 c.stop();
                 c.resume();
                 int minute = c.getMinute();
                 int heure = c.getHeure();
-                if (heure > 0 || minute > 5) {
+                if (heure > 0 || minute >= 5) {
                     game.getPlayerList().remove(player.getUniqueId());
                     player.teleport(getLobby());
                     player.setScoreboard(info.getPlayerScoreboard());
+                    getUuidToChrono().remove(player.getUniqueId());
+                    return;
                 }
                 getUuidToChrono().remove(player.getUniqueId());
             } else {
-                game.getPlayerList().remove(player.getUniqueId());
                 player.teleport(getLobby());
                 player.setScoreboard(info.getPlayerScoreboard());
             }
+        } else {
+            player.teleport(getLobby());
+            player.setScoreboard(info.getPlayerScoreboard());
         }
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Game game = getGameByPlayer(player);
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (game != null) {
-            if(game.getState() == State.WAITING) {
+        if (info.isInGame()) {
+            Game game = getGameByPlayer(player);
+            if (game.getState() == State.STARTED) {
+                Chrono chrono = new Chrono();
+                chrono.start();
+                getUuidToChrono().put(player.getUniqueId(), chrono);
+            } else {
                 game.getPlayerList().remove(player.getUniqueId());
                 GameStart start = getQuakeTaskHashMap().get(game);
                 if (start != null) {
-                    if(game.getPlayerList().size() < game.getMinPlayer()) {
+                    if (game.getPlayerList().size() < game.getMinPlayer()) {
                         start.cancel();
                         getQuakeTaskHashMap().remove(game);
                     }
                 }
-            } else {
-                Chrono chrono = new Chrono();
-                chrono.start();
-                getUuidToChrono().put(player.getUniqueId(), chrono);
+                signEvent.actualiseJoinSignForGame(game);
             }
-            signEvent.actualiseJoinSignForGame(game);
+        } else {
+            info.save();
+            Quake.getPlayerInfos().remove(info);
         }
-        info.save();
-        Quake.getPlayerInfos().remove(info);
     }
 
     @EventHandler
@@ -289,7 +290,7 @@ public class GameManager implements Listener {
 
         if (game.getState() == State.WAITING) {
             int players = game.getPlayerList().size() + 1;
-            if(players == game.getMinPlayer()) {
+            if (players == game.getMinPlayer()) {
                 GameStart gameStart = new GameStart(Quake.quake, 20L, 20L, game);
                 getQuakeTaskHashMap().put(game, gameStart);
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
@@ -304,7 +305,7 @@ public class GameManager implements Listener {
             }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
             player.setWalkSpeed(0.3F);
-        } else if(game.getState() == State.STARTED) {
+        } else if (game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");
             event.setCancelled(true);
             return;
@@ -317,7 +318,7 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
         if (game.getState() == State.STARTED) {
-            if(game.getPlayerList().size() - 1 == 0) {
+            if (game.getPlayerList().size() - 1 == 0) {
                 game.stop();
             }
         }
@@ -330,10 +331,10 @@ public class GameManager implements Listener {
 
     @EventHandler
     public void onPlayerHasDamage(EntityDamageEvent event) {
-        if(event.getEntity() instanceof Player) {
+        if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if(getGameByPlayer(player) != null) {
-                if(event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+            if (getGameByPlayer(player) != null) {
+                if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
                     event.setCancelled(true);
                 }
             } else {
@@ -352,21 +353,22 @@ public class GameManager implements Listener {
         Game game = event.getGame();
         PlayerInfo info = Quake.getPlayerInfo(player);
 
-        if(info.isShoot()) {
-            if(event.getKill() == 2) {
+        if (info.isShoot()) {
+            if (event.getKill() == 2) {
                 game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Double kill !");
-            } else if(event.getKill() == 3) {
+            } else if (event.getKill() == 3) {
                 game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Triple kill !");
-            } else if(event.getKill() >= 4) {
+            } else if (event.getKill() >= 4) {
                 game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Multiple kill !");
             }
 
-            for(Player p : event.getPlayers()) {
+            for (Player p : event.getPlayers()) {
                 Util.shootFirework(p.getEyeLocation());
                 game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
             }
 
-            if (Integer.valueOf(game.getKill(player)) != null && game.getKill(player) >= game.getMaxKill()) {
+            if (Integer.valueOf(game.getKill(player)) != null && (game.getKill(player) + event.getKill()) >= game.getMaxKill()) {
+                game.broadcastMessage(ChatColor.BLUE + player.getName() + " Has won the game !");
                 game.stop();
             }
         }

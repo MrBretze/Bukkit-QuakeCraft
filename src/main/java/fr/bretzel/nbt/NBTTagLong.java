@@ -8,7 +8,8 @@ public class NBTTagLong extends NBTNumber {
 
     private long data;
 
-    NBTTagLong() {}
+    NBTTagLong() {
+    }
 
     public NBTTagLong(long i) {
         this.data = i;

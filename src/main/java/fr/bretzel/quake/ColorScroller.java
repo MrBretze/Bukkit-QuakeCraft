@@ -30,26 +30,22 @@ public class ColorScroller {
         this.position = scrollType == ScrollType.FORWARD ? -1 : str.length();
     }
 
-    public enum ScrollType {
-        FORWARD, BACKWARD;
-    }
-
     public String getString() {
         return str;
     }
 
     public String next() {
 
-        if(position >= str.length()) {
+        if (position >= str.length()) {
             String one = str.substring(position - 1, str.length() - 1);
 
-            if(bold) {
+            if (bold) {
                 String two = upperCaseMid ? colorMid + ChatColor.BOLD + one.toUpperCase() : colorMid + ChatColor.BOLD + one;
                 String fin = textColor + "" + ChatColor.BOLD + str.substring(0, str.length() - 1) +
                         colorBefore + ChatColor.BOLD +
                         str.substring(str.length() - 1, str.length()) + two;
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position = -1;
                 } else {
                     position--;
@@ -61,7 +57,7 @@ public class ColorScroller {
                 String fin = textColor + str.substring(0, str.length() - 1) +
                         colorBefore + str.substring(str.length() - 1, str.length()) + two;
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position = -1;
                 } else {
                     position--;
@@ -71,31 +67,31 @@ public class ColorScroller {
             }
         }
 
-        if(position <= -1) {
+        if (position <= -1) {
 
-            if(getScrollType() == ScrollType.FORWARD) {
+            if (getScrollType() == ScrollType.FORWARD) {
                 position++;
             } else {
                 position = str.length();
             }
 
-            if(bold) {
+            if (bold) {
                 return colorBefore + ChatColor.BOLD + str.substring(0, 1) + textColor + ChatColor.BOLD + str.substring(1, str.length());
             } else {
                 return colorBefore + str.substring(0, 1) + textColor + str.substring(1, str.length());
             }
         }
 
-        if(position == 0) {
+        if (position == 0) {
             String one = str.substring(0, 1);
 
-            if(bold) {
+            if (bold) {
                 String two = upperCaseMid ? colorMid + ChatColor.BOLD + one.toUpperCase() : colorMid + ChatColor.BOLD + one;
                 String fin = two + colorAfter + ChatColor.BOLD +
                         str.substring(1, 2) + textColor + ChatColor.BOLD +
                         str.substring(2, str.length());
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position++;
                 } else {
                     position--;
@@ -108,7 +104,7 @@ public class ColorScroller {
                         str.substring(1, 2) + textColor +
                         str.substring(2, str.length());
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position++;
                 } else {
                     position--;
@@ -118,11 +114,11 @@ public class ColorScroller {
             }
         }
 
-        if(position >= 1) {
+        if (position >= 1) {
             String one = str.substring(0, position);
             String two = str.substring(position + 1, str.length());
 
-            if(bold) {
+            if (bold) {
                 String three = upperCaseMid ? colorMid + ChatColor.BOLD + str.substring(position, position + 1).toUpperCase() : colorMid + ChatColor.BOLD + str.substring(position, position + 1);
                 String fin = null;
 
@@ -138,7 +134,7 @@ public class ColorScroller {
 
                 fin = textColor + first + three + second;
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position++;
                 } else {
                     position--;
@@ -163,7 +159,7 @@ public class ColorScroller {
 
                 fin = textColor + first + three + second;
 
-                if(getScrollType() == ScrollType.FORWARD) {
+                if (getScrollType() == ScrollType.FORWARD) {
                     position++;
                 } else {
                     position--;
@@ -210,5 +206,9 @@ public class ColorScroller {
 
     public void setScrollType(ScrollType scrollType) {
         this.scrollType = scrollType;
+    }
+
+    public enum ScrollType {
+        FORWARD, BACKWARD
     }
 }

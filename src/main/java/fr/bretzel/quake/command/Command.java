@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -67,7 +67,7 @@ public class Command implements CommandExecutor, TabCompleter {
                             if (manager.getGameByName(args[1]) != null) {
                                 Game game = manager.getGameByName(args[1]);
                                 if (args.length > 2) {
-                                    if(args[2].equalsIgnoreCase("setspawn")) {
+                                    if (args[2].equalsIgnoreCase("setspawn")) {
                                         game.setSpawn(player.getLocation());
                                         player.sendMessage(ChatColor.GREEN + "The new spawn for " + game.getName() + " has been set tou your position !");
                                         return true;
@@ -75,13 +75,13 @@ public class Command implements CommandExecutor, TabCompleter {
                                         game.addRespawn(player.getLocation().add(0.0, 1, 0.0).clone());
                                         player.sendMessage(ChatColor.GREEN + "The respawn point has been set tout your position");
                                         return true;
-                                    } else if(args[2].equalsIgnoreCase("view")) {
-                                        if(game.getRespawn().isEmpty()) {
+                                    } else if (args[2].equalsIgnoreCase("view")) {
+                                        if (game.getRespawn().isEmpty()) {
                                             player.sendMessage(ChatColor.GREEN + "The respawn has been not set for the game !");
                                             return true;
                                         } else {
                                             game.view();
-                                            if(game.isView()) {
+                                            if (game.isView()) {
                                                 player.sendMessage(ChatColor.GREEN + "The respawn location is visible !");
                                                 return true;
                                             } else {
@@ -119,21 +119,21 @@ public class Command implements CommandExecutor, TabCompleter {
                          *TODO:
                         */
                         return true;
-                    } else if(args[0].equalsIgnoreCase("player")) {
-                        if(args.length > 1) {
-                            if(Bukkit.getPlayer(args[1]) != null) {
+                    } else if (args[0].equalsIgnoreCase("player")) {
+                        if (args.length > 1) {
+                            if (Bukkit.getPlayer(args[1]) != null) {
                                 Player target = Bukkit.getPlayer(args[1]);
-                                if(args.length > 2) {
-                                    if(args[2].equalsIgnoreCase("join")) {
+                                if (args.length > 2) {
+                                    if (args[2].equalsIgnoreCase("join")) {
                                         Game b = manager.getGameByPlayer(target);
-                                        if(args.length > 3) {
-                                            if(manager.getGameByName(args[3]) != null && b == null) {
+                                        if (args.length > 3) {
+                                            if (manager.getGameByName(args[3]) != null && b == null) {
                                                 manager.getGameByName(args[3]).addPlayer(target);
                                                 player.sendMessage(ChatColor.GREEN + "Player has join the game !");
-                                            } else if(b != null) {
+                                            } else if (b != null) {
                                                 player.sendMessage(ChatColor.RED + "The player is already in a a game !");
                                                 return true;
-                                            } else if(manager.getGameByName(args[3]) == null) {
+                                            } else if (manager.getGameByName(args[3]) == null) {
                                                 player.sendMessage(ChatColor.RED + "Game not found !");
                                                 return true;
                                             } else {
@@ -144,8 +144,8 @@ public class Command implements CommandExecutor, TabCompleter {
                                             player.sendMessage(ChatColor.RED + "Usage: /quake player " + target.getDisplayName() + " join <game>");
                                             return true;
                                         }
-                                    } else if(args[2].equalsIgnoreCase("quit")) {
-                                        if(manager.getGameByPlayer(target) != null) {
+                                    } else if (args[2].equalsIgnoreCase("quit")) {
+                                        if (manager.getGameByPlayer(target) != null) {
                                             manager.signEvent.actualiseJoinSignForGame(manager.getGameByPlayer(target));
                                             manager.getGameByPlayer(target).getPlayerList().remove(target.getUniqueId());
                                             player.sendMessage(ChatColor.GREEN + "Player has left the game !");
@@ -177,10 +177,12 @@ public class Command implements CommandExecutor, TabCompleter {
                         player.sendMessage(ChatColor.GREEN + "The lobby has been set to your location !");
                         return true;
                     } else if (args[0].equalsIgnoreCase("stop")) {
-                        if(args.length > 1) {
+                        if (args.length > 1) {
                             Game game = manager.getGameByName(args[1]);
-                            if(game != null) {
+                            if (game != null) {
+                                game.broadcastMessage(ChatColor.RED + "The game has been brake by an admin !");
                                 game.stop();
+                                player.sendMessage(ChatColor.GREEN + "The game has been reset !");
                             } else {
                                 player.sendMessage(ChatColor.RED + "Could not found the game !");
                                 return true;
@@ -210,7 +212,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, org.bukkit.command.Command command, String label, String[] args) {
-        if(args.length == 1) {
+        if (args.length == 1) {
             return (List) StringUtil.copyPartialMatches(args[0], MAIN, new ArrayList<>());
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("edit")) {

@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -36,7 +36,7 @@ import java.util.*;
 public class Util {
 
     public static LinkedList<Location> getLocationByDirection(Player player, int range, double distance) {
-        if(distance == 0.0D) {
+        if (distance == 0.0D) {
             distance = 1.0D;
         }
         LinkedList<Location> list = new LinkedList<>();
@@ -47,9 +47,9 @@ public class Util {
         int maxRange = 100 * range / 70;
         boolean wallHack = false;
 
-        for(int loop = maxRange; loop > 0; loop--) {
+        for (int loop = maxRange; loop > 0; loop--) {
             f.add(progress);
-            if(!wallHack && f.getBlock().getType().isSolid()) {
+            if (!wallHack && f.getBlock().getType().isSolid()) {
                 break;
             }
             list.add(f.clone());
@@ -60,10 +60,10 @@ public class Util {
 
     public static List<Player> getPlayerListInDirection(List<Location> locations, Player shoot, double distance) {
         List<Player> players = new ArrayList<>();
-        for(Entity e : getEntityListInDirection(locations, shoot, distance)) {
-            if(e instanceof Player) {
+        for (Entity e : getEntityListInDirection(locations, shoot, distance)) {
+            if (e instanceof Player) {
                 Player p = (Player) e;
-                if(p != shoot && !players.contains(p) && !p.isDead()) {
+                if (p != shoot && !players.contains(p) && !p.isDead()) {
                     players.add(p);
                 }
             }
@@ -73,8 +73,8 @@ public class Util {
 
     public static List<Entity> getEntityListInDirection(List<Location> locations, Player shoot, double distance) {
         List<Entity> entities = new ArrayList<>();
-        for(Location l : locations) {
-            for(Entity e : l.getWorld().getEntities()) {
+        for (Location l : locations) {
+            for (Entity e : l.getWorld().getEntities()) {
                 if (e instanceof LivingEntity) {
                     LivingEntity j = (LivingEntity) e;
                     Location h = j.getLocation().add(0.0, 1, 0.0);
@@ -86,7 +86,7 @@ public class Util {
                     boolean dY = Math.abs(l.getY() - py) < 1.6D * distance;
                     boolean dZ = Math.abs(l.getZ() - pz) < 1.0D * distance;
 
-                    if(dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
+                    if (dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
                         entities.add(e);
                     }
                 }
@@ -95,8 +95,7 @@ public class Util {
         return entities;
     }
 
-    public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2)
-    {
+    public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2) {
         List<Block> blocks = new ArrayList<>();
 
         int topBlockX = (loc1.getBlockX() < loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
@@ -108,12 +107,9 @@ public class Util {
         int topBlockZ = (loc1.getBlockZ() < loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
         int bottomBlockZ = (loc1.getBlockZ() > loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
 
-        for(int x = bottomBlockX; x <= topBlockX; x++)
-        {
-            for(int z = bottomBlockZ; z <= topBlockZ; z++)
-            {
-                for(int y = bottomBlockY; y <= topBlockY; y++)
-                {
+        for (int x = bottomBlockX; x <= topBlockX; x++) {
+            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
+                for (int y = bottomBlockY; y <= topBlockY; y++) {
                     Block block = loc1.getWorld().getBlockAt(x, y, z);
                     blocks.add(block);
                 }
@@ -133,9 +129,9 @@ public class Util {
     }
 
     public static ChatColor getChatColorByInt(int i) {
-        if(i >= 10) {
+        if (i >= 10) {
             return ChatColor.GREEN;
-        } else if(i > 5 && i < 10) {
+        } else if (i > 5 && i < 10) {
             return ChatColor.GOLD;
         } else {
             return ChatColor.RED;
@@ -153,18 +149,18 @@ public class Util {
 
 
     /**
-    * InstantFirework class made by TehHypnoz.
-    *
-    * Credits to:
-    *
-    * - fromgate, for explaining that setting the ticksFlown field to the expectedLifespan field will create instant fireworks.
-    * - Skionz, for the getNMSClass() method.
-    *
-    * Example usage:
-    * FireworkEffect fireworkEffect = FireworkEffect.builder().flicker(false).trail(true).with(Type.BALL).withColor(Color.ORANGE).withFade(Color.RED).build();
-    * Location location = p.getLocation();
-    * new InstantFirework(fireworkEffect, location);
-    */
+     * InstantFirework class made by TehHypnoz.
+     * <p>
+     * Credits to:
+     * <p>
+     * - fromgate, for explaining that setting the ticksFlown field to the expectedLifespan field will create instant fireworks.
+     * - Skionz, for the getNMSClass() method.
+     * <p>
+     * Example usage:
+     * FireworkEffect fireworkEffect = FireworkEffect.builder().flicker(false).trail(true).with(Type.BALL).withColor(Color.ORANGE).withFade(Color.RED).build();
+     * Location location = p.getLocation();
+     * new InstantFirework(fireworkEffect, location);
+     */
     public static void shootFirework(Location location) {
         Random random = new Random();
         int fType = random.nextInt(5) + 1;
@@ -207,6 +203,65 @@ public class Util {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static String getCardinalDirection(Player player) {
+        double rotation = (player.getLocation().getYaw() - 90) % 360;
+        if (rotation < 0) {
+            rotation += 360.0;
+        }
+        if (0 <= rotation && rotation < 22.5) {
+            return "N";
+        } else if (22.5 <= rotation && rotation < 67.5) {
+            return "NE";
+        } else if (67.5 <= rotation && rotation < 112.5) {
+            return "E";
+        } else if (112.5 <= rotation && rotation < 157.5) {
+            return "SE";
+        } else if (157.5 <= rotation && rotation < 202.5) {
+            return "S";
+        } else if (202.5 <= rotation && rotation < 247.5) {
+            return "SW";
+        } else if (247.5 <= rotation && rotation < 292.5) {
+            return "W";
+        } else if (292.5 <= rotation && rotation < 337.5) {
+            return "NW";
+        } else if (337.5 <= rotation && rotation < 360.0) {
+            return "N";
+        } else {
+            return null;
+        }
+    }
+
+    public static Location getRollBackLocation(Player player) {
+        Location location = player.getLocation();
+        switch (getCardinalDirection(player)) {
+            case "N":
+                location.add(0, 0, -1);
+                break;
+            case "E":
+                location.add(1, 0, 0);
+                break;
+            case "S":
+                location.add(0, 0, 1);
+                break;
+            case "W":
+                location.add(-1, 0, 0);
+                break;
+            case "NE":
+                location.add(1, 0, -1);
+                break;
+            case "SE":
+                location.add(1, 0, 1);
+                break;
+            case "NW":
+                location.add(-1, 0, -1);
+                break;
+            case "SW":
+                location.add(-1, 0, 1);
+                break;
+        }
+        return location;
     }
 
 

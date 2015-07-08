@@ -9,7 +9,8 @@ public class NBTTagIntArray extends NBTBase {
 
     private int[] data;
 
-    NBTTagIntArray() {}
+    NBTTagIntArray() {
+    }
 
     public NBTTagIntArray(int[] aint) {
         this.data = aint;

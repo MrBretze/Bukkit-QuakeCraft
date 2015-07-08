@@ -24,7 +24,6 @@ import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -369,7 +368,6 @@ public class Game {
             Player p = Bukkit.getPlayer(uuid);
             PlayerInfo info = Quake.getPlayerInfo(p);
             if(p != null && p.isOnline()) {
-                p.sendMessage(ChatColor.RED + "The game has been stopped !");
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
                 p.setWalkSpeed(0.2F);

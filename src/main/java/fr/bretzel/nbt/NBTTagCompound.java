@@ -12,7 +12,39 @@ public class NBTTagCompound extends NBTBase {
 
     private Map map = new HashMap<>();
 
-    public NBTTagCompound() {}
+    public NBTTagCompound() {
+    }
+
+    private static void a(String s, NBTBase nbtbase, DataOutput dataoutput) throws IOException {
+        dataoutput.writeByte(nbtbase.getTypeId());
+        if (nbtbase.getTypeId() != 0) {
+            dataoutput.writeUTF(s);
+            nbtbase.write(dataoutput);
+        }
+    }
+
+    private static byte a(DataInput datainput, NBTReadLimiter nbtreadlimiter) throws IOException {
+        return datainput.readByte();
+    }
+
+    private static String b(DataInput datainput, NBTReadLimiter nbtreadlimiter) throws IOException {
+        return datainput.readUTF();
+    }
+
+    static NBTBase a(byte b0, String s, DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) {
+        NBTBase nbtbase = NBTBase.createTag(b0);
+
+        try {
+            nbtbase.load(datainput, i, nbtreadlimiter);
+            return nbtbase;
+        } catch (IOException ioexception) {
+            throw new RuntimeException(ioexception);
+        }
+    }
+
+    static Map b(NBTTagCompound nbttagcompound) {
+        return nbttagcompound.map;
+    }
 
     void write(DataOutput dataoutput) throws IOException {
         Iterator iterator = this.map.keySet().iterator();
@@ -120,7 +152,6 @@ public class NBTTagCompound extends NBTBase {
             return true;
         } else if (i != 99) {
             if (b0 > 0) {
-                ;
             }
 
             return false;
@@ -274,33 +305,6 @@ public class NBTTagCompound extends NBTBase {
         return super.hashCode() ^ this.map.hashCode();
     }
 
-    private static void a(String s, NBTBase nbtbase, DataOutput dataoutput) throws IOException {
-        dataoutput.writeByte(nbtbase.getTypeId());
-        if (nbtbase.getTypeId() != 0) {
-            dataoutput.writeUTF(s);
-            nbtbase.write(dataoutput);
-        }
-    }
-
-    private static byte a(DataInput datainput, NBTReadLimiter nbtreadlimiter) throws IOException {
-        return datainput.readByte();
-    }
-
-    private static String b(DataInput datainput, NBTReadLimiter nbtreadlimiter) throws IOException {
-        return datainput.readUTF();
-    }
-
-    static NBTBase a(byte b0, String s, DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) {
-        NBTBase nbtbase = NBTBase.createTag(b0);
-
-        try {
-            nbtbase.load(datainput, i, nbtreadlimiter);
-            return nbtbase;
-        } catch (IOException ioexception) {
-            throw new RuntimeException(ioexception);
-        }
-    }
-
     public void a(NBTTagCompound nbttagcompound) {
         Iterator iterator = nbttagcompound.map.keySet().iterator();
 
@@ -321,9 +325,5 @@ public class NBTTagCompound extends NBTBase {
             }
         }
 
-    }
-
-    static Map b(NBTTagCompound nbttagcompound) {
-        return nbttagcompound.map;
     }
 }

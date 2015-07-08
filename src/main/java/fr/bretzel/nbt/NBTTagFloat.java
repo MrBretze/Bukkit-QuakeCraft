@@ -8,7 +8,8 @@ public class NBTTagFloat extends NBTNumber {
 
     private float data;
 
-    NBTTagFloat() {}
+    NBTTagFloat() {
+    }
 
     public NBTTagFloat(float f) {
         this.data = f;

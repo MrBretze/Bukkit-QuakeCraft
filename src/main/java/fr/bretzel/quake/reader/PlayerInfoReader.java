@@ -57,5 +57,8 @@ public class PlayerInfoReader {
         if (compound.hasKey("playerKill")) {
             player.setPlayerkill(compound.getInt("playerKill"));
         }
+        if (compound.hasKey("coins")) {
+            player.setCoins(compound.getInt("coins"));
+        }
     }
 }

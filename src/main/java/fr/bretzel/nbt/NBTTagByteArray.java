@@ -9,7 +9,8 @@ public class NBTTagByteArray extends NBTBase {
 
     private byte[] data;
 
-    NBTTagByteArray() {}
+    NBTTagByteArray() {
+    }
 
     public NBTTagByteArray(byte[] abyte) {
         this.data = abyte;

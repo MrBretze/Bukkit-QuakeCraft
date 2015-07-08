@@ -8,7 +8,8 @@ public class NBTTagDouble extends NBTNumber {
 
     private double data;
 
-    NBTTagDouble() {}
+    NBTTagDouble() {
+    }
 
     public NBTTagDouble(double d0) {
         this.data = d0;
