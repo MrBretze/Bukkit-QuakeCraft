@@ -23,10 +23,7 @@ import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStart;
 import fr.bretzel.quake.game.task.MainTask;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,6 +31,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -303,6 +301,9 @@ public class GameManager implements Listener {
                 player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
             }
+            if (player.getGameMode() != GameMode.ADVENTURE) {
+                player.setGameMode(GameMode.ADVENTURE);
+            }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
             player.setWalkSpeed(0.3F);
         } else if (game.getState() == State.STARTED) {
@@ -315,8 +316,8 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerQuitGameEvent(PlayerLeaveGameEvent event) {
         Game game = event.getGame();
-        Player player = event.getPlayer();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        final Player player = event.getPlayer();
+        final PlayerInfo info = Quake.getPlayerInfo(player);
         if (game.getState() == State.STARTED) {
             if (game.getPlayerList().size() - 1 == 0) {
                 game.stop();
@@ -326,7 +327,13 @@ public class GameManager implements Listener {
         game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                 + ChatColor.BLUE + ")");
         player.setWalkSpeed(0.2F);
-        player.setScoreboard(info.getPlayerScoreboard());
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                player.setScoreboard(info.getPlayerScoreboard());
+            }
+        }.runTaskLater(Quake.quake, 10L);
     }
 
     @EventHandler
@@ -365,11 +372,6 @@ public class GameManager implements Listener {
             for (Player p : event.getPlayers()) {
                 Util.shootFirework(p.getEyeLocation());
                 game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
-            }
-
-            if (Integer.valueOf(game.getKill(player)) != null && (game.getKill(player) + event.getKill()) >= game.getMaxKill()) {
-                game.broadcastMessage(ChatColor.BLUE + player.getName() + " Has won the game !");
-                game.stop();
             }
         }
     }

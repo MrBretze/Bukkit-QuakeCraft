@@ -40,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -201,6 +202,20 @@ public class PlayerInfo {
                 game.addKill(getPlayer(), shoot.getKill());
                 game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
                 setPlayerkill(getPlayerkill() + shoot.getKill());
+
+                if (game.getKill(getPlayer()) >= game.getMaxKill()) {
+                    game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
+                    for (UUID uuid : game.getPlayerList()) {
+                        Player p = Bukkit.getPlayer(uuid);
+                        if (p != null && p.isOnline()) {
+                            p.sendMessage(ChatColor.AQUA + "####################"); //20 #
+                            p.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + game.getKill(p) + ChatColor.AQUA + "          #");
+                            p.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + game.getKill(p) * 5 + ChatColor.AQUA + "         #");
+                            p.sendMessage(ChatColor.AQUA + "####################"); //20 #
+                        }
+                    }
+                    game.stop();
+                }
             }
         }
     }
