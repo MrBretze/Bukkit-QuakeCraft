@@ -28,7 +28,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 
@@ -391,35 +390,17 @@ public class Game {
 
     public void respawn(Player p) {
         if (getState() == State.STARTED) {
+            PlayerInfo info = Quake.getPlayerInfo(p);
             Location location = getRespawn().get(random.nextInt(getRespawn().size()));
-            int pSize = 0;
-            int tentative;
-            if (Quake.gameManager.getRespawnTentative().get(p) == null) {
-                tentative = 0;
-                Quake.gameManager.getRespawnTentative().put(p, 0);
-            } else {
-                tentative = Quake.gameManager.getRespawnTentative().get(p);
-            }
-            if (tentative <= 5) {
+            int esize = location.getWorld().getNearbyEntities(location, 10.5D, 10.5D, 10.5D).size();
+            if (esize == 0) {
                 p.teleport(location);
-                Quake.gameManager.getRespawnTentative().put(p, 0);
-                Quake.gameManager.getRespawnTentative().remove(p);
+            } else if (info.getRespawn() >= 5) {
+                p.teleport(location);
             } else {
-                for (Entity e : p.getWorld().getNearbyEntities(location, 10, 10, 10)) {
-                    if (e instanceof Player) {
-                        pSize++;
-                    }
-                }
-                if (pSize == 0) {
-                    p.teleport(location);
-                    Quake.gameManager.getRespawnTentative().remove(p);
-                    Quake.gameManager.getRespawnTentative().put(p, 0);
-                } else {
-                    respawn(p);
-                    Quake.gameManager.getRespawnTentative().remove(p);
-                    Quake.gameManager.getRespawnTentative().put(p, tentative + 1);
-                }
+                respawn(p);
             }
+            info.setRespawn(0);
         }
     }
 

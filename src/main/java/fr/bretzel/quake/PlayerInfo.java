@@ -58,6 +58,7 @@ public class PlayerInfo {
     private int playerkill = 0;
     private int coins = 0;
     private File file;
+    private int respawn = 0;
     private Random random = new Random();
 
     public PlayerInfo(Player player) {
@@ -209,8 +210,8 @@ public class PlayerInfo {
                         Player p = Bukkit.getPlayer(uuid);
                         if (p != null && p.isOnline()) {
                             p.sendMessage(ChatColor.AQUA + "####################"); //20 #
-                            p.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + game.getKill(p) + ChatColor.AQUA + "          #");
-                            p.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + game.getKill(p) * 5 + ChatColor.AQUA + "         #");
+                            p.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + game.getKill(p) + ChatColor.AQUA + "            #");
+                            p.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + game.getKill(p) * 5 + ChatColor.AQUA + "          #");
                             p.sendMessage(ChatColor.AQUA + "####################"); //20 #
                         }
                     }
@@ -255,6 +256,18 @@ public class PlayerInfo {
         objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
         objective.getScore("§r§r§r").setScore(6);
         return scoreboard;
+    }
+
+    public int getRespawn() {
+        return respawn;
+    }
+
+    public void setRespawn(int respawn) {
+        this.respawn = respawn;
+    }
+
+    public void addRespawn(int respawn) {
+        setRespawn(getRespawn() + respawn);
     }
 
     public void save() {
