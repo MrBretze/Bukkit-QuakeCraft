@@ -398,7 +398,9 @@ public class Game {
             } else if (info.getRespawn() >= 5) {
                 p.teleport(location);
             } else {
+                info.addRespawn(1);
                 respawn(p);
+                return;
             }
             info.setRespawn(0);
         }
