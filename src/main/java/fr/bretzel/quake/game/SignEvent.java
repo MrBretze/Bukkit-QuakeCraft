@@ -113,7 +113,7 @@ public class SignEvent implements Listener {
             if (sign == null) {
                 return;
             }
-            Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
+            Game game = getGameBySign(sign);
             game.removeSign(sign);
         }
     }
@@ -173,6 +173,20 @@ public class SignEvent implements Listener {
                         sign.getLocation().getBlockY() == location.getBlockY() &&
                         sign.getLocation().getBlockZ() == location.getBlockZ()) {
                     return sign;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Game getGameBySign(Sign location) {
+        for (Game game : getManager().getGameLinkedList()) {
+            for (Sign sign : game.getSignList()) {
+                if (sign.getLocation().getWorld() == location.getWorld() &&
+                        sign.getLocation().getBlockX() == location.getX() &&
+                        sign.getLocation().getBlockY() == location.getY() &&
+                        sign.getLocation().getBlockZ() == location.getZ()) {
+                    return game;
                 }
             }
         }

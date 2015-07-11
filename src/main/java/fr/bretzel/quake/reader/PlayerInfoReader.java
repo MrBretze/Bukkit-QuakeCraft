@@ -36,6 +36,7 @@ public class PlayerInfoReader {
         compound.setDouble("reload", playerInfo.getReloadTime());
         compound.setInt("playerKill", playerInfo.getPlayerkill());
         compound.setInt("coins", playerInfo.getCoins());
+        compound.setInt("wonGame", playerInfo.getWon());
         return compound;
     }
 
@@ -59,6 +60,9 @@ public class PlayerInfoReader {
         }
         if (compound.hasKey("coins")) {
             player.setCoins(compound.getInt("coins"));
+        }
+        if (compound.hasKey("wonGame")) {
+            player.setWon(compound.getInt("wonGame"));
         }
     }
 }

@@ -50,7 +50,6 @@ public class GameManager implements Listener {
     private HashMap<Game, GameStart> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
-    private HashMap<Player, Integer> respawnTentative = new HashMap<>();
     private Quake quake;
     private Location lobby;
     private MainTask mainTask;
@@ -125,9 +124,6 @@ public class GameManager implements Listener {
         this.lobby = lobby;
     }
 
-    public HashMap<Player, Integer> getRespawnTentative() {
-        return respawnTentative;
-    }
 
     public HashMap<Game, GameStart> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;

@@ -221,14 +221,12 @@ public class Game {
     }
 
     public Block getBlockByLocation(Location location) {
-        Block b = null;
         for(Block block : getBlocks()) {
             if(block.getWorld() == location.getWorld() && block.getX() == location.getBlockX() && block.getY() == location.getBlockY() && block.getZ() == location.getBlockZ()) {
-                b = block;
-                break;
+                return block;
             }
         }
-        return b;
+        return null;
     }
 
     public void addBlock(Block block) {

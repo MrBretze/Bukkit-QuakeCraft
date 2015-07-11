@@ -30,6 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.UUID;
 
 /**
@@ -38,10 +39,10 @@ import java.util.UUID;
 
 public class GameStart extends GameTask {
 
+    private static NumberFormat formatter = new DecimalFormat("00");
     String last = "last";
     private int minSecQuake = getGame().getSecLaunch();
     private ScoreboardAPI scoreboardAPI = getGame().getScoreboardManager();
-    private DecimalFormat decimalFormat = new DecimalFormat("##");
 
     public GameStart(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
@@ -63,17 +64,7 @@ public class GameStart extends GameTask {
             minSecQuake--;
         }
 
-        StringBuilder format = new StringBuilder();
-
-        if (minSecQuake > 60) {
-            int min = minSecQuake / 60;
-            for (int i = 0; i <= min; i++) {
-                minSecQuake = -60;
-            }
-            format.append(decimalFormat.format(min)).append(":");
-        }
-
-        format.append(decimalFormat.format(minSecQuake));
+        String format = formatter.format(minSecQuake) + "s";
 
         if (!last.equalsIgnoreCase("last")) {
             scoreboardAPI.getScoreboard().resetScores("Waiting...");

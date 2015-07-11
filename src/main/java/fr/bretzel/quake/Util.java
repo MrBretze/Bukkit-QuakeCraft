@@ -265,7 +265,7 @@ public class Util {
     }
 
 
-    private static Color getColor(int r, int v, int b) {
+    public static Color getColor(int r, int v, int b) {
         return Color.fromRGB(r, v, b);
     }
 

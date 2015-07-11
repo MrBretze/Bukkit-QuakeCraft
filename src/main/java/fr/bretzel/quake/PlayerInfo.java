@@ -20,8 +20,10 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
+import fr.bretzel.quake.game.event.GameEndEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.DashTask;
+import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 import fr.bretzel.quake.reader.PlayerInfoReader;
@@ -40,7 +42,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -57,6 +58,7 @@ public class PlayerInfo {
     private boolean dash = true;
     private int playerkill = 0;
     private int coins = 0;
+    private int won = 0;
     private File file;
     private int respawn = 0;
     private Random random = new Random();
@@ -202,20 +204,16 @@ public class PlayerInfo {
                 addCoins(5 * shoot.getKill());
                 game.addKill(getPlayer(), shoot.getKill());
                 game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
-                setPlayerkill(getPlayerkill() + shoot.getKill());
 
                 if (game.getKill(getPlayer()) >= game.getMaxKill()) {
-                    game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
-                    for (UUID uuid : game.getPlayerList()) {
-                        Player p = Bukkit.getPlayer(uuid);
-                        if (p != null && p.isOnline()) {
-                            p.sendMessage(ChatColor.AQUA + "####################"); //20 #
-                            p.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + game.getKill(p) + ChatColor.AQUA + "            #");
-                            p.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + game.getKill(p) * 5 + ChatColor.AQUA + "          #");
-                            p.sendMessage(ChatColor.AQUA + "####################"); //20 #
-                        }
+                    GameEndEvent event = new GameEndEvent(getPlayer(), game);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled()) {
+                        return;
                     }
-                    game.stop();
+                    GameEndTask endTask = new GameEndTask(Quake.quake, 15L, 15L, game, getPlayer());
+                    addWoon(1);
+                    game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
                 }
             }
         }
@@ -255,6 +253,7 @@ public class PlayerInfo {
         objective.getScore("§r§r").setScore(8);
         objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
         objective.getScore("§r§r§r").setScore(6);
+        objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
         return scoreboard;
     }
 
@@ -268,6 +267,18 @@ public class PlayerInfo {
 
     public void addRespawn(int respawn) {
         setRespawn(getRespawn() + respawn);
+    }
+
+    public int getWon() {
+        return won;
+    }
+
+    public void setWon(int won) {
+        this.won = won;
+    }
+
+    public void addWoon(int woon) {
+        setWon(getWon() + woon);
     }
 
     public void save() {
