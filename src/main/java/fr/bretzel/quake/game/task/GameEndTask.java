@@ -44,73 +44,6 @@ public class GameEndTask extends GameTask {
         setPlayer(player);
     }
 
-    @Override
-    public void run() {
-        if (firewokSpawnable >= 0) {
-            firewokSpawnable--;
-            if (firewokSpawnable == 5) {
-                for (UUID uuid : getGame().getPlayerList()) {
-                    Player p = Bukkit.getPlayer(uuid);
-                    if (p != null && p.isOnline()) {
-                        sendGameInfo(p);
-                    }
-                }
-            }
-            for (int i = 0; i <= 5; i++) {
-                spawnFirework(player.getLocation());
-            }
-        } else {
-            getGame().stop();
-            cancel();
-        }
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    private void spawnFirework(Location location) {
-        Firework fw = location.getWorld().spawn(location.clone().add(0.0D, 0.7D, 0.0D), Firework.class);
-        FireworkMeta fm = fw.getFireworkMeta();
-        int fType = random.nextInt(5) + 1;
-        FireworkEffect.Type type = FireworkEffect.Type.BALL;
-        switch (fType) {
-            case 1:
-                type = FireworkEffect.Type.BALL;
-                break;
-            case 2:
-                type = FireworkEffect.Type.BALL_LARGE;
-                break;
-            case 3:
-                type = FireworkEffect.Type.BURST;
-                break;
-            case 4:
-                type = FireworkEffect.Type.CREEPER;
-                break;
-            case 5:
-                type = FireworkEffect.Type.STAR;
-        }
-
-        int c1i = random.nextInt(17) + 1;
-        int c2i = random.nextInt(17) + 1;
-        Color c1 = getColor(c1i);
-        Color c2 = getColor(c2i);
-        FireworkEffect effect = FireworkEffect.builder()
-                .flicker(random.nextBoolean()).withColor(c1).withFade(c2)
-                .with(type).trail(random.nextBoolean()).build();
-        fm.addEffect(effect);
-        fm.setPower(random.nextInt(2) + 1);
-        fw.setFireworkMeta(fm);
-    }
-
     private static Color getColor(int c) {
         switch (c) {
             default:
@@ -149,6 +82,65 @@ public class GameEndTask extends GameTask {
             case 17:
                 return Color.YELLOW;
         }
+    }
+
+    @Override
+    public void run() {
+        if (firewokSpawnable >= 0) {
+            firewokSpawnable--;
+            if (firewokSpawnable == 5) {
+                for (UUID uuid : getGame().getPlayerList()) {
+                    Player p = Bukkit.getPlayer(uuid);
+                    if (p != null && p.isOnline()) {
+                        sendGameInfo(p);
+                    }
+                }
+            }
+            for (int i = 0; i <= 5; i++) {
+                spawnFirework(player.getLocation());
+            }
+        } else {
+            getGame().stop();
+            cancel();
+        }
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    private void spawnFirework(Location location) {
+        Firework fw = location.getWorld().spawn(location.clone().add(0.0D, 0.7D, 0.0D), Firework.class);
+        FireworkMeta fm = fw.getFireworkMeta();
+        int fType = random.nextInt(5) + 1;
+        FireworkEffect.Type type = FireworkEffect.Type.BALL;
+        switch (fType) {
+            case 1:
+                type = FireworkEffect.Type.BALL;
+                break;
+            case 2:
+                type = FireworkEffect.Type.BALL_LARGE;
+                break;
+            case 3:
+                type = FireworkEffect.Type.BURST;
+                break;
+            case 4:
+                type = FireworkEffect.Type.CREEPER;
+                break;
+            case 5:
+                type = FireworkEffect.Type.STAR;
+        }
+
+        int c1i = random.nextInt(17) + 1;
+        int c2i = random.nextInt(17) + 1;
+        Color c1 = getColor(c1i);
+        Color c2 = getColor(c2i);
+        FireworkEffect effect = FireworkEffect.builder()
+                .flicker(random.nextBoolean()).withColor(c1).withFade(c2)
+                .with(type).trail(random.nextBoolean()).build();
+        fm.addEffect(effect);
+        fm.setPower(random.nextInt(2) + 1);
+        fw.setFireworkMeta(fm);
     }
 
     public void sendGameInfo(Player player) {
