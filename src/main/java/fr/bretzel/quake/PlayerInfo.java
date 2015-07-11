@@ -59,6 +59,7 @@ public class PlayerInfo {
     private int playerkill = 0;
     private int coins = 0;
     private int won = 0;
+    private int killstreak = 0;
     private File file;
     private int respawn = 0;
     private Random random = new Random();
@@ -191,7 +192,8 @@ public class PlayerInfo {
             if (shoot.getKill() > 0 && game.getState() == State.STARTED) {
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().respawn(p);
-                    p.getWorld().playSound(p.getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+                    shoot.getGame().setKillSteak(p, 0);
+                    p.getWorld().playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
                 }
                 getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, random.nextFloat(), random.nextFloat());
                 int kill;
@@ -200,6 +202,25 @@ public class PlayerInfo {
                 } else {
                     kill = game.getKill(getPlayer()) + shoot.getKill();
                 }
+
+                shoot.getGame().addKillStreak(getPlayer(), shoot.getKill());
+
+                int killStreak = shoot.getGame().getKillStreak(getPlayer());
+
+                if (killStreak == 5) {
+                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS KILLING SPREE !");
+                    addKillStreak(1);
+                } else if (killStreak == 10) {
+                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A RAMPAGE !");
+                    addKillStreak(1);
+                } else if (killStreak == 15) {
+                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A DEMON !");
+                    addKillStreak(1);
+                } else if (killStreak == 20) {
+                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " J4AI PLUS DID2E !");
+                    addKillStreak(1);
+                }
+
                 addKill(shoot.getKill());
                 addCoins(5 * shoot.getKill());
                 game.addKill(getPlayer(), shoot.getKill());
@@ -243,6 +264,18 @@ public class PlayerInfo {
         setCoins(getCoins() + coins);
     }
 
+    public int getKillStreak() {
+        return killstreak;
+    }
+
+    public void setKillStreak(int killstreak) {
+        this.killstreak = killstreak;
+    }
+
+    public void addKillStreak(int kill) {
+        setKillStreak(getKillStreak() + kill);
+    }
+
     public Scoreboard getPlayerScoreboard() {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
@@ -254,6 +287,8 @@ public class PlayerInfo {
         objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
         objective.getScore("§r§r§r").setScore(6);
         objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
+        objective.getScore("§r§r§r§r").setScore(4);
+        objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
         return scoreboard;
     }
 

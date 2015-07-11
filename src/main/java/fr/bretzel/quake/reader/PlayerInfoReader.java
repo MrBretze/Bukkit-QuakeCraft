@@ -37,6 +37,7 @@ public class PlayerInfoReader {
         compound.setInt("playerKill", playerInfo.getPlayerkill());
         compound.setInt("coins", playerInfo.getCoins());
         compound.setInt("wonGame", playerInfo.getWon());
+        compound.setInt("killStreak", playerInfo.getKillStreak());
         return compound;
     }
 
@@ -63,6 +64,9 @@ public class PlayerInfoReader {
         }
         if (compound.hasKey("wonGame")) {
             player.setWon(compound.getInt("wonGame"));
+        }
+        if (compound.hasKey("killStreak")) {
+            player.setKillStreak(compound.getInt("killStreak"));
         }
     }
 }

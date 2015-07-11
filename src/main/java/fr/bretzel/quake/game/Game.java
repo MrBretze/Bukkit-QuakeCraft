@@ -61,6 +61,7 @@ public class Game {
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
     private HashMap<UUID, Integer> playerKills = new HashMap<>();
+    private HashMap<UUID, Integer> killStreak = new HashMap<>();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -358,6 +359,34 @@ public class Game {
         setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
     }
 
+    public void addKillStreak(Player player, int kill) {
+        addKillStreak(player.getUniqueId(), kill);
+    }
+
+    public void addKillStreak(UUID uuid, int kill) {
+        if (killStreak.containsKey(uuid)) {
+            killStreak.put(uuid, getKillStreak(uuid) + kill);
+        } else {
+            killStreak.put(uuid, kill);
+        }
+    }
+
+    public Integer getKillStreak(Player player) {
+        return getKillStreak(player.getUniqueId());
+    }
+
+    public Integer getKillStreak(UUID uuid) {
+        return killStreak.get(uuid);
+    }
+
+    public void setKillSteak(Player player, int kill) {
+        setKillSteak(player.getUniqueId(), kill);
+    }
+
+    public void setKillSteak(UUID uuid, int kill) {
+        killStreak.put(uuid, kill);
+    }
+
     public void stop() {
         setState(State.WAITING);
 
@@ -386,6 +415,7 @@ public class Game {
 
         getPlayerList().clear();
         playerKills.clear();
+        killStreak.clear();
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
     }
 
