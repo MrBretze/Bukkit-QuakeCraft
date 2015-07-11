@@ -365,6 +365,9 @@ public class Game {
             Player p = Bukkit.getPlayer(uuid);
             PlayerInfo info = Quake.getPlayerInfo(p);
             if(p != null && p.isOnline()) {
+                if (!Quake.gameManager.getLobby().getChunk().isLoaded()) {
+                    Quake.gameManager.getLobby().getChunk().load(false);
+                }
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
                 p.setWalkSpeed(0.2F);

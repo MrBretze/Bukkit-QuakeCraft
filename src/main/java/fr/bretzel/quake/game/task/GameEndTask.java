@@ -19,6 +19,7 @@ package fr.bretzel.quake.game.task;
 import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -96,13 +97,18 @@ public class GameEndTask extends GameTask {
                     }
                 }
             }
-            for (int i = 0; i <= 5; i++) {
-                spawnFirework(player.getLocation());
-            }
+            spawnFirework(getPlayer().getLocation());
+            spawnFirework(getPlayer().getLocation());
+            spawnFirework(getPlayer().getLocation());
+            spawnFirework(getPlayer().getLocation());
         } else {
             getGame().stop();
             cancel();
         }
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public void setPlayer(Player player) {
@@ -110,37 +116,29 @@ public class GameEndTask extends GameTask {
     }
 
     private void spawnFirework(Location location) {
-        Firework fw = location.getWorld().spawn(location.clone().add(0.0D, 0.7D, 0.0D), Firework.class);
-        FireworkMeta fm = fw.getFireworkMeta();
-        int fType = random.nextInt(5) + 1;
+        Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+        FireworkMeta fwm = fw.getFireworkMeta();
+        Random r = new Random();
+        int rt = r.nextInt(5) + 1;
         FireworkEffect.Type type = FireworkEffect.Type.BALL;
-        switch (fType) {
-            case 1:
-                type = FireworkEffect.Type.BALL;
-                break;
-            case 2:
-                type = FireworkEffect.Type.BALL_LARGE;
-                break;
-            case 3:
-                type = FireworkEffect.Type.BURST;
-                break;
-            case 4:
-                type = FireworkEffect.Type.CREEPER;
-                break;
-            case 5:
-                type = FireworkEffect.Type.STAR;
-        }
-
-        int c1i = random.nextInt(17) + 1;
-        int c2i = random.nextInt(17) + 1;
-        Color c1 = getColor(c1i);
-        Color c2 = getColor(c2i);
-        FireworkEffect effect = FireworkEffect.builder()
-                .flicker(random.nextBoolean()).withColor(c1).withFade(c2)
-                .with(type).trail(random.nextBoolean()).build();
-        fm.addEffect(effect);
-        fm.setPower(random.nextInt(2) + 1);
-        fw.setFireworkMeta(fm);
+        if (rt == 1) type = FireworkEffect.Type.BALL;
+        if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
+        if (rt == 3) type = FireworkEffect.Type.BURST;
+        if (rt == 4) type = FireworkEffect.Type.CREEPER;
+        if (rt == 5) type = FireworkEffect.Type.STAR;
+        int u = r.nextInt(256);
+        int b = r.nextInt(256);
+        int g = r.nextInt(256);
+        Color c1 = Color.fromRGB(u, g, b);
+        u = r.nextInt(256);
+        b = r.nextInt(256);
+        g = r.nextInt(256);
+        Color c2 = Color.fromRGB(u, g, b);
+        FireworkEffect effect = FireworkEffect.builder().flicker(r.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(r.nextBoolean()).build();
+        fwm.addEffect(effect);
+        int rp = r.nextInt(2) + 1;
+        fwm.setPower(rp);
+        fw.setFireworkMeta(fwm);
     }
 
     public void sendGameInfo(Player player) {
