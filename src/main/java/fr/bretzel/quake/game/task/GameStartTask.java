@@ -37,14 +37,14 @@ import java.util.UUID;
  * Created by MrBretzel on 22/06/2015.
  */
 
-public class GameStart extends GameTask {
+public class GameStartTask extends GameTask {
 
     private static NumberFormat formatter = new DecimalFormat("00");
-    String last = "last";
+    String last = "Waiting...";
     private int minSecQuake = getGame().getSecLaunch();
     private ScoreboardAPI scoreboardAPI = getGame().getScoreboardManager();
 
-    public GameStart(JavaPlugin javaPlugin, long l, long l1, Game game) {
+    public GameStartTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
     }
 
@@ -65,11 +65,6 @@ public class GameStart extends GameTask {
         }
 
         String format = formatter.format(minSecQuake + 1) + "s";
-
-        if (!last.equalsIgnoreCase("last")) {
-            scoreboardAPI.getScoreboard().resetScores("Waiting...");
-            scoreboardAPI.getObjective().getScore(format.toString()).setScore(5);
-        }
 
         scoreboardAPI.getScoreboard().resetScores(this.last);
 

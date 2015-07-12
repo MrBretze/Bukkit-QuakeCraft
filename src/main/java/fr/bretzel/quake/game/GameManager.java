@@ -21,7 +21,7 @@ import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
-import fr.bretzel.quake.game.task.GameStart;
+import fr.bretzel.quake.game.task.GameStartTask;
 import fr.bretzel.quake.game.task.MainTask;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -47,7 +47,7 @@ public class GameManager implements Listener {
     public SignEvent signEvent;
     public int maxMinute = 10;
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
-    private HashMap<Game, GameStart> gameQuakeTaskHashMap = new HashMap<>();
+    private HashMap<Game, GameStartTask> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private Quake quake;
@@ -125,7 +125,7 @@ public class GameManager implements Listener {
     }
 
 
-    public HashMap<Game, GameStart> getQuakeTaskHashMap() {
+    public HashMap<Game, GameStartTask> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;
     }
 
@@ -262,7 +262,7 @@ public class GameManager implements Listener {
                 getUuidToChrono().put(player.getUniqueId(), chrono);
             } else {
                 game.getPlayerList().remove(player.getUniqueId());
-                GameStart start = getQuakeTaskHashMap().get(game);
+                GameStartTask start = getQuakeTaskHashMap().get(game);
                 if (start != null) {
                     if (game.getPlayerList().size() < game.getMinPlayer()) {
                         start.cancel();
@@ -285,8 +285,8 @@ public class GameManager implements Listener {
         if (game.getState() == State.WAITING) {
             int players = game.getPlayerList().size() + 1;
             if (players == game.getMinPlayer()) {
-                GameStart gameStart = new GameStart(Quake.quake, 20L, 20L, game);
-                getQuakeTaskHashMap().put(game, gameStart);
+                GameStartTask gameStartTask = new GameStartTask(Quake.quake, 20L, 20L, game);
+                getQuakeTaskHashMap().put(game, gameStartTask);
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
                 player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
