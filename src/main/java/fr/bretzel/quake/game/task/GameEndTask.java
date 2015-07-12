@@ -99,8 +99,6 @@ public class GameEndTask extends GameTask {
             }
             spawnFirework(getPlayer().getLocation());
             spawnFirework(getPlayer().getLocation());
-            spawnFirework(getPlayer().getLocation());
-            spawnFirework(getPlayer().getLocation());
         } else {
             getGame().stop();
             cancel();
@@ -118,25 +116,24 @@ public class GameEndTask extends GameTask {
     private void spawnFirework(Location location) {
         Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
         FireworkMeta fwm = fw.getFireworkMeta();
-        Random r = new Random();
-        int rt = r.nextInt(5) + 1;
+        int rt = random.nextInt(5) + 1;
         FireworkEffect.Type type = FireworkEffect.Type.BALL;
         if (rt == 1) type = FireworkEffect.Type.BALL;
         if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
         if (rt == 3) type = FireworkEffect.Type.BURST;
         if (rt == 4) type = FireworkEffect.Type.CREEPER;
         if (rt == 5) type = FireworkEffect.Type.STAR;
-        int u = r.nextInt(256);
-        int b = r.nextInt(256);
-        int g = r.nextInt(256);
+        int u = random.nextInt(256);
+        int b = random.nextInt(256);
+        int g = random.nextInt(256);
         Color c1 = Color.fromRGB(u, g, b);
-        u = r.nextInt(256);
-        b = r.nextInt(256);
-        g = r.nextInt(256);
+        u = random.nextInt(256);
+        b = random.nextInt(256);
+        g = random.nextInt(256);
         Color c2 = Color.fromRGB(u, g, b);
-        FireworkEffect effect = FireworkEffect.builder().flicker(r.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(r.nextBoolean()).build();
+        FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(random.nextBoolean()).build();
         fwm.addEffect(effect);
-        int rp = r.nextInt(2) + 1;
+        int rp = random.nextInt(2) + 1;
         fwm.setPower(rp);
         fw.setFireworkMeta(fwm);
     }

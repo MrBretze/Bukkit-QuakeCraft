@@ -21,6 +21,7 @@ import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameEndEvent;
+import fr.bretzel.quake.game.event.PlayerDashEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.GameEndTask;
@@ -42,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -166,12 +168,17 @@ public class PlayerInfo {
 
     public void dash() {
         if (isDash()) {
-            setDash(false);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
-            Vector pVector = player.getEyeLocation().getDirection();
-            Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
-            getPlayer().setVelocity(vector);
-            getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
+            if (game.getState() == State.STARTED) {
+                PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
+                Bukkit.getPluginManager().callEvent(event);
+                setDash(false);
+                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
+                Vector pVector = player.getEyeLocation().getDirection();
+                Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
+                getPlayer().setVelocity(vector);
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+            }
         }
     }
 
@@ -191,11 +198,11 @@ public class PlayerInfo {
             }
             if (shoot.getKill() > 0 && game.getState() == State.STARTED) {
                 for (Player p : shoot.getPlayers()) {
-                    shoot.getGame().respawn(p);
                     shoot.getGame().setKillSteak(p, 0);
                     p.getWorld().playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
+                    shoot.getGame().respawn(p);
                 }
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, random.nextFloat(), random.nextFloat());
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, 2F, 2F);
                 int kill;
                 if (Integer.valueOf(game.getKill(getPlayer())) == null) {
                     kill = shoot.getKill();
@@ -217,7 +224,7 @@ public class PlayerInfo {
                     game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A DEMON !");
                     addKillStreak(1);
                 } else if (killStreak == 20) {
-                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " J4AI PLUS DID2E !");
+                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " MONSTER KIL !!");
                     addKillStreak(1);
                 }
 
@@ -231,6 +238,14 @@ public class PlayerInfo {
                     Bukkit.getPluginManager().callEvent(event);
                     if (event.isCancelled()) {
                         return;
+                    }
+                    for (UUID id : game.getPlayerList()) {
+                        Player player = Bukkit.getPlayer(id);
+                        if (player != null && player.isOnline()) {
+                            player.getInventory().clear();
+                            setDash(false);
+                            setShoot(false);
+                        }
                     }
                     GameEndTask endTask = new GameEndTask(Quake.quake, 15L, 15L, game, getPlayer());
                     addWoon(1);

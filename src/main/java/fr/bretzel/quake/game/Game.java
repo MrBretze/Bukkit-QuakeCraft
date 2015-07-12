@@ -43,6 +43,7 @@ import java.util.*;
 public class Game {
 
     private LinkedList<Location> respawn = new LinkedList<>();
+    List<Location> respawns = getRespawn();
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
@@ -260,7 +261,7 @@ public class Game {
     }
 
     public void view(boolean view) {
-        if(view == true) {
+        if (view) {
             this.respawnview = true;
             for(Location location : getRespawn()) {
                 location.getWorld().getBlockAt(location).setType(Material.BEACON);
@@ -401,6 +402,8 @@ public class Game {
                 p.getInventory().clear();
                 p.setWalkSpeed(0.2F);
                 p.setScoreboard(info.getPlayerScoreboard());
+                info.setDash(true);
+                info.setShoot(true);
             }
         }
 
@@ -417,6 +420,12 @@ public class Game {
         playerKills.clear();
         killStreak.clear();
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
+    }
+
+    public void respawnAtStart(Player player) {
+        Location location = respawns.get(random.nextInt(respawns.size()));
+        respawns.remove(respawns.indexOf(location));
+        player.teleport(location);
     }
 
     public void respawn(Player p) {

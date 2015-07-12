@@ -64,7 +64,7 @@ public class GameStart extends GameTask {
             minSecQuake--;
         }
 
-        String format = formatter.format(minSecQuake) + "s";
+        String format = formatter.format(minSecQuake + 1) + "s";
 
         if (!last.equalsIgnoreCase("last")) {
             scoreboardAPI.getScoreboard().resetScores("Waiting...");
@@ -93,7 +93,7 @@ public class GameStart extends GameTask {
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
                 if(p!= null || p.isOnline()) {
-                    getGame().respawn(p);
+                    getGame().respawnAtStart(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
                     Chrono chrono = new Chrono();
