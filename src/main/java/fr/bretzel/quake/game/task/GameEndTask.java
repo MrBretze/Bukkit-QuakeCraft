@@ -99,6 +99,7 @@ public class GameEndTask extends GameTask {
             }
             spawnFirework(getPlayer().getLocation());
             spawnFirework(getPlayer().getLocation());
+            spawnFirework(getPlayer().getLocation());
         } else {
             getGame().stop();
             cancel();

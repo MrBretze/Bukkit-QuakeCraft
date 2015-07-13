@@ -86,30 +86,24 @@ public class GameReader {
             game.addBlock(b);
         }
 
-        System.out.print("Init signs");
 
         if (compound.hasKey("signs")) {
             NBTTagCompound s = compound.getCompound("signs");
             int size = s.getInt("size");
             int vsize = size - 1;
-            System.out.print("Init signs size:" + size);
             if (size > 0) {
                 for (int i = 0; i <= vsize; i++) {
-                    System.out.print("Init signs: " + i);
                     game.addSign(SignReader.read(s.getCompound(String.valueOf(i))));
                 }
             }
         }
 
-        System.out.print("Init respawn");
         if (compound.hasKey("respawns")) {
             NBTTagCompound s = compound.getCompound("respawns");
             int size = s.getInt("size");
             int vsize = size - 1;
-            System.out.print("Init respawn size: " + size);
             if (size > 0) {
                 for (int i = 0; i <= vsize; i++) {
-                    System.out.print("Init respawn: " + i);
                     if (size != size - 1) {
                         game.addRespawn(Util.toLocationString(s.getString(String.valueOf(i))));
                     }

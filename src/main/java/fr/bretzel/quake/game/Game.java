@@ -446,6 +446,11 @@ public class Game {
         }
     }
 
+    public void delete() {
+        getFile().delete();
+        Quake.gameManager.getGameLinkedList().remove(this);
+    }
+
     public void save() {
         try {
             NBTCompressedStreamTools.wrhite(GameReader.write(this), new FileOutputStream(getFile()));

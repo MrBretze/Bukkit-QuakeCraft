@@ -191,18 +191,18 @@ public class PlayerInfo {
             if (shoot.isCancelled()) {
                 return;
             }
-            setShoot(false);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
-            for (Location location : locs) {
-                new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
-            }
             if (shoot.getKill() > 0 && game.getState() == State.STARTED) {
+                setShoot(false);
+                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
+                for (Location location : locs) {
+                    new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
+                }
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().setKillSteak(p, 0);
                     p.getWorld().playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
                     shoot.getGame().respawn(p);
                 }
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, 2F, 2F);
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, 2F, 1F);
                 int kill;
                 if (Integer.valueOf(game.getKill(getPlayer())) == null) {
                     kill = shoot.getKill();
