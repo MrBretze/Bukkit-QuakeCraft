@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -23,6 +23,7 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -409,10 +410,10 @@ public class Game {
 
         getScoreboardManager().getObjective().unregister();
         getScoreboardManager().setObjective(getScoreboardManager().getScoreboard().registerNewObjective("quake", "dummy"));
-        getScoreboardManager().getObjective().getScore("§r").setScore(10);
+        getScoreboardManager().getObjective().getScore("ï¿½r").setScore(10);
         getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
-        getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
-        getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
+        getScoreboardManager().getObjective().getScore("ï¿½rï¿½r").setScore(8);
+        getScoreboardManager().getObjective().getScore("ï¿½rï¿½rï¿½r").setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
