@@ -50,21 +50,19 @@ public class GameManager implements Listener {
     private HashMap<Game, GameStartTask> gameQuakeTaskHashMap = new HashMap<>();
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
-    private Quake quake;
     private Location lobby;
     private MainTask mainTask;
 
-    public GameManager(Quake quake) {
-        this.quake = quake;
+    public GameManager() {
 
-        Quake.manager.registerEvents(this, quake);
+        Quake.manager.registerEvents(this, Quake.quake);
 
         this.signEvent = new SignEvent(this);
 
-        if (!quake.getConfig().isSet("lobby")) {
-            quake.getConfig().set("lobby", Util.toStringLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
+        if (!Quake.quake.getConfig().isSet("lobby")) {
+            Quake.quake.getConfig().set("lobby", Util.toStringLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
         } else {
-            lobby = Util.toLocationString(quake.getConfig().getString("lobby"));
+            lobby = Util.toLocationString(Quake.quake.getConfig().getString("lobby"));
         }
 
         this.mainTask = new MainTask(this);
@@ -147,10 +145,6 @@ public class GameManager implements Listener {
 
     public void setSignEvent(SignEvent signEvent) {
         this.signEvent = signEvent;
-    }
-
-    public Quake getQuake() {
-        return quake;
     }
 
     public LinkedList<Game> getGameLinkedList() {
