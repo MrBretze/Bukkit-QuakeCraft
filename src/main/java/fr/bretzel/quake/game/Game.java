@@ -16,6 +16,8 @@
  */
 package fr.bretzel.quake.game;
 
+import fr.bretzel.hologram.Hologram;
+import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.PlayerInfo;
@@ -26,7 +28,6 @@ import fr.bretzel.quake.reader.GameReader;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -264,34 +265,17 @@ public class Game {
     public void view(boolean view) {
         if (view) {
             this.respawnview = true;
+            int s = 0;
             for(Location location : getRespawn()) {
-                location.getWorld().getBlockAt(location).setType(Material.BEACON);
-                for (int xPoint = location.getBlockX() - 1; xPoint <= location.getBlockX() + 1 ; xPoint++) {
-                    for (int zPoint = location.getBlockZ() - 1 ; zPoint <= location.getBlockZ() + 1; zPoint++) {
-                        Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
-                        for(UUID id : getPlayerList()) {
-                            Player player = Bukkit.getPlayer(id);
-                            if(player != null && player.isOnline()) {
-                                player.sendBlockChange(l, Material.IRON_BLOCK, (byte) 0);
-                            }
-                        }
-                    }
-                }
+                s++;
+                Hologram hologram = new Hologram(location, "Respawn: " + s);
+                hologram.display(true);
             }
         } else {
             this.respawnview = false;
             for(Location location : getRespawn()) {
-                for (int xPoint = location.getBlockX() - 1; xPoint <= location.getBlockX() + 1 ; xPoint++) {
-                    for (int zPoint = location.getBlockZ() - 1 ; zPoint <= location.getBlockZ() + 1; zPoint++) {
-                        Location l = location.getWorld().getBlockAt(xPoint, location.getBlockY() - 1, zPoint).getLocation().clone();
-                        for(UUID id : getPlayerList()) {
-                            Player player = Bukkit.getPlayer(id);
-                            if(player != null && player.isOnline()) {
-                                player.sendBlockChange(l, getBlockByLocation(l).getType(), getBlockByLocation(l).getData());
-                            }
-                        }
-                    }
-                }
+                Hologram hologram = HologramManager.getHoloManager().getHologram(location, 0.5);
+                hologram.display(false);
             }
         }
     }

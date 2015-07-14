@@ -40,7 +40,7 @@ public class HoloEntity {
         getStand().setGravity(false);
         getStand().setBasePlate(false);
         getStand().setArms(false);
-        getStand().setCustomNameVisible(true);
+        getStand().setCustomNameVisible(false);
         getStand().setMarker(true);
         getStand().setVisible(false);
         getStand().setCustomName(getLine());

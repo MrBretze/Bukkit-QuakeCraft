@@ -67,6 +67,12 @@ public class Hologram {
         HologramManager.getHoloManager().getHoloList().add(this);
     }
 
+    public void display(boolean b) {
+        for(HoloEntity e : getHoloEntities()) {
+            e.getStand().setCustomNameVisible(b);
+        }
+    }
+
     public HoloEntity[] getHoloEntities() {
         return holoEntities;
     }

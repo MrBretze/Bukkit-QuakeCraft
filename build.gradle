@@ -23,7 +23,7 @@ jar {
 }
 
 dependencies {
-    compile name: ''
+    compile files('libs/Bukkit-1.8.7.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
