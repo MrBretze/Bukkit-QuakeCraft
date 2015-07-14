@@ -34,20 +34,20 @@ public class Hologram {
     private Location[] locations = {};
     private Location location;
 
-    public Hologram(World world, double x, double y, double z, String[] lines) {
-        this(new Location(world, x, y, z), lines);
+    public Hologram(World world, double x, double y, double z, String[] lines, HologramManager manager) {
+        this(new Location(world, x, y, z), lines, manager);
     }
 
-    public Hologram(Location location, String line) {
-        this(location, HologramManager.toArray(Arrays.asList(line)));
+    public Hologram(Location location, String line, HologramManager manager) {
+        this(location, new String[]{line}, manager);
     }
 
-    public Hologram(World world, double x, double y, double z, String line) {
-        this(new Location(world, x, y, z), line);
+    public Hologram(World world, double x, double y, double z, String line, HologramManager manager) {
+        this(new Location(world, x, y, z), line, manager);
     }
 
-    public Hologram(Location location, String[] lines) {
-        if(HologramManager.getHoloManager() == null) {
+    public Hologram(Location location, String[] lines, HologramManager manager) {
+        if(manager == null) {
             throw new NullPointerException("The hologram manager is not instanced !");
         }
         setLines(lines);
@@ -62,9 +62,9 @@ public class Hologram {
             HoloEntity entity = new HoloEntity(loc, s, HologramManager.getPlugin());
             holos.add(entity);
         }
-        setHoloEntities(HologramManager.toArray(holos));
-        setLocations(HologramManager.toArray(locs));
-        HologramManager.getHoloManager().getHoloList().add(this);
+        setHoloEntities(holos.toArray(new HoloEntity[holos.size()]));
+        setLocations(locs.toArray(new Location[locs.size()]));
+        manager.getHoloList().add(this);
     }
 
     public void display(boolean b) {

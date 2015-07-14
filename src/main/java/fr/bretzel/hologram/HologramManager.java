@@ -19,6 +19,9 @@ package fr.bretzel.hologram;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -28,15 +31,14 @@ import java.util.List;
  * Created by mrbretzel on 13/07/15.
  */
 
-public class HologramManager {
+public class HologramManager implements Listener {
 
     private List<Hologram> holoList = new ArrayList<>();
-    private static HologramManager instace;
     private static Plugin plugin;
 
     public HologramManager(Plugin plugin) {
         setPlugin(plugin);
-        this.instace = this;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public Hologram getHologram(World world, double x, double y, double z) {
@@ -61,7 +63,7 @@ public class HologramManager {
 
     public Hologram getHologram(Location location, double range) {
         for (Hologram holo : getHoloList()) {
-            if(holo.getLocation().distance(location) <= range) {
+            if (holo.getLocation().distance(location) <= range) {
                 return holo;
             }
         }
@@ -89,9 +91,9 @@ public class HologramManager {
         if (hologram == null) {
             return;
         }
-        for(HoloEntity e : hologram.getHoloEntities()) {
+        for (HoloEntity e : hologram.getHoloEntities()) {
             ArmorStand stand = e.getStand();
-            if(stand != null)
+            if (stand != null)
                 stand.remove();
         }
     }
@@ -112,12 +114,15 @@ public class HologramManager {
         this.plugin = plugin;
     }
 
-    public static <T> T[] toArray(List<T> list) {
-        T[] arr = (T[]) new Object[]{};
-        return list.toArray(arr);      // Not sure to function !
-    }
-
-    public static HologramManager getHoloManager() {
-        return instace;
+    @EventHandler
+    public void onPluginDisable(PluginDisableEvent event) {
+        Plugin plugin = event.getPlugin();
+        if(plugin == getPlugin()) {
+            for(Hologram hologram : getHoloList()) {
+                for(HoloEntity e : hologram.getHoloEntities()) {
+                    e.getStand().remove();
+                }
+            }
+        }
     }
 }

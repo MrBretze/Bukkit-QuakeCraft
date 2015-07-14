@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -28,7 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ScoreboardTask extends GameTask {
 
-    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
+    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "Â§c", "Â§4", "Â§c", true, false, ColorScroller.ScrollType.FORWARD);
 
     public ScoreboardTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
@@ -42,7 +42,7 @@ public class ScoreboardTask extends GameTask {
             }
         } else {
             if (scroller.getPosition() <= -1) {
-                scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
+                scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "Â§c", "Â§4", "Â§c", true, false, ColorScroller.ScrollType.FORWARD);
             }
         }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -16,6 +16,7 @@
  */
 package fr.bretzel.quake;
 
+import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
@@ -42,6 +43,7 @@ public class Quake extends JavaPlugin {
     public static GameManager gameManager;
     public static Quake quake;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
+    public static HologramManager holoManager;
 
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
@@ -49,6 +51,7 @@ public class Quake extends JavaPlugin {
                 return pi;
             }
         }
+
         PlayerInfo info = new PlayerInfo(player);
         playerInfos.add(info);
         return info;
@@ -61,6 +64,8 @@ public class Quake extends JavaPlugin {
     @Override
     public void onEnable() {
         quake = this;
+
+        holoManager = new HologramManager(this);
 
         getDataFolder().mkdir();
 

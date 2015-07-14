@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 LoÃ¯c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -295,14 +295,14 @@ public class PlayerInfo {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    §r");
-        objective.getScore("§r").setScore(10);
+        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    Â§r");
+        objective.getScore("Â§r").setScore(10);
         objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
-        objective.getScore("§r§r").setScore(8);
+        objective.getScore("Â§rÂ§r").setScore(8);
         objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
-        objective.getScore("§r§r§r").setScore(6);
+        objective.getScore("Â§rÂ§rÂ§r").setScore(6);
         objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
-        objective.getScore("§r§r§r§r").setScore(4);
+        objective.getScore("Â§rÂ§rÂ§rÂ§r").setScore(4);
         objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
         return scoreboard;
     }

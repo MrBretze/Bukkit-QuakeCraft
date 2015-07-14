@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 LoÃ¯c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -46,10 +46,10 @@ public class ScoreboardAPI {
 
         setObjective(getScoreboard().registerNewObjective("quake", "dummy"));
 
-        getObjective().getScore("§r").setScore(10);
+        getObjective().getScore("Â§r").setScore(10);
         getObjective().getScore("Map: " + game.getDisplayName()).setScore(9);
-        getObjective().getScore("§r§r").setScore(8);
-        getObjective().getScore("§r§r§r").setScore(6);
+        getObjective().getScore("Â§rÂ§r").setScore(8);
+        getObjective().getScore("Â§rÂ§rÂ§r").setScore(6);
         getObjective().getScore("Waiting...").setScore(5);
         getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 

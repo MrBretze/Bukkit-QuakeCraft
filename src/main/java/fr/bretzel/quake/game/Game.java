@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Lo�c Nussbaumer
+ * Copyright 2015 Loïc Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -268,13 +268,16 @@ public class Game {
             int s = 0;
             for(Location location : getRespawn()) {
                 s++;
-                Hologram hologram = new Hologram(location, "Respawn: " + s);
+                Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
+                if(hologram == null) {
+                    hologram = new Hologram(location, "Respawn: " + s, Quake.holoManager);
+                }
                 hologram.display(true);
             }
         } else {
             this.respawnview = false;
             for(Location location : getRespawn()) {
-                Hologram hologram = HologramManager.getHoloManager().getHologram(location, 0.5);
+                Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
                 hologram.display(false);
             }
         }
@@ -394,10 +397,10 @@ public class Game {
 
         getScoreboardManager().getObjective().unregister();
         getScoreboardManager().setObjective(getScoreboardManager().getScoreboard().registerNewObjective("quake", "dummy"));
-        getScoreboardManager().getObjective().getScore("�r").setScore(10);
+        getScoreboardManager().getObjective().getScore("§r").setScore(10);
         getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
-        getScoreboardManager().getObjective().getScore("�r�r").setScore(8);
-        getScoreboardManager().getObjective().getScore("�r�r�r").setScore(6);
+        getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
+        getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
