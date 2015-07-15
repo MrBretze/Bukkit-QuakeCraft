@@ -17,7 +17,6 @@
 package fr.bretzel.quake.game;
 
 import fr.bretzel.hologram.Hologram;
-import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.PlayerInfo;

@@ -115,7 +115,7 @@ public class HologramManager implements Listener {
     }
 
     @EventHandler
-    public void onPluginDisable(PluginDisableEvent event) {
+    private void onPluginDisable(PluginDisableEvent event) {
         Plugin plugin = event.getPlugin();
         if(plugin == getPlugin()) {
             for(Hologram hologram : getHoloList()) {
