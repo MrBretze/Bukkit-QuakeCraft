@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -28,6 +28,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Team;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -50,6 +51,12 @@ public class GameStartTask extends GameTask {
 
     @Override
     public void run() {
+        if(getGame().getPlayerList().size() < getGame().getMinPlayer()) {
+            getGame().getScoreboardManager().getScoreboard().resetScores(this.last);
+            getGame().getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
+            cancel();
+            return;
+        }
         if (minSecQuake <= 5 || minSecQuake == 10) {
             getGame().broadcastMessage(ChatColor.BLUE + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
             for(UUID id : getGame().getPlayerList()) {
@@ -68,9 +75,9 @@ public class GameStartTask extends GameTask {
 
         scoreboardAPI.getScoreboard().resetScores(this.last);
 
-        scoreboardAPI.getObjective().getScore(format.toString()).setScore(5);
+        scoreboardAPI.getObjective().getScore(format).setScore(5);
 
-        this.last = format.toString();
+        this.last = format;
 
         if (minSecQuake <= 0 && getGame().getState() == State.WAITING) {
             GameStartEvent event = new GameStartEvent(getGame());
@@ -87,7 +94,7 @@ public class GameStartTask extends GameTask {
             scoreboardAPI.getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
-                if(p!= null || p.isOnline()) {
+                if((p != null) || (p.isOnline())) {
                     getGame().respawnAtStart(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));

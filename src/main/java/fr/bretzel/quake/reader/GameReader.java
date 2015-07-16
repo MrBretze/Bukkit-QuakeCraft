@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -23,6 +23,7 @@ import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.scoreboard.Team;
 
 import java.io.File;
 import java.util.UUID;
@@ -128,6 +129,8 @@ public class GameReader {
 
         game.setDisplayName(compound.getString("displayName"));
         game.setScoreboardManager(new ScoreboardAPI(game));
+        Team team = game.getScoreboardManager().getScoreboard().registerNewTeam(game.getName());
+        game.setTeam(team);
         return game;
     }
 

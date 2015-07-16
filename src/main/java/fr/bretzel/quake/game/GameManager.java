@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -22,7 +22,6 @@ import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStartTask;
-import fr.bretzel.quake.game.task.MainTask;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,7 +50,6 @@ public class GameManager implements Listener {
     private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
     private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private Location lobby;
-    private MainTask mainTask;
 
     public GameManager() {
 
@@ -64,10 +62,6 @@ public class GameManager implements Listener {
         } else {
             lobby = Util.toLocationString(Quake.quake.getConfig().getString("lobby"));
         }
-
-        this.mainTask = new MainTask(this);
-
-        mainTask.runTaskTimer(Quake.quake, 5L, 5L);
     }
 
     public void registerGame(Player creator, String name, Location loc1, Location loc2) {
@@ -194,8 +188,10 @@ public class GameManager implements Listener {
             if (game.getState() == State.STARTED) {
                 if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                     pi.dash();
+                    event.setCancelled(true);
                 } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
                     pi.shoot();
+                    event.setCancelled(true);
                 }
             }
         }
@@ -208,7 +204,7 @@ public class GameManager implements Listener {
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
             if (!game.getBlocks().contains(event.getTo().getBlock())) {
-                player.teleport(Util.getRollBackLocation(player));
+                player.teleport(event.getTo());
             }
         }
     }
@@ -223,17 +219,16 @@ public class GameManager implements Listener {
             Chrono c = getChronoByUUID(player.getUniqueId());
             if (c != null) {
                 c.stop();
-                c.resume();
-                int minute = c.getMinute();
-                int heure = c.getHeure();
+                int minute = c.getMinutes();
+                int heure = c.getHours();
                 if (heure > 0 || minute >= 5) {
                     game.getPlayerList().remove(player.getUniqueId());
                     player.teleport(getLobby());
                     player.setScoreboard(info.getPlayerScoreboard());
                     getUuidToChrono().remove(player.getUniqueId());
-                    return;
+                } else {
+                    player.setScoreboard(game.getScoreboardManager().getScoreboard());
                 }
-                getUuidToChrono().remove(player.getUniqueId());
             } else {
                 player.teleport(getLobby());
                 player.setScoreboard(info.getPlayerScoreboard());
@@ -248,27 +243,8 @@ public class GameManager implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
-            Game game = getGameByPlayer(player);
-            if (game.getState() == State.STARTED) {
-                Chrono chrono = new Chrono();
-                chrono.start();
-                getUuidToChrono().put(player.getUniqueId(), chrono);
-            } else {
-                game.getPlayerList().remove(player.getUniqueId());
-                GameStartTask start = getQuakeTaskHashMap().get(game);
-                if (start != null) {
-                    if (game.getPlayerList().size() < game.getMinPlayer()) {
-                        start.cancel();
-                        getQuakeTaskHashMap().remove(game);
-                    }
-                }
-                signEvent.actualiseJoinSignForGame(game);
-            }
-        } else {
-            info.save();
-            Quake.getPlayerInfos().remove(info);
-        }
+        info.save();
+        Quake.getPlayerInfos().remove(info);
     }
 
     @EventHandler
@@ -295,6 +271,7 @@ public class GameManager implements Listener {
                 player.setGameMode(GameMode.ADVENTURE);
             }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
+            game.getTeam().addPlayer(player);
             player.setWalkSpeed(0.3F);
         } else if (game.getState() == State.STARTED) {
             player.sendMessage(ChatColor.RED + "The game has bin started !");

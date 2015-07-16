@@ -34,6 +34,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
@@ -195,7 +196,7 @@ public class PlayerInfo {
                 setShoot(false);
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
                 for (Location location : locs) {
-                    new ParticleEffect.ParticlePacket(getEffect(), 0.0F, 0.0F, 0.0F, 0.0F, 1, true, null).sendTo(location.clone(), 200D);
+                    new ParticleEffect.ParticlePacket(getEffect(), new ParticleEffect.OrdinaryColor(random.nextInt(256), random.nextInt(256), random.nextInt(256)), true).sendTo(location, 200D);
                 }
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().setKillSteak(p, 0);
@@ -247,8 +248,10 @@ public class PlayerInfo {
                             setShoot(false);
                         }
                     }
-                    GameEndTask endTask = new GameEndTask(Quake.quake, 15L, 15L, game, getPlayer());
+                    GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
                     addWoon(1);
+                    game.getTeam().getPlayers().clear();
+                    game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
                     game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
                 }
             }

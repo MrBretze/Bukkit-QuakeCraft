@@ -71,7 +71,7 @@ public class Quake extends JavaPlugin {
 
         manager = getServer().getPluginManager();
 
-        gameManager = new GameManager(this);
+        gameManager = new GameManager();
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
         getCommand("quake").setTabCompleter(new fr.bretzel.quake.command.Command());
@@ -106,7 +106,8 @@ public class Quake extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
             Player player = (Player) sender;
-            Util.shootFirework(player.getEyeLocation());
+            PlayerInfo info = getPlayerInfo(player);
+            info.shoot();
             return true;
         }
         return true;
@@ -117,8 +118,6 @@ public class Quake extends JavaPlugin {
             try {
                 Game game = GameReader.read(NBTCompressedStreamTools.read(new FileInputStream(f)), f);
                 gameManager.getGameLinkedList().add(game);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }

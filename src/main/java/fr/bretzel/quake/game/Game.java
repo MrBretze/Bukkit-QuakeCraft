@@ -31,6 +31,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.NameTagVisibility;
+import org.bukkit.scoreboard.Team;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,6 +56,7 @@ public class Game {
     private List<UUID> playerList = new ArrayList<>();
     private LinkedList<Sign> signList = new LinkedList<>();
     private Random random = new Random();
+    private Team team;
     private boolean respawnview = false;
     private int maxPlayer = 16;
     private int minPlayer = 2;
@@ -90,6 +93,9 @@ public class Game {
             e.fillInStackTrace();
         }
         setScoreboardManager(new ScoreboardAPI(this));
+        Team team = getScoreboardManager().getScoreboard().registerNewTeam(getName());
+        team.setNameTagVisibility(NameTagVisibility.NEVER);
+        setTeam(team);
     }
 
     public Game() {
@@ -376,6 +382,14 @@ public class Game {
         killStreak.put(uuid, kill);
     }
 
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
     public void stop() {
         setState(State.WAITING);
 
@@ -403,6 +417,9 @@ public class Game {
         getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        getTeam().getPlayers().clear();
+        getTeam().setNameTagVisibility(NameTagVisibility.NEVER);
 
         getPlayerList().clear();
         playerKills.clear();

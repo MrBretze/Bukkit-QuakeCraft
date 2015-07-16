@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -49,7 +49,7 @@ public class SignEvent implements Listener {
     public SignEvent(GameManager gameManager) {
         setManager(gameManager);
 
-        getManager().getQuake().getServer().getPluginManager().registerEvents(this, Quake.quake);
+        Quake.quake.getServer().getPluginManager().registerEvents(this, Quake.quake);
     }
 
     @EventHandler
@@ -194,7 +194,7 @@ public class SignEvent implements Listener {
     }
 
     public String getInfoPlayer(Game game) {
-        return (ChatColor.BLUE + "" + game.getPlayerList().size()) + ChatColor.DARK_GRAY + "/" + ChatColor.BLUE + "" + game.getMaxPlayer();
+        return (ChatColor.BLUE.toString() + game.getPlayerList().size()) + ChatColor.DARK_GRAY + "/" + ChatColor.BLUE + "" + game.getMaxPlayer();
     }
 
     public GameManager getManager() {

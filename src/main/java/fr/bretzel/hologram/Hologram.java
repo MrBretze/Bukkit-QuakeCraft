@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
