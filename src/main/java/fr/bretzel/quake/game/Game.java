@@ -44,7 +44,7 @@ import java.util.*;
 public class Game {
 
     private LinkedList<Location> respawn = new LinkedList<>();
-    List<Location> respawns = getRespawn();
+    private List<Location> respawns = getRespawn();
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
@@ -277,7 +277,8 @@ public class Game {
             this.respawnview = false;
             for(Location location : getRespawn()) {
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
-                hologram.display(false);
+                if(hologram != null)
+                    hologram.display(false);
             }
         }
     }

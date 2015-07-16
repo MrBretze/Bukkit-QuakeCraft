@@ -104,4 +104,10 @@ public class Hologram {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public void remove() {
+        for(HoloEntity entity : getHoloEntities()) {
+            entity.getStand().remove();
+        }
+    }
 }

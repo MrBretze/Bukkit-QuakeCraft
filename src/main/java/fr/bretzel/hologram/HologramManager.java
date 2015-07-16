@@ -119,9 +119,7 @@ public class HologramManager implements Listener {
         Plugin plugin = event.getPlugin();
         if(plugin == getPlugin()) {
             for(Hologram hologram : getHoloList()) {
-                for(HoloEntity e : hologram.getHoloEntities()) {
-                    e.getStand().remove();
-                }
+                hologram.remove();
             }
         }
     }
