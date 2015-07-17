@@ -303,7 +303,7 @@ public class PlayerInfo {
         objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
         objective.getScore("§r§r").setScore(8);
         objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
-        objective.getScore("§r§r§r").setScore(6);
+        objective.getScore("§r                            §r").setScore(6);
         objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
         objective.getScore("§r§r§r§r").setScore(4);
         objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);

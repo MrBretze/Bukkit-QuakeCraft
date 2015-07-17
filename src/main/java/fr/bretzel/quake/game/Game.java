@@ -414,7 +414,7 @@ public class Game {
         getScoreboardManager().getObjective().getScore("§r").setScore(10);
         getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
         getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
-        getScoreboardManager().getObjective().getScore("§r§r§r").setScore(6);
+        getScoreboardManager().getObjective().getScore("§r                            §r").setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
