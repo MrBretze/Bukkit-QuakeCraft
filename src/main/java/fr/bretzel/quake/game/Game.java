@@ -46,7 +46,7 @@ import java.util.*;
 public class Game {
 
     private LinkedList<Location> respawn = new LinkedList<>();
-    private List<Location> respawns = getRespawn();
+    private List<Location> usedLoc = new ArrayList<>();
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
@@ -430,10 +430,23 @@ public class Game {
     }
 
     public void respawnAtStart(Player player) {
-        ArrayList<Location> locs = (ArrayList<Location>) getRespawn().clone();
-        Location location = locs.get(random.nextInt(locs.size()));
-        locs.remove(locs.indexOf(location));
-        player.teleport(location);
+        Location location = getRespawn().get(random.nextInt(getRespawn().size()));
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        if(info.getRespawn() >= 5) {
+            this.usedLoc.add(location);
+            player.teleport(location);
+            info.setRespawn(0);
+            return;
+        }
+        if(!this.usedLoc.contains(location)) {
+            this.usedLoc.add(location);
+            player.teleport(location);
+            info.setRespawn(0);
+            return;
+        } else {
+            respawnAtStart(player);
+            info.addRespawn(1);
+        }
     }
 
     public void respawn(Player p) {

@@ -108,12 +108,17 @@ public class SignEvent implements Listener {
         Block block = event.getBlock();
         Player player = event.getPlayer();
         if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-            Sign sign = getSignByLocation(block.getLocation());
-            if (sign == null) {
-                return;
+            if(getSignByLocation(block.getLocation()) != null) {
+                if(player.hasPermission("quake.event.sign.break")) {
+                    if (player.isSneaking()) {
+
+                    } else {
+                        event.setCancelled(true);
+                    }
+                } else {
+                    event.setCancelled(true);
+                }
             }
-            Game game = getGameBySign(sign);
-            game.removeSign(sign);
         }
     }
 

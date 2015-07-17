@@ -251,7 +251,6 @@ public class PlayerInfo {
                         }
                         GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
                         addWoon(1);
-                        game.getTeam().getPlayers().clear();
                         game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
                         game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
                     }

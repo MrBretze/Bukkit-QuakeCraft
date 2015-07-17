@@ -23,6 +23,7 @@ import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Location;
+import org.bukkit.block.CommandBlock;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -104,12 +105,21 @@ public class Quake extends JavaPlugin {
         }
     }
 
+    /**
+     * Player player = (Player) sender;
+     * GameEndTask.spawnFirework(GameEndTask.getCircle(player.getLocation(), 0.5, 5));
+     */
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
-            Player player = (Player) sender;
-            GameEndTask.spawnFirework(GameEndTask.getCircle(player.getLocation(), 0.5, 5));
-            return true;
+            if(sender instanceof Player) {
+                Player player = (Player) sender;
+                GameEndTask.spawnFirework(GameEndTask.getCircle(player.getLocation(), 0.5, 5));
+                return true;
+            } else {
+                return true;
+            }
         }
         return true;
     }
