@@ -200,10 +200,10 @@ public class PlayerInfo {
                 }
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().setKillSteak(p, 0);
-                    p.getWorld().playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
+                    Util.playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
                     shoot.getGame().respawn(p);
                 }
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.FIREWORK_BLAST, 2F, 1F);
+                Util.playSound(getPlayer().getEyeLocation(), Sound.FIREWORK_LARGE_BLAST, 2F, 1F);
                 int kill;
                 if (Integer.valueOf(game.getKill(getPlayer())) == null) {
                     kill = shoot.getKill();
@@ -248,7 +248,7 @@ public class PlayerInfo {
                             setShoot(false);
                         }
                     }
-                    GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
+                    GameEndTask endTask = new GameEndTask(Quake.quake, 20L, 20L, game, getPlayer());
                     addWoon(1);
                     game.getTeam().getPlayers().clear();
                     game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);

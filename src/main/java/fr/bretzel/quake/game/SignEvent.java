@@ -61,7 +61,6 @@ public class SignEvent implements Listener {
             case RIGHT_CLICK_BLOCK:
                 Block block = event.getClickedBlock();
                 if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
-                    try {
                         Sign sign = getSignByLocation(block.getLocation());
                         boolean isJoin = sign.getMetadata("join").get(0).asBoolean();
                         Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
@@ -97,8 +96,6 @@ public class SignEvent implements Listener {
                         } else {
                             break;
                         }
-                    } catch (NullArgumentException e) {
-                    }
                 }
                 break;
         }

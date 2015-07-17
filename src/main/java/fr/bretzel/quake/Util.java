@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -93,6 +93,40 @@ public class Util {
             }
         }
         return entities;
+    }
+
+    public static void playSound(Location location, Sound sound, float f1, float f2) {
+        for(Player player : location.getWorld().getPlayers()) {
+            player.playSound(location, sound, f1, f2);
+        }
+    }
+
+    public static void playSound(Location location, Sound sound) {
+        playSound(location, sound, 1F, 1F);
+    }
+
+    public static void playSound(Location location, String sound) {
+        playSound(location, Sound.valueOf(sound), 1F, 1F);
+    }
+
+    public static void playSound(Location location, String sound, float f1, float f2) {
+        playSound(location, Sound.valueOf(sound), f1, f2);
+    }
+
+    public static void playSound(World world, double x, double y, double z, Sound sound) {
+        playSound(new Location(world, x, y, z), sound, 1F, 1F);
+    }
+
+    public static void playSound(World world, double x, double y, double z, Sound sound, float f1, float f2) {
+        playSound(new Location(world, x, y, z), sound, f1, f2);
+    }
+
+    public static void playSound(World world, double x, double y, double z, String sound) {
+        playSound(new Location(world, x, y, z), sound, 1F, 1F);
+    }
+
+    public static void playSound(World world, double x, double y, double z, String sound, float f1, float f2) {
+        playSound(new Location(world, x, y, z), sound, f1, f2);
     }
 
     public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2) {

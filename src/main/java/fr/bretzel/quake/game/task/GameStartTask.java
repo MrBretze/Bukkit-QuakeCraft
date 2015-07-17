@@ -62,7 +62,7 @@ public class GameStartTask extends GameTask {
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
                 if(p!= null || p.isOnline()) {
-                    p.playSound(p.getLocation(), Sound.NOTE_PLING, 2.0F, 2.0F);
+                    Util.playSound(p.getLocation(), Sound.NOTE_PLING, 2.0F, 2.0F);
                 }
             }
         }
