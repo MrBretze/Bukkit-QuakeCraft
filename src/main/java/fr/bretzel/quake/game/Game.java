@@ -430,8 +430,9 @@ public class Game {
     }
 
     public void respawnAtStart(Player player) {
-        Location location = respawns.get(random.nextInt(respawns.size()));
-        respawns.remove(respawns.indexOf(location));
+        ArrayList<Location> locs = (ArrayList<Location>) getRespawn().clone();
+        Location location = locs.get(random.nextInt(locs.size()));
+        locs.remove(locs.indexOf(location));
         player.teleport(location);
     }
 
