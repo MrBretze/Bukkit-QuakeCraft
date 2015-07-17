@@ -419,7 +419,9 @@ public class Game {
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
         getTeam().unregister();
-        setTeam(getScoreboardManager().getScoreboard().registerNewTeam(getDisplayName()));
+        Team t = getScoreboardManager().getScoreboard().registerNewTeam(getDisplayName());
+        t.setNameTagVisibility(NameTagVisibility.NEVER);
+        setTeam(t);
 
         getPlayerList().clear();
         playerKills.clear();

@@ -40,7 +40,7 @@ public class GameEndTask extends GameTask {
 
     private Player player;
     private int firewokSpawnable = 10;
-    private static Random random = new Random();
+    private Random random = new Random();
 
     public GameEndTask(JavaPlugin javaPlugin, long l, long l1, Game game, Player player) {
         super(javaPlugin, l, l1, game);
@@ -116,7 +116,7 @@ public class GameEndTask extends GameTask {
         this.player = player;
     }
 
-    public static void spawnFirework(Location location) {
+    public void spawnFirework(Location location) {
         Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
         FireworkMeta fwm = fw.getFireworkMeta();
         int rt = random.nextInt(5) + 1;
@@ -150,7 +150,7 @@ public class GameEndTask extends GameTask {
 
     }
 
-    public static List<Location> getCircle(Location center, double radius, int amount){
+    public List<Location> getCircle(Location center, double radius, int amount){
         World world = center.getWorld();
         double increment = (2*Math.PI)/amount;
         ArrayList<Location> locations = new ArrayList<>();

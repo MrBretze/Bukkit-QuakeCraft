@@ -109,10 +109,6 @@ public class Quake extends JavaPlugin {
         if(label.equals("test")) {
             Player player = (Player) sender;
             player.sendMessage("Start");
-            for(Location location : GameEndTask.getCircle(player.getLocation(), 0.5, 8)) {
-                GameEndTask.spawnFirework(location);
-            }
-            player.sendMessage("Start");
             return true;
         }
         return true;
