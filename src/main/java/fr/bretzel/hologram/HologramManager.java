@@ -63,7 +63,7 @@ public class HologramManager implements Listener {
 
     public Hologram getHologram(Location location, double range) {
         for (Hologram holo : getHoloList()) {
-            if (holo.getLocation().distance(location) <= range) {
+            if (holo.getLocation().getWorld() == location.getWorld() && holo.getLocation().distance(location) <= range) {
                 return holo;
             }
         }
