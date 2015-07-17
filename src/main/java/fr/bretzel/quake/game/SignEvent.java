@@ -20,7 +20,6 @@ package fr.bretzel.quake.game;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
-import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -61,6 +60,7 @@ public class SignEvent implements Listener {
             case RIGHT_CLICK_BLOCK:
                 Block block = event.getClickedBlock();
                 if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
+                    if (getSignByLocation(block.getLocation()) != null) {
                         Sign sign = getSignByLocation(block.getLocation());
                         boolean isJoin = sign.getMetadata("join").get(0).asBoolean();
                         Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
@@ -96,6 +96,8 @@ public class SignEvent implements Listener {
                         } else {
                             break;
                         }
+                    }
+                    break;
                 }
                 break;
         }

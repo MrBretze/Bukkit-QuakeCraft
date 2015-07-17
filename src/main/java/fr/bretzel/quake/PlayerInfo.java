@@ -192,67 +192,69 @@ public class PlayerInfo {
             if (shoot.isCancelled()) {
                 return;
             }
-            if (shoot.getKill() > 0 && game.getState() == State.STARTED) {
+            if (game.getState() == State.STARTED) {
                 setShoot(false);
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
+                Util.playSound(getPlayer().getEyeLocation(), Sound.FIREWORK_LARGE_BLAST, 2F, 1F);
                 for (Location location : locs) {
                     new ParticleEffect.ParticlePacket(getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(location, 200D);
                 }
-                for (Player p : shoot.getPlayers()) {
-                    shoot.getGame().setKillSteak(p, 0);
-                    Util.playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
-                    shoot.getGame().respawn(p);
-                }
-                Util.playSound(getPlayer().getEyeLocation(), Sound.FIREWORK_LARGE_BLAST, 2F, 1F);
-                int kill;
-                if (Integer.valueOf(game.getKill(getPlayer())) == null) {
-                    kill = shoot.getKill();
-                } else {
-                    kill = game.getKill(getPlayer()) + shoot.getKill();
-                }
-
-                shoot.getGame().addKillStreak(getPlayer(), shoot.getKill());
-
-                int killStreak = shoot.getGame().getKillStreak(getPlayer());
-
-                if (killStreak == 5) {
-                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS KILLING SPREE !");
-                    addKillStreak(1);
-                } else if (killStreak == 10) {
-                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A RAMPAGE !");
-                    addKillStreak(1);
-                } else if (killStreak == 15) {
-                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A DEMON !");
-                    addKillStreak(1);
-                } else if (killStreak == 20) {
-                    game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " MONSTER KIL !!");
-                    addKillStreak(1);
-                }
-
-                addKill(shoot.getKill());
-                addCoins(5 * shoot.getKill());
-                game.addKill(getPlayer(), shoot.getKill());
-                game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
-
-                if (game.getKill(getPlayer()) >= game.getMaxKill()) {
-                    GameEndEvent event = new GameEndEvent(getPlayer(), game);
-                    Bukkit.getPluginManager().callEvent(event);
-                    if (event.isCancelled()) {
-                        return;
+                if (shoot.getKill() > 0) {
+                    for (Player p : shoot.getPlayers()) {
+                        shoot.getGame().setKillSteak(p, 0);
+                        Util.playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
+                        shoot.getGame().respawn(p);
                     }
-                    for (UUID id : game.getPlayerList()) {
-                        Player player = Bukkit.getPlayer(id);
-                        if (player != null && player.isOnline()) {
-                            player.getInventory().clear();
-                            setDash(false);
-                            setShoot(false);
+                    int kill;
+                    if (Integer.valueOf(game.getKill(getPlayer())) == null) {
+                        kill = shoot.getKill();
+                    } else {
+                        kill = game.getKill(getPlayer()) + shoot.getKill();
+                    }
+
+                    shoot.getGame().addKillStreak(getPlayer(), shoot.getKill());
+
+                    int killStreak = shoot.getGame().getKillStreak(getPlayer());
+
+                    if (killStreak == 5) {
+                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS KILLING SPREE !");
+                        addKillStreak(1);
+                    } else if (killStreak == 10) {
+                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A RAMPAGE !");
+                        addKillStreak(1);
+                    } else if (killStreak == 15) {
+                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A DEMON !");
+                        addKillStreak(1);
+                    } else if (killStreak == 20) {
+                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " MONSTER KIL !!");
+                        addKillStreak(1);
+                    }
+
+                    addKill(shoot.getKill());
+                    addCoins(5 * shoot.getKill());
+                    game.addKill(getPlayer(), shoot.getKill());
+                    game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
+
+                    if (game.getKill(getPlayer()) >= game.getMaxKill()) {
+                        GameEndEvent event = new GameEndEvent(getPlayer(), game);
+                        Bukkit.getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            return;
                         }
+                        for (UUID id : game.getPlayerList()) {
+                            Player player = Bukkit.getPlayer(id);
+                            if (player != null && player.isOnline()) {
+                                player.getInventory().clear();
+                                setDash(false);
+                                setShoot(false);
+                            }
+                        }
+                        GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
+                        addWoon(1);
+                        game.getTeam().getPlayers().clear();
+                        game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
+                        game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
                     }
-                    GameEndTask endTask = new GameEndTask(Quake.quake, 20L, 20L, game, getPlayer());
-                    addWoon(1);
-                    game.getTeam().getPlayers().clear();
-                    game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
-                    game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
                 }
             }
         }

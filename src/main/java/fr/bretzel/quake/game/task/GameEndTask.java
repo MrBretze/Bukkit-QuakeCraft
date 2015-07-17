@@ -39,8 +39,8 @@ import java.util.UUID;
 public class GameEndTask extends GameTask {
 
     private Player player;
-    private int firewokSpawnable = 10;
-    private Random random = new Random();
+    private int firewokSpawnable = 15;
+    private static Random random = new Random();
 
     public GameEndTask(JavaPlugin javaPlugin, long l, long l1, Game game, Player player) {
         super(javaPlugin, l, l1, game);
@@ -99,9 +99,7 @@ public class GameEndTask extends GameTask {
                     }
                 }
             }
-            for(Location location : getCircle(player.getLocation(), 0.5, 5)) {
-                spawnFirework(location);
-            }
+            spawnFirework(getCircle(player.getLocation(), 0.5, 5));
         } else {
             getGame().stop();
             cancel();
@@ -116,32 +114,34 @@ public class GameEndTask extends GameTask {
         this.player = player;
     }
 
-    public void spawnFirework(Location location) {
-        Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
-        FireworkMeta fwm = fw.getFireworkMeta();
-        int rt = random.nextInt(5) + 1;
-        FireworkEffect.Type type = FireworkEffect.Type.BALL;
-        if (rt == 1) type = FireworkEffect.Type.BALL;
-        if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
-        if (rt == 3) type = FireworkEffect.Type.BURST;
-        if (rt == 4) type = FireworkEffect.Type.CREEPER;
-        if (rt == 5) type = FireworkEffect.Type.STAR;
-        int u = random.nextInt(256);
-        int b = random.nextInt(256);
-        int g = random.nextInt(256);
-        Color c1 = Color.fromRGB(u, g, b);
-        u = random.nextInt(256);
-        b = random.nextInt(256);
-        g = random.nextInt(256);
-        Color c2 = Color.fromRGB(u, g, b);
-        FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(random.nextBoolean()).build();
-        fwm.addEffect(effect);
-        int rp = random.nextInt(2) + 1;
-        fwm.setPower(rp);
-        fw.setFireworkMeta(fwm);
+    public static void spawnFirework(List<Location> location) {
+        for(Location l : location) {
+            Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+            FireworkMeta fwm = fw.getFireworkMeta();
+            int rt = random.nextInt(5) + 1;
+            FireworkEffect.Type type = FireworkEffect.Type.BALL;
+            if (rt == 1) type = FireworkEffect.Type.BALL;
+            if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
+            if (rt == 3) type = FireworkEffect.Type.BURST;
+            if (rt == 4) type = FireworkEffect.Type.CREEPER;
+            if (rt == 5) type = FireworkEffect.Type.STAR;
+            int u = random.nextInt(256);
+            int b = random.nextInt(256);
+            int g = random.nextInt(256);
+            Color c1 = Color.fromRGB(u, g, b);
+            u = random.nextInt(256);
+            b = random.nextInt(256);
+            g = random.nextInt(256);
+            Color c2 = Color.fromRGB(u, g, b);
+            FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(random.nextBoolean()).build();
+            fwm.addEffect(effect);
+            int rp = random.nextInt(2) + 1;
+            fwm.setPower(rp);
+            fw.setFireworkMeta(fwm);
+        }
     }
 
-    public void sendGameInfo(Player player) {
+    private void sendGameInfo(Player player) {
         NumberFormat formatter = new DecimalFormat("00");
         player.sendMessage(ChatColor.AQUA + "####################");
         player.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player)) + ChatColor.AQUA + "            #");
@@ -150,9 +150,9 @@ public class GameEndTask extends GameTask {
 
     }
 
-    public List<Location> getCircle(Location center, double radius, int amount){
+    public static List<Location> getCircle(Location center, double radius, int amount){
         World world = center.getWorld();
-        double increment = (2*Math.PI)/amount;
+        double increment = (2 * Math.PI) / amount;
         ArrayList<Location> locations = new ArrayList<>();
         for(int i = 0;i < amount; i++){
             double angle = i*increment;

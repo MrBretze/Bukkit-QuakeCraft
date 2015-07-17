@@ -108,7 +108,7 @@ public class Quake extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
             Player player = (Player) sender;
-            player.sendMessage("Start");
+            GameEndTask.spawnFirework(GameEndTask.getCircle(player.getLocation(), 0.5, 5));
             return true;
         }
         return true;
