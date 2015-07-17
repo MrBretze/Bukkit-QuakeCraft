@@ -418,8 +418,8 @@ public class Game {
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        getTeam().getPlayers().clear();
-        getTeam().setNameTagVisibility(NameTagVisibility.NEVER);
+        getTeam().unregister();
+        setTeam(getScoreboardManager().getScoreboard().registerNewTeam(getDisplayName()));
 
         getPlayerList().clear();
         playerKills.clear();

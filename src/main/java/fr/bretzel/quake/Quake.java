@@ -20,7 +20,9 @@ import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
+import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.reader.GameReader;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -106,8 +108,11 @@ public class Quake extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(label.equals("test")) {
             Player player = (Player) sender;
-            PlayerInfo info = getPlayerInfo(player);
-            info.shoot();
+            player.sendMessage("Start");
+            for(Location location : GameEndTask.getCircle(player.getLocation(), 0.5, 8)) {
+                GameEndTask.spawnFirework(location);
+            }
+            player.sendMessage("Start");
             return true;
         }
         return true;

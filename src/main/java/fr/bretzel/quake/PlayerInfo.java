@@ -196,7 +196,7 @@ public class PlayerInfo {
                 setShoot(false);
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
                 for (Location location : locs) {
-                    new ParticleEffect.ParticlePacket(getEffect(), new ParticleEffect.OrdinaryColor(random.nextInt(256), random.nextInt(256), random.nextInt(256)), true).sendTo(location, 200D);
+                    new ParticleEffect.ParticlePacket(getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(location, 200D);
                 }
                 for (Player p : shoot.getPlayers()) {
                     shoot.getGame().setKillSteak(p, 0);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -27,6 +27,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -38,7 +40,7 @@ public class GameEndTask extends GameTask {
 
     private Player player;
     private int firewokSpawnable = 10;
-    private Random random = new Random();
+    private static Random random = new Random();
 
     public GameEndTask(JavaPlugin javaPlugin, long l, long l1, Game game, Player player) {
         super(javaPlugin, l, l1, game);
@@ -97,9 +99,9 @@ public class GameEndTask extends GameTask {
                     }
                 }
             }
-            spawnFirework(getPlayer().getLocation());
-            spawnFirework(getPlayer().getLocation());
-            spawnFirework(getPlayer().getLocation());
+            for(Location location : getCircle(player.getLocation(), 0.5, 5)) {
+                spawnFirework(location);
+            }
         } else {
             getGame().stop();
             cancel();
@@ -114,7 +116,7 @@ public class GameEndTask extends GameTask {
         this.player = player;
     }
 
-    private void spawnFirework(Location location) {
+    public static void spawnFirework(Location location) {
         Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
         FireworkMeta fwm = fw.getFireworkMeta();
         int rt = random.nextInt(5) + 1;
@@ -147,4 +149,18 @@ public class GameEndTask extends GameTask {
         player.sendMessage(ChatColor.AQUA + "####################");
 
     }
+
+    public static List<Location> getCircle(Location center, double radius, int amount){
+        World world = center.getWorld();
+        double increment = (2*Math.PI)/amount;
+        ArrayList<Location> locations = new ArrayList<>();
+        for(int i = 0;i < amount; i++){
+            double angle = i*increment;
+            double x = center.getX() + (radius * Math.cos(angle));
+            double z = center.getZ() + (radius * Math.sin(angle));
+            locations.add(new Location(world, x, center.getY(), z));
+        }
+        return locations;
+    }
+
 }

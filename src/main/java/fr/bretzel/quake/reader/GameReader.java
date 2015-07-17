@@ -23,6 +23,7 @@ import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
 import java.io.File;
@@ -128,8 +129,10 @@ public class GameReader {
         }
 
         game.setDisplayName(compound.getString("displayName"));
-        game.setScoreboardManager(new ScoreboardAPI(game));
-        Team team = game.getScoreboardManager().getScoreboard().registerNewTeam(game.getName());
+        ScoreboardAPI api = new ScoreboardAPI(game);
+        game.setScoreboardManager(api);
+        Team team = api.getScoreboard().registerNewTeam(game.getName());
+        team.setNameTagVisibility(NameTagVisibility.NEVER);
         game.setTeam(team);
         return game;
     }
