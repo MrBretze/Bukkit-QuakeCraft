@@ -27,10 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by Loic on 05/07/2015.
@@ -115,7 +112,9 @@ public class GameEndTask extends GameTask {
     }
 
     public static void spawnFirework(List<Location> location) {
-        for(Location l : location) {
+        Iterator<Location> iterator = location.iterator();
+        while (iterator.hasNext()) {
+            Location l = iterator.next();
             Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
             FireworkMeta fwm = fw.getFireworkMeta();
             int rt = random.nextInt(5) + 1;

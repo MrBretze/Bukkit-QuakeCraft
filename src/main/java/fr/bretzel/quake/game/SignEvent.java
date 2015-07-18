@@ -34,6 +34,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Created by MrBretzel on 19/06/2015.
@@ -110,9 +111,13 @@ public class SignEvent implements Listener {
         if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
             if(getSignByLocation(block.getLocation()) != null) {
                 if(player.hasPermission("quake.event.sign.break")) {
+                    Sign sign = getSignByLocation(block.getLocation());
+                    Game game = getGameBySign(sign);
                     if (player.isSneaking()) {
-
+                        player.sendMessage(ChatColor.GREEN.toString() + "Remove sign for " + game.getName());
+                        game.getSignList().remove(sign);
                     } else {
+                        player.sendMessage(ChatColor.RED.toString() + "To break this sign please sneak !");
                         event.setCancelled(true);
                     }
                 } else {
@@ -125,9 +130,17 @@ public class SignEvent implements Listener {
     @EventHandler
     public void onSignChangeEvent(SignChangeEvent event) {
         String[] lines = event.getLines();
-        Block block = event.getBlock();
-
+        final Block block = event.getBlock();
         if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+            if(getSignByLocation(block.getLocation()) != null) {
+                Sign sign = getSignByLocation(block.getLocation());
+                Game game = getGameBySign(sign);
+                event.setLine(0, CLICK_TO_JOIN);
+                event.setLine(1, ChatColor.BLUE + game.getDisplayName());
+                event.setLine(2, getInfoPlayer(game));
+                event.setLine(3, game.getState().getName());
+                return;
+            }
             if (lines[0].equals("[quake]")) {
                 Sign sign = (Sign) block.getState();
                 if (lines[1].equals("join") && getManager().getGameByName(lines[2]) != null) {
