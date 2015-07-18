@@ -426,6 +426,7 @@ public class Game {
         getPlayerList().clear();
         playerKills.clear();
         killStreak.clear();
+        usedLoc.clear();
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
     }
 

@@ -204,7 +204,9 @@ public class GameManager implements Listener {
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
             if (!game.getBlocks().contains(event.getTo().getBlock())) {
-                player.teleport(event.getTo());
+                Location from = event.getFrom();
+                from.setDirection(player.getEyeLocation().getDirection());
+                player.teleport(from);
             }
         }
     }
