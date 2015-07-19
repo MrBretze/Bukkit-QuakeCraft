@@ -16,7 +16,9 @@
  */
 package fr.bretzel.quake.game.task;
 
+import fr.bretzel.quake.EndTaskUtil;
 import fr.bretzel.quake.GameTask;
+import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
@@ -37,51 +39,10 @@ public class GameEndTask extends GameTask {
 
     private Player player;
     private int firewokSpawnable = 15;
-    private static Random random = new Random();
 
     public GameEndTask(JavaPlugin javaPlugin, long l, long l1, Game game, Player player) {
         super(javaPlugin, l, l1, game);
         setPlayer(player);
-    }
-
-    private static Color getColor(int c) {
-        switch (c) {
-            default:
-            case 1:
-                return Color.AQUA;
-            case 2:
-                return Color.BLACK;
-            case 3:
-                return Color.BLUE;
-            case 4:
-                return Color.FUCHSIA;
-            case 5:
-                return Color.GRAY;
-            case 6:
-                return Color.GREEN;
-            case 7:
-                return Color.LIME;
-            case 8:
-                return Color.MAROON;
-            case 9:
-                return Color.NAVY;
-            case 10:
-                return Color.OLIVE;
-            case 11:
-                return Color.ORANGE;
-            case 12:
-                return Color.PURPLE;
-            case 13:
-                return Color.RED;
-            case 14:
-                return Color.SILVER;
-            case 15:
-                return Color.TEAL;
-            case 16:
-                return Color.WHITE;
-            case 17:
-                return Color.YELLOW;
-        }
     }
 
     @Override
@@ -96,7 +57,7 @@ public class GameEndTask extends GameTask {
                     }
                 }
             }
-            spawnFirework(getCircle(player.getLocation(), 0.5, 5));
+            EndTaskUtil.spawnFirework(Util.getCircle(player.getLocation().clone(), 0.4, 6));
         } else {
             getGame().stop();
             cancel();
@@ -111,35 +72,6 @@ public class GameEndTask extends GameTask {
         this.player = player;
     }
 
-    public static void spawnFirework(List<Location> location) {
-        Iterator<Location> iterator = location.iterator();
-        while (iterator.hasNext()) {
-            Location l = iterator.next();
-            Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
-            FireworkMeta fwm = fw.getFireworkMeta();
-            int rt = random.nextInt(5) + 1;
-            FireworkEffect.Type type = FireworkEffect.Type.BALL;
-            if (rt == 1) type = FireworkEffect.Type.BALL;
-            if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
-            if (rt == 3) type = FireworkEffect.Type.BURST;
-            if (rt == 4) type = FireworkEffect.Type.CREEPER;
-            if (rt == 5) type = FireworkEffect.Type.STAR;
-            int u = random.nextInt(256);
-            int b = random.nextInt(256);
-            int g = random.nextInt(256);
-            Color c1 = Color.fromRGB(u, g, b);
-            u = random.nextInt(256);
-            b = random.nextInt(256);
-            g = random.nextInt(256);
-            Color c2 = Color.fromRGB(u, g, b);
-            FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(random.nextBoolean()).build();
-            fwm.addEffect(effect);
-            int rp = random.nextInt(2) + 1;
-            fwm.setPower(rp);
-            fw.setFireworkMeta(fwm);
-        }
-    }
-
     private void sendGameInfo(Player player) {
         NumberFormat formatter = new DecimalFormat("00");
         player.sendMessage(ChatColor.AQUA + "####################");
@@ -148,18 +80,4 @@ public class GameEndTask extends GameTask {
         player.sendMessage(ChatColor.AQUA + "####################");
 
     }
-
-    public static List<Location> getCircle(Location center, double radius, int amount){
-        World world = center.getWorld();
-        double increment = (2 * Math.PI) / amount;
-        ArrayList<Location> locations = new ArrayList<>();
-        for(int i = 0;i < amount; i++){
-            double angle = i*increment;
-            double x = center.getX() + (radius * Math.cos(angle));
-            double z = center.getZ() + (radius * Math.sin(angle));
-            locations.add(new Location(world, x, center.getY(), z));
-        }
-        return locations;
-    }
-
 }
