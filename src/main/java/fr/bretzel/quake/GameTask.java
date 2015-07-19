@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -31,7 +31,7 @@ public abstract class GameTask implements Runnable {
 
     public GameTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         this.javaPlugin = javaPlugin;
-        this.id = javaPlugin.getServer().getScheduler().scheduleAsyncRepeatingTask(javaPlugin, this, l, l1);
+        this.id = javaPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(javaPlugin, this, l, l1);
         this.game = game;
     }
 

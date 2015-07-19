@@ -18,6 +18,7 @@ package fr.bretzel.quake.game;
 
 
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.config.Config;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import org.bukkit.Bukkit;
@@ -116,6 +117,9 @@ public class SignEvent implements Listener {
                     if (player.isSneaking()) {
                         player.sendMessage(ChatColor.GREEN.toString() + "Remove sign for " + game.getName());
                         game.getSignList().remove(sign);
+                        if(Config.USE_WORLDGUARD) {
+                            block.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
+                        }
                     } else {
                         player.sendMessage(ChatColor.RED.toString() + "To break this sign please sneak !");
                         event.setCancelled(true);
