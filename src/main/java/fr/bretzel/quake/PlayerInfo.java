@@ -244,9 +244,10 @@ public class PlayerInfo {
                         for (UUID id : game.getPlayerList()) {
                             Player player = Bukkit.getPlayer(id);
                             if (player != null && player.isOnline()) {
+                                PlayerInfo info = Quake.getPlayerInfo(player);
                                 player.getInventory().clear();
-                                setDash(false);
-                                setShoot(false);
+                                info.setShoot(false);
+                                info.setDash(false);
                             }
                         }
                         GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());

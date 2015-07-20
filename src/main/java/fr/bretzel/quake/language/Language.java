@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 LoÃ¯c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -31,7 +31,7 @@ import java.util.Properties;
 public class Language {
 
     private Properties properties = new Properties();
-    private char[] colors = {'§', '&'};
+    private char[] colors = {'Â§', '&'};
     private String parm1 = "en";
     private String parm2 = "EN";
     private HashMap<Object, Object> keys = new HashMap<>();

@@ -18,6 +18,7 @@ package fr.bretzel.quake.game.task;
 
 import fr.bretzel.quake.EndTaskUtil;
 import fr.bretzel.quake.GameTask;
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.*;
@@ -59,7 +60,12 @@ public class GameEndTask extends GameTask {
             }
             EndTaskUtil.spawnFirework(Util.getCircle(player.getLocation().clone(), 0.4, 6));
         } else {
-            getGame().stop();
+            Bukkit.getScheduler().runTaskLater(Quake.quake, new Runnable() {
+                @Override
+                public void run() {
+                    getGame().stop();
+                }
+            }, 20L);
             cancel();
         }
     }

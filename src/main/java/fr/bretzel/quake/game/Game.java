@@ -395,8 +395,8 @@ public class Game {
 
         for(UUID uuid : getPlayerList()) {
             Player p = Bukkit.getPlayer(uuid);
-            PlayerInfo info = Quake.getPlayerInfo(p);
             if(p != null && p.isOnline()) {
+                PlayerInfo info = Quake.getPlayerInfo(p);
                 if (!Quake.gameManager.getLobby().getChunk().isLoaded()) {
                     Quake.gameManager.getLobby().getChunk().load(false);
                 }

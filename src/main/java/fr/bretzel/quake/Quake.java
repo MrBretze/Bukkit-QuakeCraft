@@ -77,7 +77,6 @@ public class Quake extends JavaPlugin {
         gameManager = new GameManager();
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
-        getCommand("quake").setTabCompleter(new fr.bretzel.quake.command.Command());
 
         File file = new File(getDataFolder(), File.separator + "game" + File.separator);
 

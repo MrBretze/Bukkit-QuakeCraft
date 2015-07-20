@@ -22,8 +22,7 @@ if (versionPropsFile.canRead()) {
 
     versionProps['VERSION_CODE']=code.toString()
     versionProps.store(versionPropsFile.newWriter(), null)
-}
-else {
+} else {
     throw new GradleException("Could not read version.properties!")
 }
 

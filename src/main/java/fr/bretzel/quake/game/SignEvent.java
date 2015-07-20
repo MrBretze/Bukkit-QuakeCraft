@@ -86,14 +86,14 @@ public class SignEvent implements Listener {
                                 break;
                             }
                         } else if (!isJoin) {
-                            Bukkit.getPluginManager().callEvent(new PlayerLeaveGameEvent(player, game));
-                            if (event.isCancelled()) {
+                            PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);
+                            Bukkit.getPluginManager().callEvent(e);
+                            if(e.isCancelled()) {
                                 return;
                             }
                             player.teleport(getManager().getLobby());
                             game.getPlayerList().remove(player.getUniqueId());
                             actualiseJoinSignForGame(game);
-                            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                             break;
                         } else {
                             break;
@@ -177,6 +177,9 @@ public class SignEvent implements Listener {
     public void actualiseJoinSignForGame(Game game) {
         for (Sign sign : game.getSignList()) {
             if (sign.getMetadata("join").get(0).asBoolean()) {
+                if(!sign.getLocation().getChunk().isLoaded()) {
+                    sign.getLocation().getChunk().load();
+                }
                 sign.setLine(0, CLICK_TO_JOIN);
                 sign.setLine(1, ChatColor.BLUE + game.getDisplayName());
                 sign.setLine(2, getInfoPlayer(game));

@@ -16,6 +16,7 @@
  */
 package fr.bretzel.quake;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;

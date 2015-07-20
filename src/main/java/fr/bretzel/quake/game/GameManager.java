@@ -87,6 +87,15 @@ public class GameManager implements Listener {
         creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
     }
 
+    public void deleteGame(Game game, Player deleter) {
+        if(game != null) {
+            game.delete();
+            deleter.sendMessage(ChatColor.GREEN + "The game has been deleted !");
+        } else {
+            deleter.sendMessage(ChatColor.RED + "The game has been not found !");
+        }
+    }
+
     public Game getGameByName(String name) {
         Game game = null;
         for (Game a : gameLinkedList) {
