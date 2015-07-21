@@ -67,7 +67,7 @@ public class Command extends CommandExe {
                             return true;
                         }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "/quake players <player> <quit | join | setcoins | setkill | setkillsteak | setwon>");
+                        sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
                 } else {

@@ -65,7 +65,7 @@ public class GameEndTask extends GameTask {
                 public void run() {
                     getGame().stop();
                 }
-            }, 20L);
+            }, 35L);
             cancel();
         }
     }

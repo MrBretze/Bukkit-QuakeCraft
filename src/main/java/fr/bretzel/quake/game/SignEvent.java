@@ -46,7 +46,7 @@ public class SignEvent implements Listener {
     public static String CLICK_TO_QUIT = ChatColor.RED + "Click to quit !";
     public static String CLICK_TO_JOIN = ChatColor.GREEN + "Click to join !";
     private GameManager manager;
-    private String lastPlayerInGame = "lastInGame";
+    public String lastPlayerInGame = "lastInGame";
 
     public SignEvent(GameManager gameManager) {
         setManager(gameManager);
@@ -78,12 +78,12 @@ public class SignEvent implements Listener {
                             if (this.lastPlayerInGame.equalsIgnoreCase("lastInGame")) {
                                 this.lastPlayerInGame = getInfoPlayer(game);
                                 game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
-                                break;
+                                return;
                             } else {
                                 game.getScoreboardManager().getScoreboard().resetScores(lastPlayerInGame);
                                 this.lastPlayerInGame = getInfoPlayer(game);
                                 game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
-                                break;
+                                return;
                             }
                         } else if (!isJoin) {
                             PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);
@@ -94,14 +94,14 @@ public class SignEvent implements Listener {
                             player.teleport(getManager().getLobby());
                             game.getPlayerList().remove(player.getUniqueId());
                             actualiseJoinSignForGame(game);
-                            break;
+                            return;
                         } else {
-                            break;
+                            return;
                         }
                     }
-                    break;
+                    return;
                 }
-                break;
+                return;
         }
     }
 
