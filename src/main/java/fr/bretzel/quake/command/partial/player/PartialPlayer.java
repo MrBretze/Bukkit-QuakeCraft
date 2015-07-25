@@ -66,9 +66,27 @@ public class PartialPlayer extends IPlayer {
                     getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> setcoins <coins>");
                     return this;
                 }
+            } else if(getArgs()[2].equalsIgnoreCase("addcoins")) {
+                if(getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(ChatColor.RED + getArgs()[3] + " is not a valid number !");
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(ChatColor.RED + "The value must be greater than 0 !");
+                        return this;
+                    }
+                    return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> setcoins <coins>");
+                    return this;
+                }
             }
         } else {
-            getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
+            getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | setwon>");
             setValue(true);
             return this;
         }
