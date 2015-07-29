@@ -1,5 +1,6 @@
 package fr.bretzel.commands;
 
+import fr.bretzel.quake.language.Language;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -49,5 +50,9 @@ public abstract class PartialCommand {
 
     public void setValue(boolean value) {
         this.value = value;
+    }
+
+    public String getI18(String key) {
+        return Language.get(key);
     }
 }

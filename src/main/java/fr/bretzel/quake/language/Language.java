@@ -19,7 +19,6 @@ package fr.bretzel.quake.language;
 
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
-import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,45 +41,71 @@ public class Language {
     public Language(Locale locale) {
         this.locale = locale;
 
-        object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getCountry() + "_" + locale.getLanguage() + ".json")));
+        object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
 
-        for(String keys : object.keySet()) {
-            Object value = object.get(keys);
-            if(value instanceof String) {
-                String v = (String) value;
-                if(v.contains("§")) {
-                    v = ChatColor.translateAlternateColorCodes('§', v);
-                } else if(v.contains("&")) {
-                    v = ChatColor.translateAlternateColorCodes('&', v);
-                }
-                if(!maps.containsKey(keys)) {
-                    maps.put(keys, v);
-                } else {
-                    throw new AllReadyRegisterdException("The language is already registered !");
-                }
-            } else if(value instanceof JSONArray) {
-                JSONArray array = (JSONArray) value;
-                Iterator<Object> iterator = array.iterator();
-                while (iterator.hasNext()) {
-                    Object v = iterator.hasNext();
-                    if(v instanceof JSONObject) {
-                        JSONObject ob2 = (JSONObject) v;
-                        //TODO: car il se fait tard !
+        addJsonObject(object, "");
+    }
+
+
+    private static void addJsonArray(JSONArray array, String key) {
+        Iterator<Object> o = array.iterator();
+        while (o.hasNext()) {
+            Object object = o.next();
+            if(object instanceof JSONObject) {
+                JSONObject jsonObject = (JSONObject) object;
+                for(String k : jsonObject.keySet()) {
+                    Object obj = jsonObject.get(k);
+                    if(obj instanceof JSONArray) {
+                        JSONArray a = (JSONArray) obj;
+                        addJsonArray(a, key + k + ".");
+
+                    } else if(obj instanceof JSONObject) {
+                        JSONObject t = (JSONObject) obj;
+                        addJsonObject(t, k + ".");
+                    } else if (obj instanceof String) {
+                        String s = (String) obj;
+                        add(formatizeKey(key + k + "."), s);
                     }
                 }
             }
         }
     }
 
-    public static String get(String keys) {
-        return maps.get(keys);
+    private static String formatizeKey(String key) {
+        if (key.startsWith(".")) {
+            key = key.replaceFirst(".", "");
+        }
+        if(key.endsWith(".") && key.length() > 0) {
+            key = key.substring(0, key.length()-1);
+        }
+        return key.replace("..", ".").trim();
     }
 
-    public Locale getLocale() {
-        return locale;
+    private static void add(String key, String value) {
+        if(!maps.containsKey(key)) {
+            maps.put(key, value);
+        } else {
+            throw new AllReadyRegisterdException("The language is already registered !");
+        }
     }
 
-    public static String fileToJson(InputStream stream) {
+    private static void addJsonObject(JSONObject jsonObject, String key) {
+        for (String k : jsonObject.keySet()) {
+            Object o = jsonObject.get(k);
+            if(o instanceof JSONArray) {
+                JSONArray a = (JSONArray) o;
+                addJsonArray(a, key + "." + k + ".");
+            } else if(o instanceof JSONObject) {
+                JSONObject o2 = (JSONObject) o;
+                addJsonObject(o2, key + "." + k + ".");
+            } else if(o instanceof String) {
+                String s = (String) o;
+                add(formatizeKey(key + "." + k + "."), s);
+            }
+        }
+    }
+
+    private static String fileToJson(InputStream stream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder builder = new StringBuilder();
         String line;

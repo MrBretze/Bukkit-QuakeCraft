@@ -27,7 +27,7 @@ public class PartialPlayer extends IPlayer {
                 if(info.isInGame()) {
                    return new PlayerQuit(getSender(), getCommand(), getPermission(), getArgs(), getPlayer()).execute();
                 } else {
-                    getSender().sendMessage(ChatColor.RED + "The player is not in a game !");
+                    getSender().sendMessage(getI18("command.players.playerNotInAGame"));
                     setValue(true);
                     return this;
                 }
@@ -37,15 +37,15 @@ public class PartialPlayer extends IPlayer {
                         if(Quake.gameManager.getGameByName(getArgs()[3]) != null) {
                             return new PlayerJoin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), Quake.gameManager.getGameByName(getArgs()[3])).execute();
                         } else {
-                            getSender().sendMessage(ChatColor.RED + "Not found the game !");
+                            getSender().sendMessage(getI18("command.players.gameNotFound"));
                             return this;
                         }
                     } else {
-                        getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> join <game>");
+                        getSender().sendMessage(getI18("command.players.usageJoin"));
                         return this;
                     }
                 } else {
-                    getSender().sendMessage(ChatColor.RED + "The player is already in a game !");
+                    getSender().sendMessage(getI18("command.players.alReadyInAGame"));
                     return this;
                 }
             } else if(getArgs()[2].equalsIgnoreCase("setcoins")) {
@@ -54,16 +54,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(ChatColor.RED + getArgs()[3] + " is not a valid number !");
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(ChatColor.RED + "The value must be greater than 0 !");
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> setcoins <coins>");
+                    getSender().sendMessage(getI18("command.players.usageSetCoins"));
                     return this;
                 }
             } else if(getArgs()[2].equalsIgnoreCase("addcoins")) {
@@ -72,21 +72,21 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(ChatColor.RED + getArgs()[3] + " is not a valid number !");
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(ChatColor.RED + "The value must be greater than 0 !");
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> setcoins <coins>");
+                    getSender().sendMessage(getI18("command.players.usageAddCoins"));
                     return this;
                 }
             }
         } else {
-            getSender().sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | setwon>");
+            getSender().sendMessage(getI18("command.players.usage"));
             setValue(true);
             return this;
         }

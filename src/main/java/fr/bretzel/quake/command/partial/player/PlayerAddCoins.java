@@ -3,8 +3,6 @@ package fr.bretzel.quake.command.partial.player;
 import fr.bretzel.commands.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.language.Language;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,7 +24,7 @@ public class PlayerAddCoins extends IPlayer {
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.addCoins(i);
-        info.getPlayer().sendMessage(Language.get("CommandAddCoins"));
+        getPlayer().sendMessage(getI18("command.players.validAddCoins").replace("%coins%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;
     }
