@@ -19,6 +19,7 @@ package fr.bretzel.quake.language;
 
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
+import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class Language {
 
     private static void add(String key, String value) {
         if(!maps.containsKey(key)) {
-            maps.put(key, value);
+            maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
         } else {
             throw new AllReadyRegisterdException("The language is already registered !");
         }
