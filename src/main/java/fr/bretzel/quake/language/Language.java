@@ -35,20 +35,17 @@ import java.util.Locale;
 
 public class Language {
 
-    private Locale locale = Locale.getDefault();
     private JSONObject object;
     private static HashMap<String, String> maps = new HashMap<>();
 
     public Language(Locale locale) {
-        this.locale = locale;
-
         object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
 
         addJsonObject(object, "");
     }
 
 
-    private static void addJsonArray(JSONArray array, String key) {
+    private void addJsonArray(JSONArray array, String key) {
         Iterator<Object> o = array.iterator();
         while (o.hasNext()) {
             Object object = o.next();
@@ -72,7 +69,7 @@ public class Language {
         }
     }
 
-    private static String formatizeKey(String key) {
+    private String formatizeKey(String key) {
         if (key.startsWith(".")) {
             key = key.replaceFirst(".", "");
         }
@@ -82,7 +79,7 @@ public class Language {
         return key.replace("..", ".").trim();
     }
 
-    private static void add(String key, String value) {
+    private void add(String key, String value) {
         if(!maps.containsKey(key)) {
             maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
         } else {
@@ -90,7 +87,7 @@ public class Language {
         }
     }
 
-    private static void addJsonObject(JSONObject jsonObject, String key) {
+    private void addJsonObject(JSONObject jsonObject, String key) {
         for (String k : jsonObject.keySet()) {
             Object o = jsonObject.get(k);
             if(o instanceof JSONArray) {
@@ -106,7 +103,7 @@ public class Language {
         }
     }
 
-    private static String fileToJson(InputStream stream) {
+    private String fileToJson(InputStream stream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder builder = new StringBuilder();
         String line;
@@ -118,5 +115,13 @@ public class Language {
             e.printStackTrace();
         }
         return builder.toString();
+    }
+
+    public boolean hasKey(String key) {
+        return maps.containsKey(key);
+    }
+
+    public String get(String key) {
+        return maps.get(key);
     }
 }

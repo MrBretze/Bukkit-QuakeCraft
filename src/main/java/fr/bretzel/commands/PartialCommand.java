@@ -1,5 +1,6 @@
 package fr.bretzel.commands;
 
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.language.Language;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -53,6 +54,6 @@ public abstract class PartialCommand {
     }
 
     public String getI18(String key) {
-        return Language.get(key);
+        return Quake.getI18n(key);
     }
 }

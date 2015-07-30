@@ -21,6 +21,7 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.game.task.GameEndTask;
+import fr.bretzel.quake.language.LanguageManager;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Location;
 import org.bukkit.block.CommandBlock;
@@ -35,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Locale;
 
 /**
  * Created by MrBretzel on 09/06/2015.
@@ -47,6 +49,7 @@ public class Quake extends JavaPlugin {
     public static Quake quake;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
     public static HologramManager holoManager;
+    private static LanguageManager languageManager;
 
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
@@ -89,6 +92,10 @@ public class Quake extends JavaPlugin {
         saveResource("config.yml", false);
 
         reloadConfig();
+
+        Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
+
+        languageManager = new LanguageManager(locale);
     }
 
     @Override
@@ -103,11 +110,6 @@ public class Quake extends JavaPlugin {
             game.save();
         }
     }
-
-    /**
-     * Player player = (Player) sender;
-     * GameEndTask.spawnFirework(GameEndTask.getCircle(player.getLocation(), 0.5, 5));
-     */
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -132,5 +134,9 @@ public class Quake extends JavaPlugin {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String getI18n(String key) {
+        return languageManager.getI18n(key);
     }
 }
