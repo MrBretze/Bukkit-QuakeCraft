@@ -192,7 +192,7 @@ public class SignEvent implements Listener {
     public Sign getSignByLocation(Location location) {
         for (Game game : getManager().getGameLinkedList()) {
             for (Sign sign : game.getSignList()) {
-                if (sign.getLocation().getWorld() == location.getWorld() &&
+                if (sign != null && sign.getLocation().getWorld() == location.getWorld() &&
                         sign.getLocation().getBlockX() == location.getBlockX() &&
                         sign.getLocation().getBlockY() == location.getBlockY() &&
                         sign.getLocation().getBlockZ() == location.getBlockZ()) {

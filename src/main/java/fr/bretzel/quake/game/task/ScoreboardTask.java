@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Lo�c Nussbaumer
+ * Copyright 2015 Lo?c Nussbaumer
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -28,7 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ScoreboardTask extends GameTask {
 
-    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
+    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", ChatColor.RED.toString(), ChatColor.DARK_RED.toString(), ChatColor.RED.toString(), true, false, ColorScroller.ScrollType.FORWARD);
 
     public ScoreboardTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);
@@ -36,13 +36,14 @@ public class ScoreboardTask extends GameTask {
 
     @Override
     public void run() {
-        if (scroller.getScrollType() == ColorScroller.ScrollType.FORWARD) {
-            if (scroller.getPosition() >= scroller.getString().length()) {
+
+        if(scroller.getScrollType() == ColorScroller.ScrollType.FORWARD) {
+            if(scroller.getPosition() >= scroller.getString().length()) {
                 scroller.setScrollType(ColorScroller.ScrollType.BACKWARD);
             }
         } else {
-            if (scroller.getPosition() <= -1) {
-                scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", "§c", "§4", "§c", true, false, ColorScroller.ScrollType.FORWARD);
+            if(scroller.getPosition() <= -1) {
+                scroller.setScrollType(ColorScroller.ScrollType.FORWARD);
             }
         }
 

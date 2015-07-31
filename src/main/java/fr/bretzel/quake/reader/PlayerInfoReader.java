@@ -34,7 +34,7 @@ public class PlayerInfoReader {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setString("effect", playerInfo.getEffect().getName());
         compound.setDouble("reload", playerInfo.getReloadTime());
-        compound.setInt("playerKill", playerInfo.getPlayerkill());
+        compound.setInt("playerKill", playerInfo.getPlayerKill());
         compound.setInt("coins", playerInfo.getCoins());
         compound.setInt("wonGame", playerInfo.getWon());
         compound.setInt("killStreak", playerInfo.getKillStreak());
@@ -57,7 +57,7 @@ public class PlayerInfoReader {
             player.setReloadTime(compound.getDouble("reload"));
         }
         if (compound.hasKey("playerKill")) {
-            player.setPlayerkill(compound.getInt("playerKill"));
+            player.setPlayerKill(compound.getInt("playerKill"));
         }
         if (compound.hasKey("coins")) {
             player.setCoins(compound.getInt("coins"));

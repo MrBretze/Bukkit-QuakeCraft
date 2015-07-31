@@ -4,7 +4,12 @@ import fr.bretzel.commands.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 
-import org.bukkit.ChatColor;
+import fr.bretzel.quake.command.partial.player.coin.PlayerAddCoins;
+import fr.bretzel.quake.command.partial.player.coin.PlayerRemoveCoins;
+import fr.bretzel.quake.command.partial.player.coin.PlayerSetCoins;
+import fr.bretzel.quake.command.partial.player.kill.PlayerAddKill;
+import fr.bretzel.quake.command.partial.player.kill.PlayerRemoveKill;
+import fr.bretzel.quake.command.partial.player.kill.PlayerSetKill;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -63,7 +68,7 @@ public class PartialPlayer extends IPlayer {
                     }
                     return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.usageSetCoins"));
+                    getSender().sendMessage(getI18("command.players.setcoins.usage"));
                     return this;
                 }
             } else if(getArgs()[2].equalsIgnoreCase("addcoins")) {
@@ -79,9 +84,81 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new PlayerAddCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.usageAddCoins"));
+                    getSender().sendMessage(getI18("command.players.addcoins.usage"));
+                    return this;
+                }
+            } else if(getArgs()[2].equalsIgnoreCase("removecoins")) {
+                if(getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerRemoveCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    return this;
+                }
+            } else if(getArgs()[2].equalsIgnoreCase("setkill")) {
+                if(getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerSetKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.setkill.usage"));
+                    return this;
+                }
+            } else if(getArgs()[2].equalsIgnoreCase("addkill")) {
+                if(getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerAddKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("removekill")) {
+                if(getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerRemoveKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
                     return this;
                 }
             }

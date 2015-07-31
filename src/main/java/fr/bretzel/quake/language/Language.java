@@ -19,6 +19,7 @@ package fr.bretzel.quake.language;
 
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.io.BufferedReader;
@@ -39,8 +40,8 @@ public class Language {
     private static HashMap<String, String> maps = new HashMap<>();
 
     public Language(Locale locale) {
+        maps.clear();
         object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
-
         addJsonObject(object, "");
     }
 
@@ -83,7 +84,7 @@ public class Language {
         if(!maps.containsKey(key)) {
             maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
         } else {
-            throw new AllReadyRegisterdException("The language is already registered !");
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "The language {Key:" + key + ", Value:" + maps.get(key) + "} is already registered !");
         }
     }
 

@@ -34,7 +34,7 @@ public class PlayerJoin extends IPlayer {
         }
         getPlayer().teleport(game.getSpawn());
         game.addPlayer(getPlayer());
-        getSender().sendMessage(ChatColor.GREEN + "The player has been added to the game !");
+        getSender().sendMessage(getI18("command.players.join.valid"));
         e.actualiseJoinSignForGame(game);
         if (e.lastPlayerInGame.equalsIgnoreCase("lastInGame")) {
             e.lastPlayerInGame = e.getInfoPlayer(game);

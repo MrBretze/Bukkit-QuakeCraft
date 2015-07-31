@@ -230,7 +230,7 @@ public class PlayerInfo {
                         addKillStreak(1);
                     }
 
-                    addKill(shoot.getKill());
+                    addPlayerKill(shoot.getKill());
                     addCoins(5 * shoot.getKill());
                     game.addKill(getPlayer(), shoot.getKill());
                     game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
@@ -260,16 +260,20 @@ public class PlayerInfo {
         }
     }
 
-    public int getPlayerkill() {
+    public int getPlayerKill() {
         return playerkill;
     }
 
-    public void setPlayerkill(int playerkill) {
+    public void setPlayerKill(int playerkill) {
         this.playerkill = playerkill;
     }
 
-    public void addKill(int kill) {
-        setPlayerkill(getPlayerkill() + kill);
+    public void addPlayerKill(int kill) {
+        setPlayerKill(getPlayerKill() + kill);
+    }
+
+    public void removePlayerKill(int kill) {
+        setPlayerKill(getPlayerKill() - kill);
     }
 
     public int getCoins() {
@@ -284,6 +288,10 @@ public class PlayerInfo {
         setCoins(getCoins() + coins);
     }
 
+    public void removeCoins(int coins) {
+        setCoins(getCoins() - coins);
+    }
+
     public int getKillStreak() {
         return killstreak;
     }
@@ -292,22 +300,26 @@ public class PlayerInfo {
         this.killstreak = killstreak;
     }
 
-    public void addKillStreak(int kill) {
-        setKillStreak(getKillStreak() + kill);
+    public void addKillStreak(int killstreak) {
+        setKillStreak(getKillStreak() + killstreak);
+    }
+
+    public void removeKillStreak(int killstreak) {
+        setKillStreak(getKillStreak() - killstreak);
     }
 
     public Scoreboard getPlayerScoreboard() {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    §r");
-        objective.getScore("§r").setScore(10);
+        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    " + ChatColor.RESET.toString());
+        objective.getScore(ChatColor.RESET.toString()).setScore(10);
         objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
-        objective.getScore("§r§r").setScore(8);
-        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerkill()).setScore(7);
-        objective.getScore("§r                            §r").setScore(6);
+        objective.getScore(ChatColor.RESET + ChatColor.RESET.toString()).setScore(8);
+        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerKill()).setScore(7);
+        objective.getScore(ChatColor.RESET + "                            " + ChatColor.RESET).setScore(6);
         objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
-        objective.getScore("§r§r§r§r").setScore(4);
+        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(4);
         objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
         return scoreboard;
     }
@@ -334,6 +346,10 @@ public class PlayerInfo {
 
     public void addWoon(int woon) {
         setWon(getWon() + woon);
+    }
+
+    public void removeWoon(int woon) {
+        setWon(getWon() - woon);
     }
 
     public void save() {

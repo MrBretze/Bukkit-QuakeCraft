@@ -120,7 +120,7 @@ public class ColorScroller {
 
             if (bold) {
                 String three = upperCaseMid ? colorMid + ChatColor.BOLD + str.substring(position, position + 1).toUpperCase() : colorMid + ChatColor.BOLD + str.substring(position, position + 1);
-                String fin = null;
+                String fin;
 
                 int m = one.length();
                 int l = two.length();
@@ -145,7 +145,7 @@ public class ColorScroller {
             } else {
                 String three = upperCaseMid ? colorMid + str.substring(position, position + 1).toUpperCase() : colorMid + str.substring(position, position + 1);
 
-                String fin = null;
+                String fin;
 
                 int m = one.length();
                 int l = two.length();
