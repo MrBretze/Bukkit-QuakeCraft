@@ -17,16 +17,21 @@
 package fr.bretzel.quake.command;
 
 import fr.bretzel.commands.CommandExe;
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.Create;
 import fr.bretzel.quake.command.partial.Delete;
 import fr.bretzel.quake.command.partial.Stop;
 import fr.bretzel.quake.command.partial.player.PartialPlayer;
 import fr.bretzel.quake.permission.Permission;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by MrBretzel on 14/06/2015.
@@ -70,6 +75,13 @@ public class Command extends CommandExe {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
+                } else if (args[0].equalsIgnoreCase("edit")) {
+                    return true;
+                } else if (args[0].equalsIgnoreCase("help")) {
+                    for(String s : getHelps()) {
+                        sender.sendMessage(s);
+                    }
+                    return true;
                 } else {
                     //Other command !
                     return true;
@@ -82,5 +94,18 @@ public class Command extends CommandExe {
             sender.sendMessage(ChatColor.RED + "It must be a player !");
             return true;
         }
+    }
+
+    public List<String> getHelps() {
+        List list = new ArrayList();
+        for(int i = 1; i <= 100; i++) {
+            String value = Quake.getI18n("command.edit.help" + i);
+            if(StringUtils.isNotBlank(value)) {
+                list.add(i, value);
+            } else {
+                return list;
+            }
+        }
+        return list;
     }
 }
