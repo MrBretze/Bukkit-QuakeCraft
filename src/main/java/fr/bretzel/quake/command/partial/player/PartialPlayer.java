@@ -13,6 +13,9 @@ import fr.bretzel.quake.command.partial.player.kill.PlayerSetKill;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerAddKillStreak;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerRemoveKillStreak;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerSetKillStreak;
+import fr.bretzel.quake.command.partial.player.won.PlayerAddWon;
+import fr.bretzel.quake.command.partial.player.won.PlayerRemoveWon;
+import fr.bretzel.quake.command.partial.player.won.PlayerSetWon;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -232,7 +235,7 @@ public class PartialPlayer extends IPlayer {
                     getSender().sendMessage(getI18("command.players.notAValidNumber"));
                     return this;
                 }
-                return new PlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                return new PlayerSetWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
             } else {
                 getSender().sendMessage(getI18("command.players.setwon.usage"));
                 return this;
@@ -250,7 +253,7 @@ public class PartialPlayer extends IPlayer {
                     getSender().sendMessage(getI18("command.players.notAValidNumber"));
                     return this;
                 }
-                return new PlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                return new PlayerAddWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
             } else {
                 getSender().sendMessage(getI18("command.players.addwon.usage"));
                 return this;
@@ -268,7 +271,7 @@ public class PartialPlayer extends IPlayer {
                     getSender().sendMessage(getI18("command.players.notAValidNumber"));
                     return this;
                 }
-                return new PlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                return new PlayerRemoveWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
             } else {
                 getSender().sendMessage(getI18("command.players.removewon.usage"));
                 return this;

@@ -25,6 +25,7 @@ import fr.bretzel.quake.command.partial.player.PartialPlayer;
 import fr.bretzel.quake.permission.Permission;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -99,9 +100,11 @@ public class Command extends CommandExe {
     public List<String> getHelps() {
         List list = new ArrayList();
         for(int i = 1; i <= 100; i++) {
-            String value = Quake.getI18n("command.edit.help" + i);
-            if(StringUtils.isNotBlank(value)) {
-                list.add(i, value);
+            System.out.print(i);
+            String value = Quake.getI18n("command.edit.help." + i);
+            System.out.print(value);
+            if(StringUtils.isNotEmpty(value)) {
+                list.add(value);
             } else {
                 return list;
             }
