@@ -148,7 +148,7 @@
           "notAValidValue": "&4The value must be greater than 0 !"
         },
         {
-          "usage": "&4Usage: /quake players <player> <quit | join | setcoins |�addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
+          "usage": "&4Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
         }
       ]
     },
@@ -157,7 +157,7 @@
         {
           "help": [
             {
-              "1": "&c##### &lQuake&r&c #####"
+              "1": "&c????? &lQuake&r&c ◀◀◀◀◀"
             },
             {
               "2": ""

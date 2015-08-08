@@ -20,6 +20,8 @@ package fr.bretzel.quake.language;
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -27,7 +29,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -112,7 +113,7 @@ public class Language {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                builder.append(new String(line.getBytes(), Charset.forName("UTF-8")).trim());
+                builder.append(StringEscapeUtils.unescapeJava(line).trim());
             }
         } catch (IOException e) {
             e.printStackTrace();
