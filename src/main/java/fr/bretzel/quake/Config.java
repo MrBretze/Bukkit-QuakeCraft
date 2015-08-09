@@ -14,7 +14,7 @@
  * permissions and limitations under the License. See accompanying
  * LICENSE file.
  */
-package fr.bretzel.quake.config;
+package fr.bretzel.quake;
 
 import org.bukkit.Bukkit;
 

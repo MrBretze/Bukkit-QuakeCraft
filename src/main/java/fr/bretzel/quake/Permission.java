@@ -1,4 +1,4 @@
-package fr.bretzel.quake.permission;
+package fr.bretzel.quake;
 
 import org.bukkit.Bukkit;
 

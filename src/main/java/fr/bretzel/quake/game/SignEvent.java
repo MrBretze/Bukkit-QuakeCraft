@@ -18,7 +18,7 @@ package fr.bretzel.quake.game;
 
 
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.config.Config;
+import fr.bretzel.quake.Config;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import org.bukkit.Bukkit;
@@ -35,7 +35,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * Created by MrBretzel on 19/06/2015.

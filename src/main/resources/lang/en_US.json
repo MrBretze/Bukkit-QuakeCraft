@@ -5,7 +5,7 @@
         {
           "join": [
             {
-              "usage": "&4Usage: /quake players <player> join <game>"
+              "usage": "&cUsage: /quake players <player> join <game>"
             },
             {
               "valid": "&aThe player has been added to the game !"
@@ -15,7 +15,7 @@
         {
           "setcoins": [
             {
-              "usage": "&4Usage: /quake players <player> setcoins <coins>"
+              "usage": "&cUsage: /quake players <player> setcoins <coins>"
             },
             {
               "valid": "&aSet coins: %coins% coins !"
@@ -25,7 +25,7 @@
         {
           "addcoins": [
             {
-              "usage": "&4Usage: /quake players <player> addcoins <coins>"
+              "usage": "&cUsage: /quake players <player> addcoins <coins>"
             },
             {
               "valid": "&aAdding: %coins% coins !"
@@ -35,7 +35,7 @@
         {
           "removecoins": [
             {
-              "usage": "&4Usage: /quake players <player> removecoins <coins>"
+              "usage": "&cUsage: /quake players <player> removecoins <coins>"
             },
             {
               "valid": "&aRemove coins: %coins% coins !"
@@ -45,7 +45,7 @@
         {
           "setkill": [
             {
-              "usage": "&4Usage: /quake players <player> setkill <kill>"
+              "usage": "&cUsage: /quake players <player> setkill <kill>"
             },
             {
               "valid": "&aSet coins: %kill% kills !"
@@ -55,7 +55,7 @@
         {
           "addkill": [
             {
-              "usage": "&4Usage: /quake players <player> addkill <kill>"
+              "usage": "&cUsage: /quake players <player> addkill <kill>"
             },
             {
               "valid": "&aAdding: %kill% kills !"
@@ -65,7 +65,7 @@
         {
           "removekill": [
             {
-              "usage": "&4Usage: /quake players <player> removekill <kill>"
+              "usage": "&cUsage: /quake players <player> removekill <kill>"
             },
             {
               "valid": "&aRemove coins: %kill% kills !"
@@ -75,7 +75,7 @@
         {
           "setkillsteak": [
             {
-              "usage": "&4Usage: /quake players <player> setkillsteak <kill streak>"
+              "usage": "&cUsage: /quake players <player> setkillsteak <kill streak>"
             },
             {
               "valid": "&aRemove coins: %killstreak% killstreak !"
@@ -85,7 +85,7 @@
         {
           "addkillstreak": [
             {
-              "usage": "&4Usage: /quake players <player> addkillstreak <kill streak>"
+              "usage": "&cUsage: /quake players <player> addkillstreak <kill streak>"
             },
             {
               "valid": "&aRemove coins: %killstreak% killstreak !"
@@ -95,7 +95,7 @@
         {
           "removekillstreak": [
             {
-              "usage": "&4Usage: /quake players <player> removekillstreak <kill streak>"
+              "usage": "&cUsage: /quake players <player> removekillstreak <kill streak>"
             },
             {
               "valid": "&aRemove coins: %killstreak% killstreak !"
@@ -105,7 +105,7 @@
         {
           "setwon": [
             {
-              "usage": "&4Usage: /quake players <player> setwon <won>"
+              "usage": "&cUsage: /quake players <player> setwon <won>"
             },
             {
               "valid": "&aRemove coins: %won% won !"
@@ -115,7 +115,7 @@
         {
           "removewon": [
             {
-              "usage": "&4Usage: /quake players <player> removewon <won>"
+              "usage": "&cUsage: /quake players <player> removewon <won>"
             },
             {
               "valid": "&aRemove coins: %won% won !"
@@ -125,7 +125,7 @@
         {
           "addwon": [
             {
-              "usage": "&4Usage: /quake players <player> addwon <won>"
+              "usage": "&cUsage: /quake players <player> addwon <won>"
             },
             {
               "valid": "&aRemove coins: %won% won !"
@@ -133,22 +133,22 @@
           ]
         },
         {
-          "playerNotInAGame": "&4The is not in a game !"
+          "playerNotInAGame": "&cThe is not in a game !"
         },
         {
-          "gameNotFound": "&4Game not found !"
+          "gameNotFound": "&cGame not found !"
         },
         {
-          "alReadyInAGame": "&4The player is already in a game !"
+          "alReadyInAGame": "&cThe player is already in a game !"
         },
         {
-          "notAValidNumber": "&4%number% is not a valid number !"
+          "notAValidNumber": "&c%number% is not a valid number !"
         },
         {
-          "notAValidValue": "&4The value must be greater than 0 !"
+          "notAValidValue": "&cThe value must be greater than 0 !"
         },
         {
-          "usage": "&4Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
+          "usage": "&cUsage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
         }
       ]
     },
@@ -160,7 +160,16 @@
               "1": "&c\u25B6\u25B6\u25B6\u25B6\u25B6\u25B6 &lQuake&r&c \u25C0\u25C0\u25C0\u25C0\u25C0"
             },
             {
-              "2": ""
+              "2": "&c/quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
+            },
+            {
+              "3": "&c/quake delete <game>"
+            },
+            {
+              "4": "&c/quake create <game>"
+            },
+            {
+              "5": "&c/quake stop <game>"
             }
           ]
         }

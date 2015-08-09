@@ -22,7 +22,7 @@ import fr.bretzel.quake.command.partial.Create;
 import fr.bretzel.quake.command.partial.Delete;
 import fr.bretzel.quake.command.partial.Stop;
 import fr.bretzel.quake.command.partial.player.PartialPlayer;
-import fr.bretzel.quake.permission.Permission;
+import fr.bretzel.quake.Permission;
 
 import org.apache.commons.lang.StringUtils;
 
