@@ -25,10 +25,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -108,12 +105,18 @@ public class Language {
     }
 
     private String fileToJson(InputStream stream) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         StringBuilder builder = new StringBuilder();
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                builder.append(StringEscapeUtils.unescapeJava(line).trim());
+                line = StringEscapeUtils.unescapeJava(line);
+                builder.append(line.trim());
             }
         } catch (IOException e) {
             e.printStackTrace();
