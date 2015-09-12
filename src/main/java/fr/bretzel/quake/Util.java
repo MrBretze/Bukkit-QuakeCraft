@@ -16,13 +16,9 @@
  */
 package fr.bretzel.quake;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
 
@@ -33,7 +29,6 @@ import java.util.*;
 /**
  * Created by MrBretzel on 11/06/2015.
  */
-
 public class Util {
 
     public static LinkedList<Location> getLocationByDirection(Player player, int range, double distance) {
@@ -55,7 +50,6 @@ public class Util {
             }
             list.add(f.clone());
         }
-
         return list;
     }
 
@@ -295,6 +289,9 @@ public class Util {
             case "SW":
                 location.add(-1, 0, 1);
                 break;
+            default:
+                location.add(0, 0, -1);
+                break;
         }
         return location;
     }
@@ -303,7 +300,7 @@ public class Util {
         World world = center.getWorld();
         double increment = (2 * Math.PI) / amount;
         ArrayList<Location> locations = new ArrayList<>();
-        for(int i = 0;i < amount; i++){
+        for (int i = 0;i < amount; i++) {
             double angle = i * increment;
             double x = center.getX() + (radius * Math.cos(angle));
             double z = center.getZ() + (radius * Math.sin(angle));

@@ -4,6 +4,7 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.language.Language;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 /**
@@ -16,13 +17,19 @@ public abstract class PartialCommand {
     private CommandSender sender;
     private Permission permission;
     private String[] args;
+    private Player player;
     private boolean value = true;
+    private boolean isplayer = false;
 
     public PartialCommand(CommandSender sender, Command command, Permission permission, String[] args) {
         this.sender = sender;
         this.command = command;
         this.permission = permission;
         this.args = args;
+        if (sender instanceof Player) {
+            isplayer = true;
+            this.player = (Player) sender;
+        }
     }
 
     public PartialCommand execute() {
@@ -55,5 +62,13 @@ public abstract class PartialCommand {
 
     public String getI18(String key) {
         return Quake.getI18n(key);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public boolean isPlayer() {
+        return isplayer;
     }
 }

@@ -43,25 +43,15 @@ public class Command extends CommandExe {
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
         if(sender instanceof Player) {
             if(args.length > 0) {
-                if (args[0].equalsIgnoreCase("create")) {
+                if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
-                        return new Create(sender, command, Permission.COMMAND_CREATE, args, args[1]).execute().value();
+                        if (Quake.gameManager.containsGame(args[1])) {
+
+                        } else {
+
+                        }
                     } else {
-                        sender.sendMessage(ChatColor.RED + "/quake create <name>");
-                        return true;
-                    }
-                } else if(args[0].equalsIgnoreCase("delete")) {
-                    if(args.length > 1) {
-                        return new Delete(sender, command, Permission.COMMAND_DELETE, args, args[1]).execute().value();
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "/quake delete <name>");
-                        return true;
-                    }
-                } else if(args[0].equalsIgnoreCase("stop")) {
-                    if(args.length > 1) {
-                        return new Stop(sender, command, Permission.COMMAND_STOP, args, args[1]).execute().value();
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "/quake stop <game>");
+                        sender.sendMessage(getI18n("command.game"));
                         return true;
                     }
                 } else if(args[0].equalsIgnoreCase("players")) {
@@ -76,8 +66,6 @@ public class Command extends CommandExe {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
-                } else if (args[0].equalsIgnoreCase("edit")) {
-                    return true;
                 } else if (args[0].equalsIgnoreCase("help")) {
                     for(String s : getHelps()) {
                         sender.sendMessage(s);
@@ -95,13 +83,14 @@ public class Command extends CommandExe {
             sender.sendMessage(ChatColor.RED + "It must be a player !");
             return true;
         }
+        return false;
     }
 
     public List<String> getHelps() {
         List list = new ArrayList();
         for(int i = 1; i <= 100; i++) {
             System.out.print(i);
-            String value = Quake.getI18n("command.edit.help." + i);
+            String value = Quake.getI18n("command.help." + i);
             System.out.print(value);
             if(StringUtils.isNotEmpty(value)) {
                 list.add(value);

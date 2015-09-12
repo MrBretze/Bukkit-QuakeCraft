@@ -24,7 +24,7 @@ public class PlayerRemoveKillStreak extends IPlayer {
     @Override
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
-        info.addPlayerKill(i);
+        info.removeKillStreak(i);
         getPlayer().sendMessage(getI18("command.players.removekillsteak.valid").replace("%killstreak%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;

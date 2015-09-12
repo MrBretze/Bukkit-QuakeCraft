@@ -24,7 +24,7 @@ public class PlayerRemoveWon extends IPlayer {
     @Override
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
-        info.addPlayerKill(i);
+        info.removeWoon(i);
         getPlayer().sendMessage(getI18("command.players.removewon.valid").replace("%won%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;

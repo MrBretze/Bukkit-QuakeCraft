@@ -24,7 +24,7 @@ public class PlayerSetWon extends IPlayer{
     @Override
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
-        info.addPlayerKill(i);
+        info.setWon(i);
         getPlayer().sendMessage(getI18("command.players.setwon.valid").replace("%won%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;

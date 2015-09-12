@@ -33,7 +33,6 @@ import java.util.Locale;
 /**
  * Created by MrBretzel on 09/07/2015.
  */
-
 public class Language {
 
     private JSONObject object;

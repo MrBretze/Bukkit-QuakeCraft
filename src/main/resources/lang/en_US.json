@@ -153,25 +153,28 @@
       ]
     },
     {
-      "edit": [
+      "help": [
         {
-          "help": [
-            {
-              "1": "&c\u25B6\u25B6\u25B6\u25B6\u25B6\u25B6 &lQuake&r&c \u25C0\u25C0\u25C0\u25C0\u25C0"
-            },
-            {
-              "2": "&c/quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
-            },
-            {
-              "3": "&c/quake delete <game>"
-            },
-            {
-              "4": "&c/quake create <game>"
-            },
-            {
-              "5": "&c/quake stop <game>"
-            }
-          ]
+          "1": "&c\u25B6\u25B6\u25B6\u25B6\u25B6\u25B6 &lQuake&r&c \u25C0\u25C0\u25C0\u25C0\u25C0"
+        },
+        {
+          "2": "&c/quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
+        },
+        {
+          "3": "&c/quake delete <game>"
+        },
+        {
+          "4": "&c/quake create <game>"
+        },
+        {
+          "5": "&c/quake stop <game>"
+        }
+      ]
+    },
+    {
+      "game": [
+        {
+          "usage": "&c/quake game <create | delete | setdysplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
         }
       ]
     }

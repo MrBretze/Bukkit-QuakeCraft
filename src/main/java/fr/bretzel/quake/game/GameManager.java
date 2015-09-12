@@ -110,8 +110,8 @@ public class GameManager implements Listener {
         return gameLinkedList.contains(game);
     }
 
-    public boolean containsGame(String arena) {
-        return gameLinkedList.contains(getGameByName(arena));
+    public boolean containsGame(String name) {
+        return gameLinkedList.contains(getGameByName(name));
     }
 
     public Location getLobby() {
