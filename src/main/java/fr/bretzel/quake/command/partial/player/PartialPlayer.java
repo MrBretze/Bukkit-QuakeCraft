@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 /**
- * Created by mrbretzel on 20/07/15.
+ * Created by MrBretzel on 20/07/15.
  */
 public class PartialPlayer extends IPlayer {
 
@@ -166,113 +166,117 @@ public class PartialPlayer extends IPlayer {
                     getSender().sendMessage(getI18("command.players.removecoins.usage"));
                     return this;
                 }
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("setkillstreak")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+            } else if (getArgs()[2].equalsIgnoreCase("setkillstreak")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.setkillstreak.usage"));
                     return this;
                 }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
+            } else if (getArgs()[2].equalsIgnoreCase("addkillstreak")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
                     return this;
                 }
-                return new PlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+            } else if (getArgs()[2].equalsIgnoreCase("removekillstreak")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("setwon")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerSetWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.setwon.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("addwon")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerAddWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.addwon.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("removewon")) {
+                if (getArgs().length > 3) {
+                    int i = 0;
+                    try {
+                        i = Integer.valueOf(getArgs()[3]);
+                    } catch (Exception e) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        return this;
+                    }
+                    if (!(i > 0)) {
+                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        return this;
+                    }
+                    return new PlayerRemoveWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.players.removewon.usage"));
+                    return this;
+                }
             } else {
-                getSender().sendMessage(getI18("command.players.setkillstreak.usage"));
-                return this;
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("addkillstreak")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
-                    return this;
-                }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
-                    return this;
-                }
-                return new PlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
-            } else {
-                getSender().sendMessage(getI18("command.players.removecoins.usage"));
-                return this;
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("removekillstreak")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
-                    return this;
-                }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
-                    return this;
-                }
-                return new PlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
-            } else {
-                getSender().sendMessage(getI18("command.players.removecoins.usage"));
-                return this;
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("setwon")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
-                    return this;
-                }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
-                    return this;
-                }
-                return new PlayerSetWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
-            } else {
-                getSender().sendMessage(getI18("command.players.setwon.usage"));
-                return this;
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("addwon")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
-                    return this;
-                }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
-                    return this;
-                }
-                return new PlayerAddWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
-            } else {
-                getSender().sendMessage(getI18("command.players.addwon.usage"));
-                return this;
-            }
-        } else if (getArgs()[2].equalsIgnoreCase("removewon")) {
-            if (getArgs().length > 3) {
-                int i = 0;
-                try {
-                    i = Integer.valueOf(getArgs()[3]);
-                } catch (Exception e) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
-                    return this;
-                }
-                if (!(i > 0)) {
-                    getSender().sendMessage(getI18("command.players.notAValidNumber"));
-                    return this;
-                }
-                return new PlayerRemoveWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
-            } else {
-                getSender().sendMessage(getI18("command.players.removewon.usage"));
+                getSender().sendMessage(getI18("command.players.usage"));
+                setValue(true);
                 return this;
             }
         } else {
@@ -280,6 +284,5 @@ public class PartialPlayer extends IPlayer {
             setValue(true);
             return this;
         }
-        return this;
     }
 }

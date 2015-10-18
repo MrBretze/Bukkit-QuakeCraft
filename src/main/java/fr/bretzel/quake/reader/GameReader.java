@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Lo�c Nussbaumer
+ * Copyright 2015 Loïc Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -21,7 +21,6 @@ import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
@@ -49,7 +48,7 @@ public class GameReader {
 
         int respawns = 0;
         NBTTagCompound r = new NBTTagCompound();
-        for (Location loc : game.getRespawn()) {
+        for (Location loc : game.getRespawns()) {
             r.setString(String.valueOf(respawns), Util.toStringLocation(loc));
             respawns++;
         }
@@ -84,10 +83,6 @@ public class GameReader {
         game.setSecondLocation(Util.toLocationString(compound.getString("location2")));
         game.setSpawn(Util.toLocationString(compound.getString("spawn")));
 
-        for (Block b : Util.blocksFromTwoPoints(game.getFirstLocation(), game.getSecondLocation())) {
-            game.addBlock(b);
-        }
-
 
         if (compound.hasKey("signs")) {
             NBTTagCompound s = compound.getCompound("signs");
@@ -107,7 +102,7 @@ public class GameReader {
             if (size > 0) {
                 for (int i = 0; i <= vsize; i++) {
                     if (size != size - 1) {
-                        game.addRespawn(Util.toLocationString(s.getString(String.valueOf(i))));
+                        game.addRespawn(Util.toLocationString(s.getString(String.valueOf(i))).subtract(0.0, 1.0, 0.0));
                     }
                 }
             }

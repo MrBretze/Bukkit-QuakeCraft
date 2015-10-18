@@ -177,8 +177,29 @@ public class Game {
         this.scoreboardManager = scoreboardManager;
     }
 
-    public LinkedList<Location> getRespawn() {
+    public LinkedList<Location> getRespawns() {
         return respawn;
+    }
+
+    public boolean hasRespawn(Location location) {
+        for (Location l : getRespawns()) {
+            if (l.distance(location) < 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Location getRespawn(Location location) {
+        for (Location l : getRespawns()) {
+            if (l.distance(location) < 1)
+                return l;
+        }
+        return null;
+    }
+
+    public void removeRespawn(Location location) {
+        getRespawns().remove(getRespawn(location));
     }
 
     public void setRespawn(LinkedList<Location> respawn) {
@@ -186,7 +207,7 @@ public class Game {
     }
 
     public void addRespawn(Location location) {
-        getRespawn().add(location);
+        getRespawns().add(location.add(0.0, 1.0, 0.0));
     }
 
     public String getName() {
@@ -242,17 +263,19 @@ public class Game {
         if (view) {
             this.respawnview = true;
             int s = 0;
-            for(Location location : getRespawn()) {
+            for (Location location : getRespawns()) {
                 s++;
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
                 if(hologram == null) {
                     hologram = new Hologram(location, "Respawn: " + s, Quake.holoManager);
                 }
-                hologram.display(true);
+                if (!hologram.isVisible()) {
+                    hologram.display(true);
+                }
             }
         } else {
             this.respawnview = false;
-            for(Location location : getRespawn()) {
+            for (Location location : getRespawns()) {
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
                 if(hologram != null)
                     hologram.display(false);
@@ -423,7 +446,7 @@ public class Game {
     }
 
     public void respawnAtStart(Player player) {
-        Location location = getRespawn().get(random.nextInt(getRespawn().size()));
+        Location location = getRespawns().get(random.nextInt(getRespawns().size()));
         PlayerInfo info = Quake.getPlayerInfo(player);
         if(info.getRespawn() >= 5) {
             this.usedLoc.add(location);
@@ -445,7 +468,7 @@ public class Game {
     public void respawn(Player p) {
         if (getState() == State.STARTED) {
             PlayerInfo info = Quake.getPlayerInfo(p);
-            Location location = getRespawn().get(random.nextInt(getRespawn().size()));
+            Location location = getRespawns().get(random.nextInt(getRespawns().size()));
             int esize = location.getWorld().getNearbyEntities(location, 10.5D, 10.5D, 10.5D).size();
             if (esize == 0) {
                 p.teleport(location);

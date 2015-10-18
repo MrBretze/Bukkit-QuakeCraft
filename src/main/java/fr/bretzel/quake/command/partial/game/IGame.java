@@ -17,4 +17,8 @@ public abstract class IGame extends PartialCommand {
         super(sender, command, permission, args);
         this.game = game;
     }
+
+    public Game getGame() {
+        return game;
+    }
 }

@@ -81,6 +81,5 @@ public class GameEndTask extends GameTask {
         player.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player)) + ChatColor.AQUA + "            #");
         player.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player) * 5) + ChatColor.AQUA + "          #");
         player.sendMessage(ChatColor.AQUA + "####################");
-
     }
 }

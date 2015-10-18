@@ -159,7 +159,63 @@
     {
       "game": [
         {
-          "usage": "&c/quake game <games> <setdysplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+          "usage": "&c/quake game <games> <setdisplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+        },
+        {
+          "setdisplayname": [
+            {
+              "usage": "&cUsage: /quake game <games> setdisplayname <dysplayname>"
+            },
+            {
+              "valid": "&aThe display name "
+            }
+          ]
+        },
+        {
+          "setmaxplayer": [
+            {
+              "usage": "&cUsage: /quake players <player> addwon <won>"
+            },
+            {
+              "valid": "&aRemove coins: %won% won !"
+            }
+          ]
+        },
+        {
+          "setminplayer": [
+            {
+              "usage": "&cUsage: /quake players <player> addwon <won>"
+            },
+            {
+              "valid": "&aRemove coins: %won% won !"
+            }
+          ]
+        },
+        {
+          "addrespawn": [
+            {
+              "usage": "&cUsage: /quake players <player> addwon <won>"
+            },
+            {
+              "error": "&cThe respawn point is already used !"
+            },
+            {
+              "valid": "&aRemove coins: %won% won !"
+            }
+          ]
+        },
+        {
+          "deleterespawn": [
+            {
+              "usage": "&cUsage: /quake game <game> deleterespawn"
+            },
+            {
+              "error": "&cThe location you are is not valid"
+            },
+            {
+              "valid": "&aThe respawn has been has been deleted !"
+            }
+          ]
         },
         {
           "create": [
@@ -185,6 +241,9 @@
   "util": [
     {
       "playerNotInAGame": "&cThe is not in a game !"
+    },
+    {
+      "playerCanNotBeFound": "acThe player can not be found !"
     },
     {
       "gameNotFound": "&cGame not found !"

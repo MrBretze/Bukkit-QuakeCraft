@@ -118,7 +118,7 @@ public class Quake extends JavaPlugin {
         if(label.equals("test")) {
             if(sender instanceof Player) {
                 Player player = (Player) sender;
-                EndTaskUtil.spawnFirework(Util.getCircle(player.getLocation(), 0.4, 6));
+                Util.spawnFirework(Util.getCircle(player.getLocation(), 0.4, 6));
                 return true;
             } else {
                 return true;

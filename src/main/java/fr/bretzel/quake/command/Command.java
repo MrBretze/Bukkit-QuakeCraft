@@ -44,6 +44,8 @@ public class Command extends CommandExe {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
                         if (Quake.gameManager.containsGame(args[1])) {
+                            // /quake args0 args1  args2    args3...
+                            // /quake game  <game> delete
                             return new PartialGame(sender, command, Permission.COMMAND_GAME, args, Quake.gameManager.getGameByName(args[1])).execute().value();
                         } else {
                             sender.sendMessage(getI18n("util.gameNotFound"));
@@ -111,13 +113,12 @@ public class Command extends CommandExe {
     public List<String> getHelps() {
         List list = new ArrayList();
         for(int i = 1; i <= 100; i++) {
-            String value = Quake.getI18n("command.help." + i);
-            System.out.print(value);
-            if(StringUtils.isNotEmpty(value)) {
+            String value = getI18n("command.help." + i);
+            if (StringUtils.isNotEmpty(value))
                 list.add(value);
-            } else {
+            else
                 return list;
-            }
+
         }
         return list;
     }

@@ -18,7 +18,6 @@ package fr.bretzel.hologram;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -34,10 +33,10 @@ import java.util.List;
 public class HologramManager implements Listener {
 
     private List<Hologram> holoList = new ArrayList<>();
-    private static Plugin plugin;
+    private Plugin plugin;
 
     public HologramManager(Plugin plugin) {
-        setPlugin(plugin);
+        this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -62,11 +61,9 @@ public class HologramManager implements Listener {
     }
 
     public Hologram getHologram(Location location, double range) {
-        for (Hologram holo : getHoloList()) {
-            if (holo.getLocation().getWorld() == location.getWorld() && holo.getLocation().distance(location) <= range) {
+        for (Hologram holo : getHologramList())
+            if (holo.getLocation().getWorld() == location.getWorld() && holo.getLocation().distance(location) <= range)
                 return holo;
-            }
-        }
         return null;
     }
 
@@ -82,45 +79,59 @@ public class HologramManager implements Listener {
         this.removeHologram(new Location(world, x, y, z), 0.5);
     }
 
+    public void removeHologram(World world, double x, double y, double z, double range) {
+        this.removeHologram(new Location(world, x, y, z), range);
+    }
+
     public void removeHologram(Location location) {
         this.removeHologram(location, 0.5);
     }
 
     public void removeHologram(Location location, double range) {
-        Hologram hologram = getHologram(location, range);
-        if (hologram == null) {
+        if (!exist(location, range))
             return;
-        }
-        for (HoloEntity e : hologram.getHoloEntities()) {
-            ArmorStand stand = e.getStand();
-            if (stand != null)
-                stand.remove();
-        }
+        Hologram hologram = getHologram(location, range);
+        for (HoloEntity e : hologram.getHoloEntities())
+            if (e.getStand() != null)
+                e.getStand().remove();
     }
 
-    public List<Hologram> getHoloList() {
+    public boolean exist(World world, double x, double y, double z, double range) {
+        return exist(new Location(world, x, y, z), range);
+    }
+
+    public boolean exist(World world, double x, double y, double z) {
+        return exist(new Location(world, x, y, z), 0.5);
+    }
+
+    public boolean exist(World world, int x, int y, int z, double range) {
+        return exist(new Location(world, x, y, z), range);
+    }
+
+    public boolean exist(World world, int x, int y, int z) {
+        return exist(new Location(world, x, y, z), 0.5);
+    }
+
+    public boolean exist(Location location) {
+        return getHologram(location, 0.5) != null;
+    }
+
+    public boolean exist(Location location, double range) {
+        return getHologram(location, range) != null;
+    }
+
+    public List<Hologram> getHologramList() {
         return holoList;
     }
 
-    public void setHoloList(List<Hologram> holoList) {
-        this.holoList = holoList;
-    }
-
-    public static Plugin getPlugin() {
+    public Plugin getPlugin() {
         return plugin;
-    }
-
-    public void setPlugin(Plugin plugin) {
-        this.plugin = plugin;
     }
 
     @EventHandler
     private void onPluginDisable(PluginDisableEvent event) {
-        Plugin plugin = event.getPlugin();
-        if(plugin == getPlugin()) {
-            for(Hologram hologram : getHoloList()) {
+        if (event.getPlugin().getName().equals(getPlugin().getName()))
+            for (Hologram hologram : getHologramList())
                 hologram.remove();
-            }
-        }
     }
 }

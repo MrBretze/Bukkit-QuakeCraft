@@ -32,6 +32,8 @@ public class Hologram {
     private String[] lines = {};
     private Location[] locations = {};
     private Location location;
+    private HologramManager holomanager;
+    private boolean visible = false;
 
     public Hologram(World world, double x, double y, double z, String[] lines, HologramManager manager) {
         this(new Location(world, x, y, z), lines, manager);
@@ -49,6 +51,7 @@ public class Hologram {
         if(manager == null) {
             throw new NullPointerException("The hologram manager is not instanced !");
         }
+        this.holomanager = manager;
         setLines(lines);
         setLocation(location);
         double yAdd = 0.0;
@@ -58,50 +61,59 @@ public class Hologram {
             Location loc = location.clone().add(0.0, yAdd, 0.0);
             locs.add(loc);
             yAdd += 0.5;
-            HoloEntity entity = new HoloEntity(loc, s, HologramManager.getPlugin());
+            HoloEntity entity = new HoloEntity(loc, s, getHolomanager().getPlugin());
             holos.add(entity);
         }
         setHoloEntities(holos.toArray(new HoloEntity[holos.size()]));
         setLocations(locs.toArray(new Location[locs.size()]));
-        manager.getHoloList().add(this);
+        manager.getHologramList().add(this);
     }
 
     public void display(boolean b) {
+        this.visible = b;
         for(HoloEntity e : getHoloEntities()) {
             e.getStand().setCustomNameVisible(b);
         }
+    }
+
+    public boolean isVisible() {
+        return this.visible;
     }
 
     public HoloEntity[] getHoloEntities() {
         return holoEntities;
     }
 
-    public Location[] getLocations() {
-        return locations;
-    }
-
-    public String[] getLines() {
-        return lines;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
     public void setHoloEntities(HoloEntity[] holoEntities) {
         this.holoEntities = holoEntities;
     }
 
-    public void setLines(String[] lines) {
-        this.lines = lines;
+    public Location[] getLocations() {
+        return locations;
     }
 
     public void setLocations(Location[] locations) {
         this.locations = locations;
     }
 
+    public String[] getLines() {
+        return lines;
+    }
+
+    public void setLines(String[] lines) {
+        this.lines = lines;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public HologramManager getHolomanager() {
+        return holomanager;
     }
 
     public void remove() {

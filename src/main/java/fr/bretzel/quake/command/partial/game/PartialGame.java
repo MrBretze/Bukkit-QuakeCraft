@@ -23,7 +23,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
 /**
- * Created by Axelo on 09/08/2015.
+ * Created by MrBretzel on 09/08/2015.
  */
 public class PartialGame extends IGame {
 
@@ -34,9 +34,44 @@ public class PartialGame extends IGame {
 
     @Override
     public PartialCommand execute() {
-        if (getArgs().length > 3) {
-
+        if (getArgs().length > 2) {
+            if (getArgs()[2].equalsIgnoreCase("setdisplayname")) {
+                if (getArgs().length > 3) {
+                    return new GameSetDisplayName(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("setmaxplayer")) {
+                if (getArgs().length > 3) {
+                    return new GameSetMaxPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("setminplayer")) {
+                if (getArgs().length > 3) {
+                    return new GameSetMinPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("addrespawn")) {
+                if (getArgs().length > 3) {
+                    return new GameAddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("deleterespawn")) {
+                if (getArgs().length > 3) {
+                    return new GameDeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    return this;
+                }
+            } else {
+                getSender().sendMessage(getI18("command.game.usage"));
+                return this;
+            }
+        } else {
+            getSender().sendMessage(getI18("command.game.usage"));
+            return this;
         }
-        return this;
     }
 }
