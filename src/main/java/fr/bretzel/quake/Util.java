@@ -234,6 +234,36 @@ public class Util {
         }
     }
 
+    public static void spawnFirework(List<Location> location) {
+        Iterator<Location> iterator = location.iterator();
+        while (iterator.hasNext()) {
+            Location l = iterator.next();
+            Random random = new Random();
+            Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
+            FireworkMeta fwm = fw.getFireworkMeta();
+            int rt = random.nextInt(5) + 1;
+            FireworkEffect.Type type = FireworkEffect.Type.BALL;
+            if (rt == 1) type = FireworkEffect.Type.BALL;
+            if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
+            if (rt == 3) type = FireworkEffect.Type.BURST;
+            if (rt == 4) type = FireworkEffect.Type.CREEPER;
+            if (rt == 5) type = FireworkEffect.Type.STAR;
+            int u = random.nextInt(256);
+            int b = random.nextInt(256);
+            int g = random.nextInt(256);
+            Color c1 = Color.fromRGB(u, g, b);
+            u = random.nextInt(256);
+            b = random.nextInt(256);
+            g = random.nextInt(256);
+            Color c2 = Color.fromRGB(u, g, b);
+            FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(c1).withFade(c2).with(type).trail(random.nextBoolean()).build();
+            fwm.addEffect(effect);
+            int rp = random.nextInt(2) + 1;
+            fwm.setPower(rp);
+            fw.setFireworkMeta(fwm);
+        }
+    }
+
     public static String getCardinalDirection(Player player) {
         double rotation = (player.getLocation().getYaw() - 90) % 360;
         if (rotation < 0) {

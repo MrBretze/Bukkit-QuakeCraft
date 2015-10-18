@@ -16,21 +16,18 @@
  */
 package fr.bretzel.quake.game.task;
 
-import fr.bretzel.quake.EndTaskUtil;
 import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
-import org.bukkit.*;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.UUID;
 
 /**
  * Created by Loic on 05/07/2015.
@@ -58,7 +55,7 @@ public class GameEndTask extends GameTask {
                     }
                 }
             }
-            EndTaskUtil.spawnFirework(Util.getCircle(player.getLocation().clone(), 0.4, 6));
+            Util.spawnFirework(Util.getCircle(player.getLocation().clone(), 0.4, 6));
         } else {
             Bukkit.getScheduler().runTaskLater(Quake.quake, new Runnable() {
                 @Override

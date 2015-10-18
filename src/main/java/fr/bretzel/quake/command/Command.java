@@ -111,7 +111,6 @@ public class Command extends CommandExe {
     public List<String> getHelps() {
         List list = new ArrayList();
         for(int i = 1; i <= 100; i++) {
-            System.out.print(i);
             String value = Quake.getI18n("command.help." + i);
             System.out.print(value);
             if(StringUtils.isNotEmpty(value)) {
