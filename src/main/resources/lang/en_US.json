@@ -133,21 +133,6 @@
           ]
         },
         {
-          "playerNotInAGame": "&cThe is not in a game !"
-        },
-        {
-          "gameNotFound": "&cGame not found !"
-        },
-        {
-          "alReadyInAGame": "&cThe player is already in a game !"
-        },
-        {
-          "notAValidNumber": "&c%number% is not a valid number !"
-        },
-        {
-          "notAValidValue": "&cThe value must be greater than 0 !"
-        },
-        {
           "usage": "&cUsage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
         }
       ]
@@ -174,9 +159,47 @@
     {
       "game": [
         {
-          "usage": "&c/quake game <create | delete | setdysplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+          "usage": "&c/quake game <games> <setdysplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+        },
+        {
+          "create": [
+            {
+              "usage": "&c/quake create <name of game>"
+            },
+            {
+              "nameIsNull": "&cThe name is null, please send this to the authors of plugin !"
+            }
+          ],
+          "delete": [
+            {
+              "nameIsNull": "&cThe name is null, please send this to the authors of plugin !"
+            },
+            {
+              "usage": "&c/quake delete <name of game>"
+            }
+          ]
         }
       ]
+    }
+  ],
+  "util": [
+    {
+      "playerNotInAGame": "&cThe is not in a game !"
+    },
+    {
+      "gameNotFound": "&cGame not found !"
+    },
+    {
+      "alReadyInAGame": "&cThe player is already in a game !"
+    },
+    {
+      "notAValidNumber": "&c%number% is not a valid number !"
+    },
+    {
+      "notAValidValue": "&cThe value must be greater than 0 !"
+    },
+    {
+      "gameAlreadyCreate": "&cThe game is already create !"
     }
   ]
 }

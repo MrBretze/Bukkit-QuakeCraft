@@ -212,7 +212,7 @@ public class GameManager implements Listener {
         PlayerInfo info = Quake.getPlayerInfo(player);
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
-            if (!game.getBlocks().contains(event.getTo().getBlock())) {
+            if (!game.isInArea(player)) {
                 Location from = event.getFrom();
                 from.setDirection(player.getEyeLocation().getDirection());
                 player.teleport(from);

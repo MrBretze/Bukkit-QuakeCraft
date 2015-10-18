@@ -17,6 +17,7 @@
 package fr.bretzel.quake.command.partial.game;
 
 import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -24,16 +25,16 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 09/08/2015.
  */
-public class PartialGame extends PartialCommand {
+public class PartialGame extends IGame {
 
-    public PartialGame(CommandSender sender, Command command, Permission permission, String[] args) {
-        super(sender, command, permission, args);
+
+    public PartialGame(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+        super(sender, command, permission, args, game);
     }
-
 
     @Override
     public PartialCommand execute() {
-        if (getArgs().length > 2) {
+        if (getArgs().length > 3) {
 
         }
         return this;

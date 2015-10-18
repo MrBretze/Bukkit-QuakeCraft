@@ -13,21 +13,22 @@ import org.bukkit.permissions.Permission;
 
 public class Delete extends PartialCommand {
 
-    private String arena = "null";
+    private String games = "null";
 
-    public Delete(CommandSender sender, Command command, Permission permission, String[] args, String arena) {
+    public Delete(CommandSender sender, Command command, Permission permission, String[] args, String games) {
         super(sender, command, permission, args);
-        this.arena = arena;
+        this.games = games;
     }
 
     @Override
     public PartialCommand execute() {
         Player player = (Player) getSender();
-        if("null".equals(arena)) {
+        if ("null".equals(games)) {
             setValue(true);
+            getSender().sendMessage(getI18("command.game.create.nameIsNull"));
             return this;
         }
-        Quake.gameManager.deleteGame(Quake.gameManager.getGameByName(arena), player);
+        Quake.gameManager.deleteGame(Quake.gameManager.getGameByName(games), player);
         setValue(true);
         return this;
     }

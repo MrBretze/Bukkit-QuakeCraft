@@ -20,11 +20,8 @@ import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.language.LanguageManager;
 import fr.bretzel.quake.reader.GameReader;
-import org.bukkit.Location;
-import org.bukkit.block.CommandBlock;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,7 +30,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -47,8 +43,8 @@ public class Quake extends JavaPlugin {
     public static PluginManager manager;
     public static GameManager gameManager;
     public static Quake quake;
-    private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
     public static HologramManager holoManager;
+    private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
     private static LanguageManager languageManager;
 
     public static PlayerInfo getPlayerInfo(Player player) {
@@ -65,6 +61,10 @@ public class Quake extends JavaPlugin {
 
     public static LinkedList<PlayerInfo> getPlayerInfos() {
         return playerInfos;
+    }
+
+    public static String getI18n(String key) {
+        return languageManager.getI18n(key);
     }
 
     @Override
@@ -88,6 +88,8 @@ public class Quake extends JavaPlugin {
                 initGame(file);
             }
         }
+
+        Config.initialize();
 
         saveResource("config.yml", false);
 
@@ -134,9 +136,5 @@ public class Quake extends JavaPlugin {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static String getI18n(String key) {
-        return languageManager.getI18n(key);
     }
 }

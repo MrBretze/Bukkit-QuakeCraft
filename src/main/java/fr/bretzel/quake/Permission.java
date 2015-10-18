@@ -8,9 +8,8 @@ import org.bukkit.Bukkit;
 
 public class Permission {
 
-    public static org.bukkit.permissions.Permission COMMAND_CREATE = Bukkit.getPluginManager().getPermission("quake.command.create");
-    public static org.bukkit.permissions.Permission COMMAND_DELETE = Bukkit.getPluginManager().getPermission("quake.command.delete");
-    public static org.bukkit.permissions.Permission COMMAND_STOP = Bukkit.getPluginManager().getPermission("quake.command.stop");
     public static org.bukkit.permissions.Permission COMMAND_PLAYER = Bukkit.getPluginManager().getPermission("quake.command.player");
+    public static org.bukkit.permissions.Permission COMMAND_GAME = Bukkit.getPluginManager().getPermission("quake.command.game");
+    public static org.bukkit.permissions.Permission COMMAND_GAME_CREATE = Bukkit.getPluginManager().getPermission("quake.command.game.create");
 
 }

@@ -17,15 +17,13 @@
 package fr.bretzel.quake.command;
 
 import fr.bretzel.commands.CommandExe;
+import fr.bretzel.quake.Permission;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.Create;
 import fr.bretzel.quake.command.partial.Delete;
-import fr.bretzel.quake.command.partial.Stop;
+import fr.bretzel.quake.command.partial.game.PartialGame;
 import fr.bretzel.quake.command.partial.player.PartialPlayer;
-import fr.bretzel.quake.Permission;
-
 import org.apache.commons.lang.StringUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -46,12 +44,13 @@ public class Command extends CommandExe {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
                         if (Quake.gameManager.containsGame(args[1])) {
-
+                            return new PartialGame(sender, command, Permission.COMMAND_GAME, args, Quake.gameManager.getGameByName(args[1])).execute().value();
                         } else {
-
+                            sender.sendMessage(getI18n("util.gameNotFound"));
+                            return true;
                         }
                     } else {
-                        sender.sendMessage(getI18n("command.game"));
+                        sender.sendMessage(getI18n("command.game.usage"));
                         return true;
                     }
                 } else if(args[0].equalsIgnoreCase("players")) {
@@ -64,6 +63,30 @@ public class Command extends CommandExe {
                         }
                     } else {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
+                        return true;
+                    }
+                } else if (args[0].equalsIgnoreCase("create")) {
+                    if (args.length > 1) {
+                        if (Quake.gameManager.getGameByName(args[1]) == null) {
+                            return new Create(sender, command, null, args, args[1]).execute().value();
+                        } else {
+                            sender.sendMessage(getI18n("util.gameAlreadyCreate"));
+                            return true;
+                        }
+                    } else {
+                        sender.sendMessage(getI18n("command.game.create.usage"));
+                        return true;
+                    }
+                } else if (args[0].equalsIgnoreCase("delete")) {
+                    if (args.length > 1) {
+                        if (Quake.gameManager.getGameByName(args[1]) != null) {
+                            return new Delete(sender, command, null, args, args[1]).execute().value();
+                        } else {
+                            sender.sendMessage(getI18n("util.gameNotFound"));
+                            return true;
+                        }
+                    } else {
+                        sender.sendMessage(getI18n("command.game.delete.usage"));
                         return true;
                     }
                 } else if (args[0].equalsIgnoreCase("help")) {
@@ -83,7 +106,6 @@ public class Command extends CommandExe {
             sender.sendMessage(ChatColor.RED + "It must be a player !");
             return true;
         }
-        return false;
     }
 
     public List<String> getHelps() {

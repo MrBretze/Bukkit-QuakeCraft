@@ -3,7 +3,6 @@ package fr.bretzel.quake.command.partial.player;
 import fr.bretzel.commands.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
-
 import fr.bretzel.quake.command.partial.player.coin.PlayerAddCoins;
 import fr.bretzel.quake.command.partial.player.coin.PlayerRemoveCoins;
 import fr.bretzel.quake.command.partial.player.coin.PlayerSetCoins;
@@ -97,7 +96,7 @@ public class PartialPlayer extends IPlayer {
                 }
             } else if (getArgs()[2].equalsIgnoreCase("removecoins")) {
                 if (getArgs().length > 3) {
-                    int i = 0;
+                    int i;
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {

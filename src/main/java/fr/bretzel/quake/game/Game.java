@@ -21,13 +21,10 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -50,7 +47,6 @@ public class Game {
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
-    private LinkedList<Block> blocks = new LinkedList<>();
     private String name;
     private File file;
     private List<UUID> playerList = new ArrayList<>();
@@ -73,10 +69,6 @@ public class Game {
         setSecondLocation(secondLocation);
         setName(name);
         setDisplayName(name);
-
-        for(Block block : Util.blocksFromTwoPoints(getFirstLocation(), getSecondLocation())) {
-            addBlock(block);
-        }
 
         calculeSpawnBase();
 
@@ -221,27 +213,6 @@ public class Game {
         this.secondLocation = location;
     }
 
-    public LinkedList<Block> getBlocks() {
-        return blocks;
-    }
-
-    public void setBlocks(LinkedList<Block> blocks) {
-        this.blocks = blocks;
-    }
-
-    public Block getBlockByLocation(Location location) {
-        for(Block block : getBlocks()) {
-            if(block.getWorld() == location.getWorld() && block.getX() == location.getBlockX() && block.getY() == location.getBlockY() && block.getZ() == location.getBlockZ()) {
-                return block;
-            }
-        }
-        return null;
-    }
-
-    public void addBlock(Block block) {
-        getBlocks().add(block);
-    }
-
     public LinkedList<Sign> getSignList() {
         return signList;
     }
@@ -354,6 +325,27 @@ public class Game {
         setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
     }
 
+    public boolean isInArea(int x, int y, int z) {
+        return isInArea(new Location(getFirstLocation().getWorld(), x, y, z));
+    }
+
+    public boolean isInArea(Player player) {
+        return isInArea(player.getLocation());
+    }
+
+    public boolean isInArea(Location location) {
+        int maxX = (getFirstLocation().getBlockX() < getSecondLocation().getBlockX() ? getSecondLocation().getBlockX() : getFirstLocation().getBlockX());
+        int minX = (getFirstLocation().getBlockX() > getSecondLocation().getBlockX() ? getSecondLocation().getBlockX() : getFirstLocation().getBlockX());
+
+        int maxY = (getFirstLocation().getBlockY() < getSecondLocation().getBlockY() ? getSecondLocation().getBlockY() : getFirstLocation().getBlockY());
+        int minY = (getFirstLocation().getBlockY() > getSecondLocation().getBlockY() ? getSecondLocation().getBlockY() : getFirstLocation().getBlockY());
+
+        int maxZ = (getFirstLocation().getBlockZ() < getSecondLocation().getBlockZ() ? getSecondLocation().getBlockZ() : getFirstLocation().getBlockZ());
+        int minZ = (getFirstLocation().getBlockZ() > getSecondLocation().getBlockZ() ? getSecondLocation().getBlockZ() : getFirstLocation().getBlockZ());
+
+        return location.getBlockX() >= minX && location.getBlockX() <= maxX && location.getBlockY() >= minY && location.getBlockY() <= maxY && location.getBlockZ() >= minZ && location.getBlockZ() <= maxZ;
+    }
+
     public void addKillStreak(Player player, int kill) {
         addKillStreak(player.getUniqueId(), kill);
     }
@@ -366,11 +358,11 @@ public class Game {
         }
     }
 
-    public Integer getKillStreak(Player player) {
+    public int getKillStreak(Player player) {
         return getKillStreak(player.getUniqueId());
     }
 
-    public Integer getKillStreak(UUID uuid) {
+    public int getKillStreak(UUID uuid) {
         return killStreak.get(uuid);
     }
 
@@ -382,12 +374,12 @@ public class Game {
         killStreak.put(uuid, kill);
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
-    }
-
     public Team getTeam() {
         return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public void stop() {

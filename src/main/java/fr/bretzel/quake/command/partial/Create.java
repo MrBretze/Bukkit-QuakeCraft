@@ -9,26 +9,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 /**
- * Created by mrbretzel on 20/07/15.
+ * Created by MrBretzel on 20/07/15.
  */
 public class Create extends PartialCommand {
 
-    private String arena = "null";
+    private String games = "null";
 
-    public Create(CommandSender sender, Command command, Permission permission, String[] args, String arena) {
+    public Create(CommandSender sender, Command command, Permission permission, String[] args, String games) {
         super(sender, command, permission, args);
-        this.arena = arena;
+        this.games = games;
     }
 
     @Override
     public PartialCommand execute() {
         Player player = (Player) getSender();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if("null".equals(arena)) {
+        if ("null".equals(games)) {
             setValue(true);
+            getSender().sendMessage(getI18("command.game.create.nameIsNull"));
             return this;
         }
-        Quake.gameManager.registerGame(player, arena, info.getFirstLocation(), info.getSecondLocation());
+        Quake.gameManager.registerGame(player, games, info.getFirstLocation(), info.getSecondLocation());
         setValue(true);
         return this;
     }
