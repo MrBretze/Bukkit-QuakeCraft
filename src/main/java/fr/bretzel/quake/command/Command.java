@@ -98,6 +98,7 @@ public class Command extends CommandExe {
                     return true;
                 } else {
                     //Other command !
+                    sender.sendMessage("Not a valid command");
                     return true;
                 }
             } else {

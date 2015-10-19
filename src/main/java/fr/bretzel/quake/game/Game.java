@@ -183,9 +183,8 @@ public class Game {
 
     public boolean hasRespawn(Location location) {
         for (Location l : getRespawns()) {
-            if (l.distance(location) < 1) {
+            if (l.distance(location) < 1)
                 return true;
-            }
         }
         return false;
     }

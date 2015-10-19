@@ -170,6 +170,7 @@ public class PlayerInfo {
     public void dash() {
         if (isDash()) {
             Game game = Quake.gameManager.getGameByPlayer(getPlayer());
+            Quake.logDebug("Dash for player " + getPlayer().getDisplayName() + " in game " + game.getDisplayName());
             if (game.getState() == State.STARTED) {
                 PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
                 Bukkit.getPluginManager().callEvent(event);
@@ -177,9 +178,14 @@ public class PlayerInfo {
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
                 Vector pVector = player.getEyeLocation().getDirection();
                 Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
+                Quake.logDebug("The vector for the dash is: " + vector);
                 getPlayer().setVelocity(vector);
                 getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+            } else {
+                Quake.logDebug("The game is not started, the dash is annulled");
             }
+        } else {
+            Quake.logDebug("The dash is annulled because the cooldown is not finish");
         }
     }
 

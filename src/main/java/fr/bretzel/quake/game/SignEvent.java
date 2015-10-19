@@ -18,7 +18,6 @@ package fr.bretzel.quake.game;
 
 
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.Config;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import org.bukkit.Bukkit;
@@ -44,8 +43,8 @@ public class SignEvent implements Listener {
 
     public static String CLICK_TO_QUIT = ChatColor.RED + "Click to quit !";
     public static String CLICK_TO_JOIN = ChatColor.GREEN + "Click to join !";
-    private GameManager manager;
     public String lastPlayerInGame = "lastInGame";
+    private GameManager manager;
 
     public SignEvent(GameManager gameManager) {
         setManager(gameManager);
@@ -116,9 +115,6 @@ public class SignEvent implements Listener {
                     if (player.isSneaking()) {
                         player.sendMessage(ChatColor.GREEN.toString() + "Remove sign for " + game.getName());
                         game.getSignList().remove(sign);
-                        if(Config.USE_WORLDGUARD) {
-                            block.getWorld().getBlockAt(block.getLocation()).setType(Material.AIR);
-                        }
                     } else {
                         player.sendMessage(ChatColor.RED.toString() + "To break this sign please sneak !");
                         event.setCancelled(true);
@@ -175,7 +171,7 @@ public class SignEvent implements Listener {
 
     public void actualiseJoinSignForGame(Game game) {
         for (Sign sign : game.getSignList()) {
-            if (sign.getMetadata("join").get(0).asBoolean()) {
+            if (sign.getChunk().isLoaded() && sign.getMetadata("join").get(0).asBoolean()) {
                 if(!sign.getLocation().getChunk().isLoaded()) {
                     sign.getLocation().getChunk().load();
                 }

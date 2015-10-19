@@ -212,7 +212,7 @@ public class GameManager implements Listener {
         PlayerInfo info = Quake.getPlayerInfo(player);
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
-            if (!game.isInArea(player)) {
+            if (!game.isInArea(event.getTo())) {
                 Location from = event.getFrom();
                 from.setDirection(player.getEyeLocation().getDirection());
                 player.teleport(from);
@@ -322,8 +322,6 @@ public class GameManager implements Listener {
                 if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
                     event.setCancelled(true);
                 }
-            } else {
-                event.setCancelled(true);
             }
         }
     }

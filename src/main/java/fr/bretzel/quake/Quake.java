@@ -22,6 +22,8 @@ import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.language.LanguageManager;
 import fr.bretzel.quake.reader.GameReader;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -47,16 +49,14 @@ public class Quake extends JavaPlugin {
     private static LanguageManager languageManager;
     private static boolean debug = false;
 
-    //TODO: Plus de debug log
-
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
             if (pi.getPlayer() == player) {
                 return pi;
             }
         }
-
         PlayerInfo info = new PlayerInfo(player);
+        logDebug("Register new player by uuid: " + info.getPlayer().getUniqueId());
         playerInfos.add(info);
         return info;
     }
@@ -73,29 +73,31 @@ public class Quake extends JavaPlugin {
         return debug;
     }
 
+    public static void logDebug(String msg) {
+        if (isDebug())
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "[DEBUG]" + ChatColor.RESET + ": " + ChatColor.WHITE + msg);
+    }
+
+    public static void logInfo(String msg) {
+        Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "[INFO]: " + msg);
+    }
+
     @Override
     public void onEnable() {
         quake = this;
-
+        logDebug("Starting initialing Holomanager");
         holoManager = new HologramManager(this);
+        logDebug("End initialing Holomanager");
 
         getDataFolder().mkdir();
 
         manager = getServer().getPluginManager();
 
+        logDebug("Starting initialing Gamemanager");
         gameManager = new GameManager();
+        logDebug("End initialing Gamemanager");
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
-
-        File file = new File(getDataFolder(), File.separator + "game" + File.separator);
-
-        if(file.exists() && file.isDirectory()) {
-            if(file.listFiles().length > 0) {
-                initGame(file);
-            }
-        }
-
-        Config.initialize();
 
         saveResource("config.yml", false);
 
@@ -103,9 +105,18 @@ public class Quake extends JavaPlugin {
 
         debug = getConfig().getBoolean("debug");
 
+        logDebug("Starting initialing LanguageManager");
         Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
-
         languageManager = new LanguageManager(locale);
+        logDebug("Starting initialing LanguageManager");
+
+        File file = new File(getDataFolder(), File.separator + "game" + File.separator);
+
+        if (file.exists() && file.isDirectory()) {
+            if (file.listFiles().length > 0) {
+                initGame(file);
+            }
+        }
     }
 
     @Override
@@ -128,9 +139,7 @@ public class Quake extends JavaPlugin {
                 Player player = (Player) sender;
                 Util.spawnFirework(Util.getCircle(player.getLocation(), 0.4, 6));
                 return true;
-            } else {
-                return true;
-            }
+            } else return true;
         }
         return true;
     }
@@ -139,7 +148,9 @@ public class Quake extends JavaPlugin {
         for (File f : file.listFiles()) {
             try {
                 Game game = GameReader.read(NBTCompressedStreamTools.read(new FileInputStream(f)), f);
+                logDebug("Initialing game: " + game.getDisplayName());
                 gameManager.getGameLinkedList().add(game);
+                gameManager.signEvent.actualiseJoinSignForGame(game);
             } catch (IOException e) {
                 e.printStackTrace();
             }
