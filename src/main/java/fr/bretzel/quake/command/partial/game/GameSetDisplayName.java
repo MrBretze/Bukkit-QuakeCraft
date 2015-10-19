@@ -1,6 +1,7 @@
 package fr.bretzel.quake.command.partial.game;
 
 import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,15 @@ public class GameSetDisplayName extends IGame {
 
     @Override
     public PartialCommand execute() {
-        return this;
+        if (getArgs().length > 3) {
+            String name = getArgs()[3];
+            getGame().setDisplayName(name);
+            getSender().sendMessage(getI18("command.game.setdisplayname.valid").replace("%value%", name));
+            Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
+            return this;
+        } else {
+            getSender().sendMessage(getI18("command.game.setdisplayname.usage"));
+            return this;
+        }
     }
 }

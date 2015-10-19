@@ -25,6 +25,7 @@ public class GameAddRespawn extends IGame {
         if (getGame().isView()) {
             getGame().view(true);
         }
+        getSender().sendMessage("command.game.addrespawn.valid");
         return this;
     }
 }

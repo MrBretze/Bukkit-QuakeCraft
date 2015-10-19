@@ -150,9 +150,6 @@
         },
         {
           "4": "&c/quake create <game>"
-        },
-        {
-          "5": "&c/quake stop <game>"
         }
       ]
     },
@@ -164,43 +161,55 @@
         {
           "setdisplayname": [
             {
-              "usage": "&cUsage: /quake game <games> setdisplayname <dysplayname>"
+              "usage": "&cUsage: /quake game <games> setdisplayname <value>"
             },
             {
-              "valid": "&aThe display name "
+              "valid": "&aThe display name has been set to: %value%"
             }
           ]
         },
         {
           "setmaxplayer": [
             {
-              "usage": "&cUsage: /quake players <player> addwon <won>"
+              "usage": "&cUsage: /quake game <game> setminplayer <value>"
             },
             {
-              "valid": "&aRemove coins: %won% won !"
+              "error": "&cPlease use a valid number !"
+            },
+            {
+              "error2": "&cThe number must be greater than 2"
+            },
+            {
+              "valid": "&aThe max player for the game has been set to: %value%"
             }
           ]
         },
         {
           "setminplayer": [
             {
-              "usage": "&cUsage: /quake players <player> addwon <won>"
+              "usage": "&cUsage: /quake game <game> setminplayer <value>"
             },
             {
-              "valid": "&aRemove coins: %won% won !"
+              "error": "&cPlease use a valid number !"
+            },
+            {
+              "error2": "&cThe number must be greater than 2"
+            },
+            {
+              "valid": "&aThe minimum player to start the game has been set to: %value%"
             }
           ]
         },
         {
           "addrespawn": [
             {
-              "usage": "&cUsage: /quake players <player> addwon <won>"
+              "usage": "&cUsage: /quake game <game> addrespawn"
             },
             {
               "error": "&cThe respawn point is already used !"
             },
             {
-              "valid": "&aRemove coins: %won% won !"
+              "valid": "&aYou have been add a respawn point !"
             }
           ]
         },

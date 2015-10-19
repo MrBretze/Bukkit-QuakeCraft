@@ -44,8 +44,8 @@ public class Command extends CommandExe {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
                         if (Quake.gameManager.containsGame(args[1])) {
-                            // /quake args0 args1  args2    args3...
-                            // /quake game  <game> delete
+                            // /quake args0 args1  args2         args3...
+                            // /quake game  <game> setmineplayer 87
                             return new PartialGame(sender, command, Permission.COMMAND_GAME, args, Quake.gameManager.getGameByName(args[1])).execute().value();
                         } else {
                             sender.sendMessage(getI18n("util.gameNotFound"));
