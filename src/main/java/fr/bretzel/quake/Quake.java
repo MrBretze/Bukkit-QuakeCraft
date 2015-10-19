@@ -37,7 +37,6 @@ import java.util.Locale;
 /**
  * Created by MrBretzel on 09/06/2015.
  */
-
 public class Quake extends JavaPlugin {
 
     public static PluginManager manager;
@@ -46,6 +45,9 @@ public class Quake extends JavaPlugin {
     public static HologramManager holoManager;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
     private static LanguageManager languageManager;
+    private static boolean debug = false;
+
+    //TODO: Plus de debug log
 
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
@@ -65,6 +67,10 @@ public class Quake extends JavaPlugin {
 
     public static String getI18n(String key) {
         return languageManager.getI18n(key);
+    }
+
+    public static boolean isDebug() {
+        return debug;
     }
 
     @Override
@@ -94,6 +100,8 @@ public class Quake extends JavaPlugin {
         saveResource("config.yml", false);
 
         reloadConfig();
+
+        debug = getConfig().getBoolean("debug");
 
         Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
 
