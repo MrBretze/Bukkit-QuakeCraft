@@ -156,7 +156,7 @@
     {
       "game": [
         {
-          "usage": "&c/quake game <games> <setdisplayname | setspawn |setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+          "usage": "&c/quake game <games> <setdisplayname | view | setspawn |setmaxplayer | setminplayer | addrespawn | deleterespawn>"
         },
         {
           "setdisplayname": [
@@ -238,7 +238,7 @@
               "usage": "&cUsage: /quake game <game> view <true | false>"
             },
             {
-              "error": "&cThe location you are is not valid"
+              "error": "&cThe %value% is not a boolean !"
             },
             {
               "validTrue": "&aYou view the all respawn point !"

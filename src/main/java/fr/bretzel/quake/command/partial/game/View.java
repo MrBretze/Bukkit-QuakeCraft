@@ -22,7 +22,7 @@ public class View extends IGame {
             try {
                 b = Boolean.valueOf(getArgs()[3]);
             } catch (Exception e) {
-                getSender().sendMessage("command.game.view.error");
+                getSender().sendMessage(getI18("command.game.view.error").replace("%value%", getArgs()[3]));
                 return this;
             }
             getGame().view(b);
