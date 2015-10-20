@@ -9,9 +9,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class GameAddRespawn extends IGame {
+public class AddRespawn extends IGame {
 
-    public GameAddRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public AddRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
     }
 

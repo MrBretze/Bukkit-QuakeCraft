@@ -10,9 +10,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 18/10/2015.
  */
-public class GameDeleteRespawn extends IGame {
+public class DeleteRespawn extends IGame {
 
-    public GameDeleteRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public DeleteRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
     }
 

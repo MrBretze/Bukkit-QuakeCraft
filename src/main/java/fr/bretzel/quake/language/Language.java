@@ -19,9 +19,7 @@ package fr.bretzel.quake.language;
 
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
-
 import org.apache.commons.lang.StringEscapeUtils;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -35,8 +33,8 @@ import java.util.Locale;
  */
 public class Language {
 
-    private JSONObject object;
     private static HashMap<String, String> maps = new HashMap<>();
+    private JSONObject object;
 
     public Language(Locale locale) {
         maps.clear();
@@ -128,6 +126,8 @@ public class Language {
     }
 
     public String get(String key) {
-        return maps.get(key);
+        if (maps.containsKey(key))
+            return maps.get(key);
+        return key;
     }
 }

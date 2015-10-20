@@ -156,7 +156,7 @@
     {
       "game": [
         {
-          "usage": "&c/quake game <games> <setdisplayname | setmaxplayer | setminplayer | addrespawn | deleterespawn>"
+          "usage": "&c/quake game <games> <setdisplayname | setspawn |setmaxplayer | setminplayer | addrespawn | deleterespawn>"
         },
         {
           "setdisplayname": [
@@ -224,6 +224,28 @@
             {
               "valid": "&aThe respawn has been has been deleted !"
             }
+          ],
+          "setspawn": [
+            {
+              "usage": "&cUsage: /quake game <game> setspawn"
+            },
+            {
+              "valid": "&aThe spawn of this game has been set !"
+            }
+          ],
+          "view": [
+            {
+              "usage": "&cUsage: /quake game <game> view <true | false>"
+            },
+            {
+              "error": "&cThe location you are is not valid"
+            },
+            {
+              "validTrue": "&aYou view the all respawn point !"
+            },
+            {
+              "validFalse": "&aYou do not view the all respawn point !"
+            }
           ]
         },
         {
@@ -249,7 +271,7 @@
   ],
   "util": [
     {
-      "playerNotInAGame": "&cThe is not in a game !"
+      "playerNotInAGame": "&cThe player is not in a game !"
     },
     {
       "playerCanNotBeFound": "acThe player can not be found !"

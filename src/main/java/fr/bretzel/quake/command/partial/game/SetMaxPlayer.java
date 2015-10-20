@@ -9,9 +9,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class GameSetMinPlayer extends IGame {
+public class SetMaxPlayer extends IGame {
 
-    public GameSetMinPlayer(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public SetMaxPlayer(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
     }
 
@@ -22,18 +22,18 @@ public class GameSetMinPlayer extends IGame {
             try {
                 i = Integer.valueOf(getArgs()[3]);
             } catch (Exception e) {
-                getSender().sendMessage(getI18("command.game.setminplayer.error"));
+                getSender().sendMessage(getI18("command.game.setmaxplayer.error"));
                 return this;
             }
             if (i < 2) {
-                getSender().sendMessage(getI18("command.game.setminplayer.error2"));
+                getSender().sendMessage(getI18("command.game.setmaxplayer.error2"));
                 return this;
             }
-            getGame().setMinPlayer(i);
-            getSender().sendMessage(getI18("command.game.setminplayer.valid").replace("%value%", String.valueOf(i)));
+            getGame().setMaxPlayer(i);
+            getSender().sendMessage(getI18("command.game.setmaxplayer.valid").replace("%value%", String.valueOf(i)));
             return this;
         } else {
-            getSender().sendMessage(getI18("command.game.setminplayer.usage"));
+            getSender().sendMessage(getI18("command.game.setmaxplayer.usage"));
             return this;
         }
     }

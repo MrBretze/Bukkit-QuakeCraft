@@ -61,10 +61,6 @@ public class LanguageManager {
         return defaultLanguage;
     }
 
-    public void setDefaultLanguage(Language defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
-    }
-
     public Language getSelectedLanguage() {
         return selectedLanguage;
     }
@@ -75,10 +71,6 @@ public class LanguageManager {
 
     public Locale getDefaultLocale() {
         return defaultLocale;
-    }
-
-    public void setDefaultLocale(Locale defaultLocale) {
-        this.defaultLocale = defaultLocale;
     }
 
     public Locale getSelectedLocale() {

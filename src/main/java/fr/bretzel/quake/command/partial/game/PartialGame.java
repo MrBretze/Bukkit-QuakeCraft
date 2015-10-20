@@ -37,32 +37,51 @@ public class PartialGame extends IGame {
         if (getArgs().length > 2) {
             if (getArgs()[2].equalsIgnoreCase("setdisplayname")) {
                 if (getArgs().length > 3) {
-                    return new GameSetDisplayName(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                    return new SetDisplayName(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
                 } else {
+                    getSender().sendMessage(getI18("command.game.setdisplayname.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setmaxplayer")) {
                 if (getArgs().length > 3) {
-                    return new GameSetMaxPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                    return new SetMaxPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
                 } else {
+                    getSender().sendMessage(getI18("command.game.setmaxplayer.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setminplayer")) {
                 if (getArgs().length > 3) {
-                    return new GameSetMinPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                    return new SetMinPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
                 } else {
+                    getSender().sendMessage(getI18("command.game.setminplayer.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("addrespawn")) {
                 if (getArgs().length > 3) {
-                    return new GameAddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                    return new AddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
                 } else {
+                    getSender().sendMessage(getI18("command.game.addrespawn.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("deleterespawn")) {
                 if (getArgs().length > 3) {
-                    return new GameDeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                    return new DeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
                 } else {
+                    getSender().sendMessage(getI18("command.game.deleterespawn.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("setspawn")) {
+                if (getArgs().length > 3) {
+                    return new SetSpawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.game.setspawn.usage"));
+                    return this;
+                }
+            } else if (getArgs()[2].equalsIgnoreCase("view")) {
+                if (getArgs().length > 3) {
+                    return new View(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+                } else {
+                    getSender().sendMessage(getI18("command.game.view.usage"));
                     return this;
                 }
             } else {

@@ -10,9 +10,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class GameSetDisplayName extends IGame {
+public class SetDisplayName extends IGame {
 
-    public GameSetDisplayName(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public SetDisplayName(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
     }
 
