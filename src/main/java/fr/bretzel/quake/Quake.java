@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Lo�c Nussbaumer
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -32,10 +32,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -87,36 +89,52 @@ public class Quake extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!new File(getDataFolder() + "/lang/").exists()) {
-            CodeSource src = getClass().getProtectionDomain().getCodeSource();
-            if (src != null) {
-                URL jar = src.getLocation();
-                try {
-                    ZipInputStream zip = new ZipInputStream(jar.openStream());
-                    while (true) {
-                        ZipEntry e = zip.getNextEntry();
-                        if (e == null)
-                            break;
-                        String name = e.getName();
-                        if (name.startsWith("lang/") && name.endsWith(".json")) {
-                            System.out.print(name);
+        quake = this;
+
+        CodeSource src = getClass().getProtectionDomain().getCodeSource();
+        if (src != null) {
+            URL jar = src.getLocation();
+            try {
+                ZipInputStream zip = new ZipInputStream(jar.openStream());
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    ZipEntry e = zip.getNextEntry();
+                    if (e == null)
+                        break;
+                    String name = e.getName();
+                    if (name.startsWith("lang/") && name.endsWith(".json")) {
+                        new File(getDataFolder() + "/lang/").mkdir();
+                        File f = new File(getDataFolder() + "/lang/", name.replace("lang/", ""));
+                        if (!f.exists())
+                            f.createNewFile();
+                        FileOutputStream out = new FileOutputStream(f);
+
+                        int len;
+                        while ((len = zip.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
                         }
+                        out.close();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            } else {
-                logInfo("ERROR LANGUAGE NOT INITIALED !");
-                setEnabled(false);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+        } else {
+            logInfo("ERROR LANGUAGE NOT INITIALED !");
+            setEnabled(false);
         }
+
         saveResource("config.yml", false);
 
         reloadConfig();
 
         debug = getConfig().getBoolean("debug");
 
-        quake = this;
+        logDebug("Starting initialing LanguageManager");
+        Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
+        languageManager = new LanguageManager(locale);
+        logDebug("Starting initialing LanguageManager");
+
         logDebug("Starting initialing Holomanager");
         holoManager = new HologramManager(this);
         logDebug("End initialing Holomanager");
@@ -131,11 +149,6 @@ public class Quake extends JavaPlugin {
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
 
-        /**logDebug("Starting initialing LanguageManager");
-        Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
-        languageManager = new LanguageManager(locale);
-         logDebug("Starting initialing LanguageManager");*/
-
         File file = new File(getDataFolder(), File.separator + "game" + File.separator);
 
         if (file.exists() && file.isDirectory()) {
@@ -149,19 +162,19 @@ public class Quake extends JavaPlugin {
     public void onDisable() {
         saveConfig();
 
-        for(PlayerInfo playerInfo : playerInfos) {
+        for (PlayerInfo playerInfo : playerInfos) {
             playerInfo.save();
         }
 
-        for(Game game : gameManager.getGameLinkedList()) {
+        for (Game game : gameManager.getGameLinkedList()) {
             game.save();
         }
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(label.equals("test")) {
-            if(sender instanceof Player) {
+        if (label.equals("test")) {
+            if (sender instanceof Player) {
                 Player player = (Player) sender;
                 Util.spawnFirework(Util.getCircle(player.getLocation(), 0.4, 6));
                 return true;
