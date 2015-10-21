@@ -33,8 +33,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.security.CodeSource;
 import java.util.LinkedList;
-import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by MrBretzel on 09/06/2015.
@@ -84,6 +87,35 @@ public class Quake extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (!new File(getDataFolder() + "/lang/").exists()) {
+            CodeSource src = getClass().getProtectionDomain().getCodeSource();
+            if (src != null) {
+                URL jar = src.getLocation();
+                try {
+                    ZipInputStream zip = new ZipInputStream(jar.openStream());
+                    while (true) {
+                        ZipEntry e = zip.getNextEntry();
+                        if (e == null)
+                            break;
+                        String name = e.getName();
+                        if (name.startsWith("lang/") && name.endsWith(".json")) {
+                            System.out.print(name);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                logInfo("ERROR LANGUAGE NOT INITIALED !");
+                setEnabled(false);
+            }
+        }
+        saveResource("config.yml", false);
+
+        reloadConfig();
+
+        debug = getConfig().getBoolean("debug");
+
         quake = this;
         logDebug("Starting initialing Holomanager");
         holoManager = new HologramManager(this);
@@ -99,16 +131,10 @@ public class Quake extends JavaPlugin {
 
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
 
-        saveResource("config.yml", false);
-
-        reloadConfig();
-
-        debug = getConfig().getBoolean("debug");
-
-        logDebug("Starting initialing LanguageManager");
+        /**logDebug("Starting initialing LanguageManager");
         Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
         languageManager = new LanguageManager(locale);
-        logDebug("Starting initialing LanguageManager");
+         logDebug("Starting initialing LanguageManager");*/
 
         File file = new File(getDataFolder(), File.separator + "game" + File.separator);
 

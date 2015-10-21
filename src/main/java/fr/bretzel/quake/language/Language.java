@@ -19,11 +19,13 @@ package fr.bretzel.quake.language;
 
 import fr.bretzel.json.JSONArray;
 import fr.bretzel.json.JSONObject;
-import org.apache.commons.lang.StringEscapeUtils;
+import fr.bretzel.quake.Quake;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -38,7 +40,13 @@ public class Language {
 
     public Language(Locale locale) {
         maps.clear();
-        object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
+        //object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
+        try {
+            object = new JSONObject(fileToJson(new File(Quake.quake.getDataFolder() + "/lang/", locale.getLanguage() + "_" + locale.getCountry() + ".json")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         addJsonObject(object, "");
     }
 
@@ -67,24 +75,6 @@ public class Language {
         }
     }
 
-    private String formatizeKey(String key) {
-        if (key.startsWith(".")) {
-            key = key.replaceFirst(".", "");
-        }
-        if(key.endsWith(".") && key.length() > 0) {
-            key = key.substring(0, key.length()-1);
-        }
-        return key.replace("..", ".").trim();
-    }
-
-    private void add(String key, String value) {
-        if(!maps.containsKey(key)) {
-            maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
-        } else {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "The language {Key:" + key + ", Value:" + maps.get(key) + "} is already registered !");
-        }
-    }
-
     private void addJsonObject(JSONObject jsonObject, String key) {
         for (String k : jsonObject.keySet()) {
             Object o = jsonObject.get(k);
@@ -101,24 +91,26 @@ public class Language {
         }
     }
 
-    private String fileToJson(InputStream stream) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+    private String formatizeKey(String key) {
+        if (key.startsWith(".")) {
+            key = key.replaceFirst(".", "");
         }
-        StringBuilder builder = new StringBuilder();
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                line = StringEscapeUtils.unescapeJava(line);
-                builder.append(line.trim());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (key.endsWith(".") && key.length() > 0) {
+            key = key.substring(0, key.length() - 1);
         }
-        return builder.toString();
+        return key.replace("..", ".").trim();
+    }
+
+    private void add(String key, String value) {
+        if (!maps.containsKey(key)) {
+            maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
+        } else {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "The language {Key:" + key + ", Value:" + maps.get(key) + "} is already registered !");
+        }
+    }
+
+    private String fileToJson(File file) throws IOException {
+        return new String(Files.readAllBytes(file.toPath()));
     }
 
     public boolean hasKey(String key) {

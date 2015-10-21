@@ -259,8 +259,8 @@ public class Game {
     }
 
     public void view(boolean view) {
+        this.respawnview = view;
         if (view) {
-            this.respawnview = true;
             int s = 0;
             for (Location location : getRespawns()) {
                 s++;
@@ -273,7 +273,6 @@ public class Game {
                 }
             }
         } else {
-            this.respawnview = false;
             for (Location location : getRespawns()) {
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
                 if(hologram != null)
