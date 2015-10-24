@@ -18,13 +18,13 @@ public class DeleteRespawn extends IGame {
 
     @Override
     public PartialCommand execute() {
-        if (!getGame().hasRespawn(getPlayer().getLocation())) {
+        if (!getGame().hasRespawn(getPlayer().getEyeLocation())) {
             getSender().sendMessage(getI18("command.game.deleterespawn.error"));
             return this;
         }
         if (getGame().isView())
-            Quake.holoManager.removeHologram(getGame().getRespawn(getPlayer().getLocation()));
-        getGame().removeRespawn(getPlayer().getLocation());
+            Quake.holoManager.removeHologram(getGame().getRespawn(getPlayer().getEyeLocation()));
+        getGame().removeRespawn(getPlayer().getEyeLocation());
         getSender().sendMessage(getI18("command.game.deleterespawn.valid"));
         return this;
     }

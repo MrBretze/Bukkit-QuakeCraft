@@ -17,7 +17,6 @@
 package fr.bretzel.quake;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.util.Vector;
@@ -124,30 +123,6 @@ public class Util {
         playSound(new Location(world, x, y, z), sound, f1, f2);
     }
 
-    public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2) {
-        List<Block> blocks = new ArrayList<>();
-
-        int topBlockX = (loc1.getBlockX() < loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
-        int bottomBlockX = (loc1.getBlockX() > loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
-
-        int topBlockY = (loc1.getBlockY() < loc2.getBlockY() ? loc2.getBlockY() : loc1.getBlockY());
-        int bottomBlockY = (loc1.getBlockY() > loc2.getBlockY() ? loc2.getBlockY() : loc1.getBlockY());
-
-        int topBlockZ = (loc1.getBlockZ() < loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
-        int bottomBlockZ = (loc1.getBlockZ() > loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
-
-        for (int x = bottomBlockX; x <= topBlockX; x++) {
-            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
-                for (int y = bottomBlockY; y <= topBlockY; y++) {
-                    Block block = loc1.getWorld().getBlockAt(x, y, z);
-                    blocks.add(block);
-                }
-            }
-        }
-
-        return blocks;
-    }
-
     public static String toStringLocation(Location location) {
         return (location.getWorld().getName() + ";") +
                 location.getBlockX() + ";" +
@@ -193,23 +168,7 @@ public class Util {
     public static void shootFirework(Location location) {
         Random random = new Random();
         int fType = random.nextInt(5) + 1;
-        FireworkEffect.Type type = null;
-        switch (fType) {
-            case 1:
-                type = FireworkEffect.Type.BALL;
-                break;
-            case 2:
-                type = FireworkEffect.Type.BALL_LARGE;
-                break;
-            case 3:
-                type = FireworkEffect.Type.BURST;
-                break;
-            case 4:
-                type = FireworkEffect.Type.CREEPER;
-                break;
-            case 5:
-                type = FireworkEffect.Type.STAR;
-        }
+        FireworkEffect.Type type = getFireworkType(fType);
         FireworkEffect effect = FireworkEffect.builder().withFade(Arrays.asList(getColor(), getColor(), getColor()))
                 .with(type)
                 .withColor(Arrays.asList(getColor(), getColor(), getColor()))
@@ -234,6 +193,23 @@ public class Util {
         }
     }
 
+    public static FireworkEffect.Type getFireworkType(int i) {
+        switch (i) {
+            case 1:
+                return FireworkEffect.Type.BALL;
+            case 2:
+                return FireworkEffect.Type.BALL_LARGE;
+            case 3:
+                return FireworkEffect.Type.BURST;
+            case 4:
+                return FireworkEffect.Type.CREEPER;
+            case 5:
+                return FireworkEffect.Type.STAR;
+            default:
+                return FireworkEffect.Type.BALL;
+        }
+    }
+
     public static void spawnFirework(List<Location> location) {
         Iterator<Location> iterator = location.iterator();
         while (iterator.hasNext()) {
@@ -242,12 +218,7 @@ public class Util {
             Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
             FireworkMeta fwm = fw.getFireworkMeta();
             int rt = random.nextInt(5) + 1;
-            FireworkEffect.Type type = FireworkEffect.Type.BALL;
-            if (rt == 1) type = FireworkEffect.Type.BALL;
-            if (rt == 2) type = FireworkEffect.Type.BALL_LARGE;
-            if (rt == 3) type = FireworkEffect.Type.BURST;
-            if (rt == 4) type = FireworkEffect.Type.CREEPER;
-            if (rt == 5) type = FireworkEffect.Type.STAR;
+            FireworkEffect.Type type = getFireworkType(rt);
             int u = random.nextInt(256);
             int b = random.nextInt(256);
             int g = random.nextInt(256);
@@ -262,68 +233,6 @@ public class Util {
             fwm.setPower(rp);
             fw.setFireworkMeta(fwm);
         }
-    }
-
-    public static String getCardinalDirection(Player player) {
-        double rotation = (player.getLocation().getYaw() - 90) % 360;
-        if (rotation < 0) {
-            rotation += 360.0;
-        }
-        if (0 <= rotation && rotation < 22.5) {
-            return "N";
-        } else if (22.5 <= rotation && rotation < 67.5) {
-            return "NE";
-        } else if (67.5 <= rotation && rotation < 112.5) {
-            return "E";
-        } else if (112.5 <= rotation && rotation < 157.5) {
-            return "SE";
-        } else if (157.5 <= rotation && rotation < 202.5) {
-            return "S";
-        } else if (202.5 <= rotation && rotation < 247.5) {
-            return "SW";
-        } else if (247.5 <= rotation && rotation < 292.5) {
-            return "W";
-        } else if (292.5 <= rotation && rotation < 337.5) {
-            return "NW";
-        } else if (337.5 <= rotation && rotation < 360.0) {
-            return "N";
-        } else {
-            return null;
-        }
-    }
-
-    public static Location getRollBackLocation(Player player) {
-        Location location = player.getLocation();
-        switch (getCardinalDirection(player)) {
-            case "N":
-                location.add(0, 0, -1);
-                break;
-            case "E":
-                location.add(1, 0, 0);
-                break;
-            case "S":
-                location.add(0, 0, 1);
-                break;
-            case "W":
-                location.add(-1, 0, 0);
-                break;
-            case "NE":
-                location.add(1, 0, -1);
-                break;
-            case "SE":
-                location.add(1, 0, 1);
-                break;
-            case "NW":
-                location.add(-1, 0, -1);
-                break;
-            case "SW":
-                location.add(-1, 0, 1);
-                break;
-            default:
-                location.add(0, 0, -1);
-                break;
-        }
-        return location;
     }
 
     public static List<Location> getCircle(Location center, double radius, int amount){

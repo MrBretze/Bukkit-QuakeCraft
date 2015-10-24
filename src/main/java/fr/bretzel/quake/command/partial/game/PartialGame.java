@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- * <p>
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -56,27 +56,6 @@ public class PartialGame extends IGame {
                     getSender().sendMessage(getI18("command.game.setminplayer.usage"));
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("addrespawn")) {
-                if (getArgs().length > 3) {
-                    return new AddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
-                    getSender().sendMessage(getI18("command.game.addrespawn.usage"));
-                    return this;
-                }
-            } else if (getArgs()[2].equalsIgnoreCase("deleterespawn")) {
-                if (getArgs().length > 3) {
-                    return new DeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
-                    getSender().sendMessage(getI18("command.game.deleterespawn.usage"));
-                    return this;
-                }
-            } else if (getArgs()[2].equalsIgnoreCase("setspawn")) {
-                if (getArgs().length > 3) {
-                    return new SetSpawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
-                    getSender().sendMessage(getI18("command.game.setspawn.usage"));
-                    return this;
-                }
             } else if (getArgs()[2].equalsIgnoreCase("view")) {
                 if (getArgs().length > 3) {
                     return new View(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
@@ -84,6 +63,12 @@ public class PartialGame extends IGame {
                     getSender().sendMessage(getI18("command.game.view.usage"));
                     return this;
                 }
+            } else if (getArgs()[2].equalsIgnoreCase("addrespawn")) {
+                return new AddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+            } else if (getArgs()[2].equalsIgnoreCase("deleterespawn")) {
+                return new DeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
+            } else if (getArgs()[2].equalsIgnoreCase("setspawn")) {
+                return new SetSpawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
             } else {
                 getSender().sendMessage(getI18("command.game.usage"));
                 return this;

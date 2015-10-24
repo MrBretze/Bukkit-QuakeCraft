@@ -21,6 +21,7 @@ import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.Serializable;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
@@ -40,7 +41,7 @@ import java.util.*;
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class Game {
+public class Game implements Serializable {
 
     private LinkedList<Location> respawn = new LinkedList<>();
     private List<Location> usedLoc = new ArrayList<>();
@@ -183,7 +184,7 @@ public class Game {
 
     public boolean hasRespawn(Location location) {
         for (Location l : getRespawns()) {
-            if (l.distance(location) < 1)
+            if (location.distance(l) < 1.5)
                 return true;
         }
         return false;
@@ -191,7 +192,7 @@ public class Game {
 
     public Location getRespawn(Location location) {
         for (Location l : getRespawns()) {
-            if (l.distance(location) < 1)
+            if (location.distance(l) < 1.5)
                 return l;
         }
         return null;
@@ -497,5 +498,11 @@ public class Game {
     @Override
     public String toString() {
         return "{" + getFirstLocation().toString() + ", " + getSecondLocation().toString() + ", " + "ArenaName: " + getName() + "}";
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        Map map = new HashMap();
+        return map;
     }
 }
