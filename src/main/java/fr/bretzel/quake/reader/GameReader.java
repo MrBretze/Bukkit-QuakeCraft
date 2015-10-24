@@ -68,7 +68,8 @@ public class GameReader {
         compound.setString("location2", Util.toStringLocation(game.getSecondLocation()));
         compound.setString("spawn", Util.toStringLocation(game.getSpawn()));
         compound.setString("displayName", game.getDisplayName());
-
+        compound.setInt("maxPlayer", game.getMaxPlayer());
+        compound.setInt("minPlayer", game.getMinPlayer());
         return compound;
     }
 
@@ -82,7 +83,8 @@ public class GameReader {
         game.setFirstLocation(Util.toLocationString(compound.getString("location1")));
         game.setSecondLocation(Util.toLocationString(compound.getString("location2")));
         game.setSpawn(Util.toLocationString(compound.getString("spawn")));
-
+        game.setMaxPlayer(compound.getInt("maxPlayer"));
+        game.setMinPlayer(compound.getInt("minPlayer"));
 
         if (compound.hasKey("signs")) {
             NBTTagCompound s = compound.getCompound("signs");

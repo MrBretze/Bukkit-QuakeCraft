@@ -171,7 +171,7 @@ public class SignEvent implements Listener {
 
     public void actualiseJoinSignForGame(Game game) {
         for (Sign sign : game.getSignList()) {
-            if (sign.getChunk().isLoaded() && sign.getMetadata("join").get(0).asBoolean()) {
+            if (sign != null && sign.getChunk().isLoaded() && sign.getMetadata("join").get(0).asBoolean()) {
                 if(!sign.getLocation().getChunk().isLoaded()) {
                     sign.getLocation().getChunk().load();
                 }
