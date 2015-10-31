@@ -22,6 +22,8 @@ public class Map implements Savable {
 
     @Override
     public HashMap<String, Object> save() {
-        return null;
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("selection", selection.save());
+        return data;
     }
 }
