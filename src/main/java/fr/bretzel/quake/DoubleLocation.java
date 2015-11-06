@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Created by MrBretzel on 30/10/2015.
@@ -63,14 +62,18 @@ public class DoubleLocation implements Savable {
     }
 
     public World getWorld() {
-        return Objects.equals(getLocationOne().getWorld().getName(), getLocationTwo().getWorld().getName()) ? getLocationOne().getWorld() : null;
+        if (getLocationOne().getWorld() == null || getLocationTwo().getWorld() == null)
+            return null;
+        else if (getLocationOne().getWorld().getName().equalsIgnoreCase(getLocationTwo().getWorld().getName()))
+            return getLocationOne().getWorld();
+        return null;
     }
 
     @Override
     public HashMap<String, Object> save() {
         HashMap<String, Object> data = Maps.newHashMap();
-        data.put("loc1", loc1.serialize());
-        data.put("loc2", loc2.serialize());
+        data.put("loc1", Util.toStringLocation(getLocationOne()));
+        data.put("loc2", Util.toStringLocation(getLocationTwo()));
         return data;
     }
 }
