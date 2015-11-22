@@ -1,20 +1,22 @@
 package fr.bretzel.quake;
 
-import java.util.HashMap;
+import fr.bretzel.quake.api.IGame;
 
 /**
  * Created by MrBretzel on 30/10/2015.
  */
-public class Game implements Savable {
+public class Game implements IGame {
 
     private Map map;
     private int maxPlayer;
     private int minPlayer;
     private int maxKill;
     private Config config;
+    private GameState state = GameState.UNKNOW;
 
     public Game(Map map, Config config) {
-
+        this.map = map;
+        this.config = config;
     }
 
     public Config getConfig() {
@@ -35,11 +37,6 @@ public class Game implements Savable {
 
     public Map getMap() {
         return map;
-    }
-
-    @Override
-    public HashMap<String, Object> save() {
-        return null;
     }
 
     public enum GameState {

@@ -1,76 +1,114 @@
 package fr.bretzel.quake;
 
-import com.google.common.collect.Maps;
+import fr.bretzel.quake.api.IDoubleLocation;
+import fr.bretzel.quake.api.IQuakePlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by MrBretzel on 30/10/2015.
  */
-public class DoubleLocation implements Savable {
+public class DoubleLocation implements IDoubleLocation {
 
-    private Location loc1;
-    private Location loc2;
+    private Location locationOne;
+    private Location locationTwo;
 
     public DoubleLocation(Location one, Location two) {
-        this.loc1 = one;
-        this.loc2 = two;
-    }
-
-    public static DoubleLocation load(HashMap<String, Object> data) {
-        if (!data.containsKey("loc1") || !data.containsKey("loc2"))
-            throw new NullPointerException("The HahMap could not contains the key loc1 or loc2");
-        return new DoubleLocation(Location.deserialize((java.util.Map<String, Object>) data.get("loc1")), Location.deserialize((java.util.Map<String, Object>) data.get("loc2")));
-    }
-
-    public Location getLocationOne() {
-        return loc1;
-    }
-
-    public Location getLocationTwo() {
-        return loc2;
-    }
-
-    public double distance() {
-        return getLocationOne().distance(getLocationTwo());
-    }
-
-    public int getMaxX() {
-        return (getLocationOne().getBlockX() < getLocationTwo().getBlockX() ? getLocationTwo().getBlockX() : getLocationOne().getBlockX());
-    }
-
-    public int getMineX() {
-        return (getLocationOne().getBlockX() > getLocationTwo().getBlockX() ? getLocationTwo().getBlockX() : getLocationOne().getBlockX());
-    }
-
-    public int getMaxY() {
-        return (getLocationOne().getBlockY() < getLocationTwo().getBlockY() ? getLocationTwo().getBlockY() : getLocationOne().getBlockY());
-    }
-
-    public int getMinY() {
-        return (getLocationOne().getBlockY() > getLocationTwo().getBlockY() ? getLocationTwo().getBlockY() : getLocationOne().getBlockY());
-    }
-
-    public int getMaxZ() {
-        return (getLocationOne().getBlockZ() < getLocationTwo().getBlockZ() ? getLocationTwo().getBlockZ() : getLocationOne().getBlockZ());
-    }
-
-    public int getMinZ() {
-        return (getLocationOne().getBlockZ() > getLocationTwo().getBlockZ() ? getLocationTwo().getBlockZ() : getLocationOne().getBlockZ());
-    }
-
-    public World getWorld() {
-        return Objects.equals(getLocationOne().getWorld().getName(), getLocationTwo().getWorld().getName()) ? getLocationOne().getWorld() : null;
+        this.locationOne = one;
+        this.locationTwo = two;
     }
 
     @Override
-    public HashMap<String, Object> save() {
-        HashMap<String, Object> data = Maps.newHashMap();
-        data.put("loc1", loc1.serialize());
-        data.put("loc2", loc2.serialize());
-        return data;
+    public World getWorld() {
+        return getLocationOne().getWorld();
+    }
+
+    @Override
+    public Location getLocationOne() {
+        return this.locationOne;
+    }
+
+    @Override
+    public Location getLocationTwo() {
+        return this.locationTwo;
+    }
+
+    @Override
+    public Location getMidle() {
+        return new Location(getWorld(), getMaxX() / getMinX(), getMaxY() / getMinY(), getMaxZ() / getMinZ());
+    }
+
+    @Override
+    public double distance() {
+        return Math.sqrt((getLocationOne().getX() - getLocationTwo().getX()) + (getLocationOne().getY() - getLocationTwo().getY()) + (getLocationOne().getZ() - getLocationTwo().getZ()));
+    }
+
+    @Override
+    public int getMaxX() {
+        return getLocationOne().getBlockX() > getLocationTwo().getBlockX() ? getLocationOne().getBlockX() : getLocationTwo().getBlockX();
+    }
+
+    @Override
+    public int getMinX() {
+        return getLocationOne().getBlockX() < getLocationTwo().getBlockX() ? getLocationOne().getBlockX() : getLocationTwo().getBlockX();
+    }
+
+    @Override
+    public int getMaxY() {
+        return getLocationOne().getBlockY() > getLocationTwo().getBlockY() ? getLocationOne().getBlockY() : getLocationTwo().getBlockY();
+    }
+
+    @Override
+    public int getMinY() {
+        return getLocationOne().getBlockY() < getLocationTwo().getBlockY() ? getLocationOne().getBlockY() : getLocationTwo().getBlockY();
+    }
+
+    @Override
+    public int getMaxZ() {
+        return getLocationOne().getBlockZ() > getLocationTwo().getBlockZ() ? getLocationOne().getBlockZ() : getLocationTwo().getBlockZ();
+    }
+
+    @Override
+    public int getMinZ() {
+        return getLocationOne().getBlockZ() < getLocationTwo().getBlockZ() ? getLocationOne().getBlockZ() : getLocationTwo().getBlockZ();
+    }
+
+    @Override
+    public boolean inArea(Location location) {
+        return location.getBlockX() >= getMinX() && location.getBlockX() <= getMaxX() && location.getBlockX() >= getMinY() && location.getBlockY() <= getMaxY() && location.getBlockZ() >= getMinZ() && location.getBlockZ()<= getMaxZ();
+    }
+
+    @Override
+    public boolean hasEntity() {
+        return getEntitys().isEmpty();
+    }
+
+    @Override
+    public boolean hasQuakePlayer() {
+        return getPlayers().isEmpty();
+    }
+
+    @Override
+    public List<Entity> getEntitys() {
+        return getWorld().getEntities();
+    }
+
+    @Override
+    public List<IQuakePlayer> getPlayers() {
+        Iterator<Entity> e = getEntitys().iterator();
+        List<IQuakePlayer> pl = new ArrayList<>();
+        while (e.hasNext()) {
+            Entity entity = e.next();
+            if (entity instanceof Player)
+                pl.add(QuakePlayer.getIQuakePlayer(entity.getUniqueId()));
+        }
+        return pl;
     }
 }
