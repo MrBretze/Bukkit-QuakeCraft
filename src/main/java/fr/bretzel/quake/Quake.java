@@ -1,11 +1,16 @@
 package fr.bretzel.quake;
 
+import fr.bretzel.quake.api.IArena;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Created by MrBretzel on 29/10/2015.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class Quake extends JavaPlugin {
+
+    private List<IArena> arenas = new ArrayList<>();
+
+    public static Quake INSTANCE = JavaPlugin.getPlugin(Quake.class);
 
     @Override
     public void onLoad() {
@@ -19,6 +24,10 @@ public class Quake extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+    }
+
+    public static void registerGame(Arena arena) {
 
     }
 }

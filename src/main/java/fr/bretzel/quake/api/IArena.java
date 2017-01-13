@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by MrBretzel on 13/11/15.
  */
-public interface IDoubleLocation {
+public interface IArena {
 
     World getWorld();
 

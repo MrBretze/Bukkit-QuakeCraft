@@ -1,6 +1,6 @@
 package fr.bretzel.quake;
 
-import fr.bretzel.quake.api.IDoubleLocation;
+import fr.bretzel.quake.api.IArena;
 import fr.bretzel.quake.api.IQuakePlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -8,19 +8,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
-/**
- * Created by MrBretzel on 30/10/2015.
- */
-public class DoubleLocation implements IDoubleLocation {
+public class Arena implements IArena {
 
     private Location locationOne;
     private Location locationTwo;
 
-    public DoubleLocation(Location one, Location two) {
+    public Arena(Location one, Location two) {
         this.locationOne = one;
         this.locationTwo = two;
     }
@@ -97,18 +92,19 @@ public class DoubleLocation implements IDoubleLocation {
 
     @Override
     public List<Entity> getEntitys() {
-        return getWorld().getEntities();
+        ArrayList<Entity> entities = new ArrayList<>();
+        for (Entity e : getWorld().getEntitiesByClass(Entity.class))
+            if (inArea(e.getLocation()))
+                entities.add(e);
+        return entities;
     }
 
     @Override
     public List<IQuakePlayer> getPlayers() {
-        Iterator<Entity> e = getEntitys().iterator();
-        List<IQuakePlayer> pl = new ArrayList<>();
-        while (e.hasNext()) {
-            Entity entity = e.next();
-            if (entity instanceof Player)
-                pl.add(QuakePlayer.getIQuakePlayer(entity.getUniqueId()));
-        }
-        return pl;
+        ArrayList<IQuakePlayer> entities = new ArrayList<>();
+        for (Player player : getWorld().getEntitiesByClass(Player.class))
+            if (inArea(player.getLocation()))
+                entities.add(QuakePlayer.getQuakePlayer(player.getUniqueId()));
+        return entities;
     }
 }

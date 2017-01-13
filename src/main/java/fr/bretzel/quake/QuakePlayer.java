@@ -6,9 +6,6 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.UUID;
 
-/**
- * Created by MrBretzel on 09/11/15.
- */
 public class QuakePlayer extends IQuakePlayer {
 
     public UUID getUuid() {

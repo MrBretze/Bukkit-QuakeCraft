@@ -1,25 +1,24 @@
 package fr.bretzel.quake;
 
+import fr.bretzel.quake.api.IArena;
+import fr.bretzel.quake.api.IConfig;
 import fr.bretzel.quake.api.IGame;
 
-/**
- * Created by MrBretzel on 30/10/2015.
- */
 public class Game implements IGame {
 
-    private Map map;
+    private IArena arena;
     private int maxPlayer;
     private int minPlayer;
     private int maxKill;
     private Config config;
     private GameState state = GameState.UNKNOW;
 
-    public Game(Map map, Config config) {
-        this.map = map;
+    public Game(IArena arena, Config config) {
+        this.arena = arena;
         this.config = config;
     }
 
-    public Config getConfig() {
+    public IConfig getConfig() {
         return config;
     }
 
@@ -35,8 +34,8 @@ public class Game implements IGame {
         return minPlayer;
     }
 
-    public Map getMap() {
-        return map;
+    public IArena getArena() {
+        return arena;
     }
 
     public enum GameState {

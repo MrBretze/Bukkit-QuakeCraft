@@ -24,7 +24,7 @@ public abstract class IQuakePlayer {
         return null;
     }
 
-    public static IQuakePlayer getIQuakePlayer(UUID uuid) {
+    public static IQuakePlayer getQuakePlayer(UUID uuid) {
         return null;
     }
 

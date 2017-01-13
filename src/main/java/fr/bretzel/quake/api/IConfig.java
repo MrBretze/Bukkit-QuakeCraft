@@ -1,5 +1,6 @@
 package fr.bretzel.quake.api;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -21,9 +22,7 @@ public interface IConfig {
 
     Object get(String reg);
 
-    List<Object> getList(String reg);
+    <E> List<E> getList(String reg, E object);
 
-    /**
-     * TODO: SQL api pour tout c'est truc !
-     */
+    File getFile();
 }
