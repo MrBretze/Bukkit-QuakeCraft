@@ -61,8 +61,8 @@ public class GameStartTask extends GameTask {
             getGame().broadcastMessage(ChatColor.BLUE + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
-                if(p!= null || p.isOnline()) {
-                    Util.playSound(p.getLocation(), Sound.NOTE_PLING, 2.0F, 2.0F);
+                if(p != null && p.isOnline()) {
+                    Util.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 2.0F, 2.0F);
                 }
             }
         }
@@ -94,7 +94,7 @@ public class GameStartTask extends GameTask {
             scoreboardAPI.getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
             for(UUID id : getGame().getPlayerList()) {
                 Player p = Bukkit.getPlayer(id);
-                if((p != null) || (p.isOnline())) {
+                if((p != null) && (p.isOnline())) {
                     getGame().respawnAtStart(p);
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));

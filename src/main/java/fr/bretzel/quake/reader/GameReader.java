@@ -89,9 +89,8 @@ public class GameReader {
         if (compound.hasKey("signs")) {
             NBTTagCompound s = compound.getCompound("signs");
             int size = s.getInt("size");
-            int vsize = size - 1;
             if (size > 0) {
-                for (int i = 0; i <= vsize; i++) {
+                for (int i = 0; i < size; i++) {
                     game.addSign(SignReader.read(s.getCompound(String.valueOf(i))));
                 }
             }

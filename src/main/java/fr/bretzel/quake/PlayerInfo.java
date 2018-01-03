@@ -180,7 +180,7 @@ public class PlayerInfo {
                 Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
                 Quake.logDebug("The vector for the dash is: " + vector);
                 getPlayer().setVelocity(vector);
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENDERDRAGON_WINGS, random.nextFloat(), random.nextFloat());
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_AMBIENT, random.nextFloat(), random.nextFloat());
             } else {
                 Quake.logDebug("The game is not started, the dash is annulled");
             }
@@ -201,14 +201,14 @@ public class PlayerInfo {
             if (game.getState() == State.STARTED) {
                 setShoot(false);
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
-                Util.playSound(getPlayer().getEyeLocation(), Sound.FIREWORK_LARGE_BLAST, 2F, 1F);
+                Util.playSound(getPlayer().getEyeLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 2F, 1F);
                 for (Location location : locs) {
                     new ParticleEffect.ParticlePacket(getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(location, 200D);
                 }
                 if (shoot.getKill() > 0) {
                     for (Player p : shoot.getPlayers()) {
                         shoot.getGame().setKillSteak(p, 0);
-                        Util.playSound(p.getLocation(), Sound.BLAZE_DEATH, 2F, 2F);
+                        Util.playSound(p.getLocation(), Sound.ENTITY_BLAZE_DEATH, 2F, 2F);
                         shoot.getGame().respawn(p);
                     }
                     int kill;

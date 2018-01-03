@@ -166,6 +166,10 @@ public class GameManager implements Listener {
         return getUuidToChrono().get(id);
     }
 
+    public Game getGameByPlayer(PlayerInfo info) {
+        return getGameByPlayer(info.getPlayer());
+    }
+
     public Game getGameByPlayer(Player player) {
         for (Game a : getGameLinkedList()) {
             if (a.getPlayerList().contains(player.getUniqueId())) {
@@ -252,6 +256,18 @@ public class GameManager implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
+        if (info.isInGame()) {
+            Game game = getGameByPlayer(player);
+            PlayerLeaveGameEvent ev = new PlayerLeaveGameEvent(player, game);
+            Bukkit.getPluginManager().callEvent(ev);
+            if(ev.isCancelled()) {
+                return;
+            }
+
+            player.teleport(Quake.gameManager.getLobby());
+            game.getPlayerList().remove(player.getUniqueId());
+            signEvent.actualiseJoinSignForGame(game);
+        }
         info.save();
         Quake.getPlayerInfos().remove(info);
     }

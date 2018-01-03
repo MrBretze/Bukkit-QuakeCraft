@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Lo?c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -25,6 +25,7 @@ import fr.bretzel.quake.Serializable;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -425,10 +426,10 @@ public class Game implements Serializable {
 
         getScoreboardManager().getObjective().unregister();
         getScoreboardManager().setObjective(getScoreboardManager().getScoreboard().registerNewObjective("quake", "dummy"));
-        getScoreboardManager().getObjective().getScore("§r").setScore(10);
+        getScoreboardManager().getObjective().getScore(ChatColor.RESET.toString()).setScore(10);
         getScoreboardManager().getObjective().getScore("Map: " + getDisplayName()).setScore(9);
-        getScoreboardManager().getObjective().getScore("§r§r").setScore(8);
-        getScoreboardManager().getObjective().getScore("§r                            §r").setScore(6);
+        getScoreboardManager().getObjective().getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(8);
+        getScoreboardManager().getObjective().getScore(ChatColor.RESET.toString() + "                            " + ChatColor.RESET.toString()).setScore(6);
         getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
         getScoreboardManager().getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
