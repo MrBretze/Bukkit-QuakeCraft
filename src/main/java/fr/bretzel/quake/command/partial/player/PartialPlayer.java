@@ -41,7 +41,14 @@ public class PartialPlayer extends IPlayer {
                     setValue(true);
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("join")) {
+            }
+
+            if (!getSender().hasPermission("quake.players")) {
+                getSender().sendMessage("You dont have the permission !");
+                return this;
+            }
+
+            if (getArgs()[2].equalsIgnoreCase("join")) {
                 if (!info.isInGame()) {
                     if (getArgs().length > 3) {
                         if (Quake.gameManager.getGameByName(getArgs()[3]) != null) {

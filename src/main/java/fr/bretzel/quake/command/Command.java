@@ -43,6 +43,10 @@ public class Command extends CommandExe {
             if(args.length > 0) {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
+                        if (!sender.hasPermission("quake.game")) {
+                            sender.sendMessage("You dont have the permission !");
+                            return false;
+                        }
                         if (Quake.gameManager.containsGame(args[1])) {
                             // /quake args0 args1  args2         args3...
                             // /quake game  <game> setmineplayer 87
@@ -68,6 +72,10 @@ public class Command extends CommandExe {
                         return true;
                     }
                 } else if (args[0].equalsIgnoreCase("create")) {
+                    if (!sender.hasPermission("quake.create")) {
+                        sender.sendMessage("You dont have the permission !");
+                        return false;
+                    }
                     if (args.length > 1) {
                         if (Quake.gameManager.getGameByName(args[1]) == null) {
                             return new Create(sender, command, null, args, args[1]).execute().value();
@@ -80,6 +88,10 @@ public class Command extends CommandExe {
                         return true;
                     }
                 } else if (args[0].equalsIgnoreCase("delete")) {
+                    if (!sender.hasPermission("quake.game")) {
+                        sender.sendMessage("You dont have the permission !");
+                        return false;
+                    }
                     if (args.length > 1) {
                         if (Quake.gameManager.getGameByName(args[1]) != null) {
                             return new Delete(sender, command, null, args, args[1]).execute().value();
