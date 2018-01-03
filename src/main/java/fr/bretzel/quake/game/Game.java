@@ -447,7 +447,7 @@ public class Game implements Serializable {
     public void respawnAtStart(Player player) {
         Location location = getRespawns().get(random.nextInt(getRespawns().size()));
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if(info.getRespawn() >= 5) {
+        if(info.getRespawn() >= 5 && player.getWorld().getNearbyEntities(location, 10, 3, 10).size() <= 0) {
             this.usedLoc.add(location);
             player.teleport(location);
             info.setRespawn(0);
