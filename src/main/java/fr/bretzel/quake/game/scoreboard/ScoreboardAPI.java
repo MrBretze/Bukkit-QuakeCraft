@@ -21,6 +21,7 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.task.ScoreboardTask;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -46,10 +47,10 @@ public class ScoreboardAPI {
 
         setObjective(getScoreboard().registerNewObjective("quake", "dummy"));
 
-        getObjective().getScore("§r").setScore(10);
+        getObjective().getScore(ChatColor.RESET.toString()).setScore(10);
         getObjective().getScore("Map: " + game.getDisplayName()).setScore(9);
-        getObjective().getScore("§r§r").setScore(8);
-        getObjective().getScore("§r                            §r").setScore(6);
+        getObjective().getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(8);
+        getObjective().getScore(ChatColor.RESET.toString() + "                            " + ChatColor.RESET.toString()).setScore(6);
         getObjective().getScore("Waiting...").setScore(5);
         getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
 
