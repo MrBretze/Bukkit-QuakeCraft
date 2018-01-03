@@ -14,15 +14,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="Gradle: org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: junit:junit:4.10" level="project" />
     <orderEntry type="library" exported="" name="Gradle: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.google.guava:guava:17.0" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.google.code.gson:gson:2.2.4" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.avaje:ebean:2.8.1" level="project" />
     <orderEntry type="library" exported="" name="Gradle: org.yaml:snakeyaml:1.15" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: junit:junit:4.10" level="project" />
     <orderEntry type="library" exported="" name="Gradle: javax.persistence:persistence-api:1.0" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT" level="project" />
   </component>
 </module>
