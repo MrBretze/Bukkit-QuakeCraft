@@ -3,6 +3,7 @@ package fr.bretzel.quake.command.partial.game;
 import fr.bretzel.commands.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -19,7 +20,7 @@ public class SetDisplayName extends IGame {
     @Override
     public PartialCommand execute() {
         if (getArgs().length > 3) {
-            String name = getArgs()[3];
+            String name = ChatColor.translateAlternateColorCodes('&', getArgs()[3]);
             getGame().setDisplayName(name);
             getSender().sendMessage(getI18("command.game.setdisplayname.valid").replace("%value%", name));
             Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
