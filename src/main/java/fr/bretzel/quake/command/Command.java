@@ -115,7 +115,7 @@ public class Command extends CommandExe {
         List list = new ArrayList();
         for(int i = 1; i <= 100; i++) {
             String value = getI18n("command.help." + i);
-            if (StringUtils.isNotEmpty(value))
+            if (StringUtils.isNotEmpty(value) && !value.equalsIgnoreCase("command.help." + i))
                 list.add(value);
             else
                 return list;
