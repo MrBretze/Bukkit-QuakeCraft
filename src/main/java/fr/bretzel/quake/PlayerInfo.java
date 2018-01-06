@@ -16,8 +16,7 @@
  */
 package fr.bretzel.quake;
 
-import fr.bretzel.nbt.NBTCompressedStreamTools;
-import fr.bretzel.nbt.NBTTagCompound;
+import fr.bretzel.quake.config.Config;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameEndEvent;
@@ -27,7 +26,7 @@ import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
-import fr.bretzel.quake.reader.PlayerInfoReader;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -40,8 +39,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -63,6 +62,7 @@ public class PlayerInfo {
     private int coins = 0;
     private int won = 0;
     private int killstreak = 0;
+    private int death = 0;
     private File file;
     private int respawn = 0;
     private Random random = new Random();
@@ -76,7 +76,7 @@ public class PlayerInfo {
 
         setFile(new File(mk, player.getUniqueId().toString() + ".dat"));
 
-        try {
+        /*try {
             if (!getFile().exists()) {
                 getFile().createNewFile();
                 NBTTagCompound compound = new NBTTagCompound();
@@ -87,7 +87,7 @@ public class PlayerInfo {
         } catch (Exception e) {
             e.fillInStackTrace();
         }
-        PlayerInfoReader.read(this);
+        PlayerInfoReader.read(this);*/
     }
 
     public File getFile() {
@@ -114,6 +114,9 @@ public class PlayerInfo {
         this.effect = effect;
     }
 
+    public UUID getUUID() {
+        return getPlayer().getUniqueId();
+    }
     public Player getPlayer() {
         return player;
     }
@@ -180,7 +183,7 @@ public class PlayerInfo {
                 Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
                 Quake.logDebug("The vector for the dash is: " + vector);
                 getPlayer().setVelocity(vector);
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_AMBIENT, random.nextFloat(), random.nextFloat());
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
             } else {
                 Quake.logDebug("The game is not started, the dash is annulled");
             }
@@ -256,7 +259,9 @@ public class PlayerInfo {
                                 info.setDash(false);
                             }
                         }
-                        GameEndTask endTask = new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
+
+                        new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
+
                         addWoon(1);
                         game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
                         game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
@@ -358,11 +363,60 @@ public class PlayerInfo {
         setWon(getWon() - woon);
     }
 
+    public int getDeath() {
+        return death;
+    }
+
+    public void setDeath(int death) {
+        this.death = death;
+    }
+
+    public void addDeath(int death) {
+        setDeath(getDeath() + death);
+    }
+
     public void save() {
-        try {
-            NBTCompressedStreamTools.wrhite(PlayerInfoReader.write(this), new FileOutputStream(getFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
+        Bukkit.getScheduler().runTask(Quake.quake, new SaveTask(this));
+    }
+
+    private class SaveTask implements Runnable {
+
+        private PlayerInfo info;
+
+        public SaveTask(PlayerInfo info) {
+            this.info = info;
+        }
+
+        @Override
+        public void run() {
+            //setInfo();
+        }
+
+        /**
+         * For the first connection !
+         */
+        private void setInfo() {
+            try {
+                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Won, KillStreak, Death) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                statement.setString(1, info.getUUID().toString());
+                statement.setString(2, info.getEffect().getName());
+                statement.setDouble(3, info.getReloadTime());
+                statement.setInt(4, info.getPlayerKill());
+                statement.setInt(5, info.getCoins());
+                statement.setInt(6, info.getWon());
+                statement.setInt(7, info.getKillStreak());
+                statement.setInt(8, info.getDeath());
+                Quake.config.set(statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * For the next of time !
+         */
+        private void updateInfo() {
+
         }
     }
 }

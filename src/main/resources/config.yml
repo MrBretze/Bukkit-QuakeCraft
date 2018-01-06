@@ -6,6 +6,18 @@ language:
    Region: US
 
 ################################
+#          MySQL info          #
+################################
+
+mysql:
+  Enabled: false
+  Hotsname: 'host'
+  Username: 'user'
+  Password: 'pass'
+  Port: 3306
+  Database: 'database'
+
+################################
 #          Debug info          #
 ################################
 

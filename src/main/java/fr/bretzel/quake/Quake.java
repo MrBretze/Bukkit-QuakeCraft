@@ -16,12 +16,14 @@
  */
 package fr.bretzel.quake;
 
+import fr.bretzel.quake.config.Config;
 import fr.bretzel.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
 import fr.bretzel.quake.language.LanguageManager;
 import fr.bretzel.quake.reader.GameReader;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -32,19 +34,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.security.CodeSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-/**
- * Created by MrBretzel on 09/06/2015.
- */
+
 public class Quake extends JavaPlugin {
+
+    public static Config config;
 
     public static PluginManager manager;
     public static GameManager gameManager;
@@ -61,7 +60,6 @@ public class Quake extends JavaPlugin {
             }
         }
         PlayerInfo info = new PlayerInfo(player);
-        logDebug("Register new player by uuid: " + info.getPlayer().getUniqueId());
         playerInfos.add(info);
         return info;
     }
@@ -84,78 +82,75 @@ public class Quake extends JavaPlugin {
     }
 
     public static void logInfo(String msg) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.WHITE + "[INFO]: " + msg);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "[INFO]: " + msg);
     }
 
     @Override
     public void onEnable() {
         quake = this;
 
-        CodeSource src = getClass().getProtectionDomain().getCodeSource();
-        if (src != null) {
-            URL jar = src.getLocation();
-            try {
-                ZipInputStream zip = new ZipInputStream(jar.openStream());
-                byte[] buffer = new byte[1024];
-                while (true) {
-                    ZipEntry e = zip.getNextEntry();
-                    if (e == null)
-                        break;
-                    String name = e.getName();
-                    if (name.startsWith("lang/") && name.endsWith(".json")) {
-                        new File(getDataFolder() + "/lang/").mkdir();
-                        File f = new File(getDataFolder() + "/lang/", name.replace("lang/", ""));
-                        if (!f.exists())
-                            f.createNewFile();
-                        FileOutputStream out = new FileOutputStream(f);
 
-                        int len;
-                        while ((len = zip.read(buffer)) > 0) {
-                            out.write(buffer, 0, len);
-                        }
-                        out.close();
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            logInfo("ERROR LANGUAGE NOT INITIALED !");
-            setEnabled(false);
+        logInfo("Registering Lang");
+        LanguageManager.init(this);
+        logInfo("End");
+
+
+        if (!new File(getDataFolder(), "config.yml").exists()) {
+            saveResource("config.yml", false);
         }
 
-        saveResource("config.yml", false);
 
         reloadConfig();
-
         debug = getConfig().getBoolean("debug");
 
-        logDebug("Starting initialing LanguageManager");
+
+        logInfo("Starting initialing LanguageManager");
         Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
         languageManager = new LanguageManager(locale);
-        logDebug("Starting initialing LanguageManager");
+        logInfo("End initialing LanguageManager");
 
-        logDebug("Starting initialing Holomanager");
+
+        logInfo("Starting initialing Holomanager");
         holoManager = new HologramManager(this);
-        logDebug("End initialing Holomanager");
+        logInfo("End initialing Holomanager");
+
 
         getDataFolder().mkdir();
-
         manager = getServer().getPluginManager();
 
-        logDebug("Starting initialing Gamemanager");
+
+        logInfo("Starting initialing Gamemanager");
         gameManager = new GameManager();
-        logDebug("End initialing Gamemanager");
+        logInfo("End initialing Gamemanager");
 
+
+        logInfo("Registering Command");
         getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
+        logInfo("End");
 
+
+        logInfo("Registering Game");
         File file = new File(getDataFolder(), File.separator + "game" + File.separator);
-
         if (file.exists() && file.isDirectory()) {
             if (file.listFiles().length > 0) {
                 initGame(file);
             }
         }
+        logInfo("End");
+
+        boolean isMySQLconf = getConfig().getBoolean("mysql.Enabled");
+
+        if (isMySQLconf) {
+            this.config = new Config(getConfig().getString("mysql.Hotsname"),
+                    getConfig().getString("mysql.Username"),
+                    getConfig().getString("mysql.Password"),
+                    getConfig().getString("mysql.Port"),
+                    getConfig().getString("mysql.Database")) {
+            };
+        } else {
+            this.config = new Config(new File(getDataFolder(), "database.sql"));
+        }
+
     }
 
     @Override
@@ -173,10 +168,23 @@ public class Quake extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (label.equals("test")) {
+        if (label.equalsIgnoreCase("test")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                Util.spawnFirework(Util.getCircle(player.getLocation(), 0.4, 6));
+                Util.spawnFirework(Util.getCircle(player.getLocation(), 3, 8));
+                return true;
+            } else return true;
+        }
+        if (label.equalsIgnoreCase("sqlSet")) {
+            if (sender instanceof Player) {
+                config.setString(args[0], "Test", "", Config.Table.TEST);
+                return true;
+            } else return true;
+        }
+        if (label.equalsIgnoreCase("sqlGet")) {
+            if (sender instanceof Player) {
+                String str = config.getString("Test", "WHERE Test = '" + args[0] + "'", Config.Table.TEST);
+                sender.sendMessage(str);
                 return true;
             } else return true;
         }
