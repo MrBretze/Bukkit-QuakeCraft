@@ -20,7 +20,12 @@ public class SetDisplayName extends IGame {
     @Override
     public PartialCommand execute() {
         if (getArgs().length > 3) {
-            String name = ChatColor.translateAlternateColorCodes('&', getArgs()[3]);
+            StringBuilder buildName = new StringBuilder();
+            for (int i = 3; i < getArgs().length; i++) {
+                buildName.append(" ").append(getArgs()[i]);
+            }
+
+            String name = ChatColor.translateAlternateColorCodes('&', buildName.toString());
             getGame().setDisplayName(name);
             getSender().sendMessage(getI18("command.game.setdisplayname.valid").replace("%value%", name));
             Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());

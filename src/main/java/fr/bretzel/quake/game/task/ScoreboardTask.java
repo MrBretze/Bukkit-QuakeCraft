@@ -28,7 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ScoreboardTask extends GameTask {
 
-    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", ChatColor.RED.toString(), ChatColor.DARK_RED.toString(), ChatColor.RED.toString(), true, false, ColorScroller.ScrollType.FORWARD);
+    private ColorScroller scroller = new ColorScroller(ChatColor.RED, "QuakeCraft", ChatColor.DARK_RED.toString(), ChatColor.RED.toString(), ChatColor.RED.toString(), true, false, ColorScroller.ScrollType.FORWARD);
 
     public ScoreboardTask(JavaPlugin javaPlugin, long l, long l1, Game game) {
         super(javaPlugin, l, l1, game);

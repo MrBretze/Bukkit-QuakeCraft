@@ -268,8 +268,8 @@ public class GameManager implements Listener {
             game.getPlayerList().remove(player.getUniqueId());
             signEvent.actualiseJoinSignForGame(game);
         }
+
         info.save();
-        Quake.getPlayerInfos().remove(info);
     }
 
     @EventHandler

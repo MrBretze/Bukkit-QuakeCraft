@@ -16,8 +16,17 @@
  */
 package fr.bretzel.quake.language;
 
+import fr.bretzel.quake.Quake;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.security.CodeSource;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by Loic on 30/07/2015.
@@ -55,6 +64,40 @@ public class LanguageManager {
             return builder.toString();
         }
         return get(key);
+    }
+
+    public static void init(Quake plugin) {
+        CodeSource src = plugin.getClass().getProtectionDomain().getCodeSource();
+        if (src != null) {
+            URL jar = src.getLocation();
+            try {
+                ZipInputStream zip = new ZipInputStream(jar.openStream());
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    ZipEntry e = zip.getNextEntry();
+                    if (e == null)
+                        break;
+                    String name = e.getName();
+                    if (name.startsWith("lang/") && name.endsWith(".json")) {
+                        new File(plugin.getDataFolder() + "/lang/").mkdir();
+                        File f = new File(plugin.getDataFolder() + "/lang/", name.replace("lang/", ""));
+                        if (!f.exists())
+                            f.createNewFile();
+                        FileOutputStream out = new FileOutputStream(f);
+
+                        int len;
+                        while ((len = zip.read(buffer)) > 0) {
+                            out.write(buffer, 0, len);
+                        }
+                        out.close();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            plugin.logInfo("ERROR LANGUAGE NOT INITIALED !");
+        }
     }
 
     public Language getDefaultLanguage() {
