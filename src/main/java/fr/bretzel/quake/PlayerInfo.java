@@ -40,7 +40,9 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -63,39 +65,13 @@ public class PlayerInfo {
     private int won = 0;
     private int killstreak = 0;
     private int death = 0;
-    private File file;
     private int respawn = 0;
     private Random random = new Random();
 
     public PlayerInfo(Player player) {
         setPlayer(player);
 
-        File mk = new File(Quake.quake.getDataFolder() + File.separator + "players" + File.separator);
-
-        mk.mkdir();
-
-        setFile(new File(mk, player.getUniqueId().toString() + ".dat"));
-
-        /*try {
-            if (!getFile().exists()) {
-                getFile().createNewFile();
-                NBTTagCompound compound = new NBTTagCompound();
-                compound.setDouble("reload", getReloadTime());
-                compound.setString("effect", getEffect().getName());
-                NBTCompressedStreamTools.wrhite(compound, new FileOutputStream(getFile()));
-            }
-        } catch (Exception e) {
-            e.fillInStackTrace();
-        }
-        PlayerInfoReader.read(this);*/
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
+        Bukkit.getScheduler().runTask(Quake.quake, new LoadTask(this));
     }
 
     public double getReloadTime() {
@@ -141,7 +117,7 @@ public class PlayerInfo {
         this.secondLocation = secondLocation;
     }
 
-    public void setReload(long reload) {
+    public void setReload(double reload) {
         this.reload = reload;
     }
 
@@ -213,6 +189,7 @@ public class PlayerInfo {
                         shoot.getGame().setKillSteak(p, 0);
                         Util.playSound(p.getLocation(), Sound.ENTITY_BLAZE_DEATH, 2F, 2F);
                         shoot.getGame().respawn(p);
+                        Quake.getPlayerInfo(p).addDeath(1);
                     }
                     int kill;
                     if (Integer.valueOf(game.getKill(getPlayer())) == null) {
@@ -332,6 +309,8 @@ public class PlayerInfo {
         objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
         objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(4);
         objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
+        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(2);
+        objective.getScore("Death: " + ChatColor.BLUE + getDeath()).setScore(1);
         return scoreboard;
     }
 
@@ -376,47 +355,72 @@ public class PlayerInfo {
     }
 
     public void save() {
-        Bukkit.getScheduler().runTask(Quake.quake, new SaveTask(this));
+        if (Quake.config.ifStringExist(getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
+            try {
+                PreparedStatement statement = Quake.config.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET Effect = ?, Reload = ?, PlayerKill = ?, Coins = ?, Won = ?, KillStreak = ?, Death = ? WHERE UUID = ?");
+                statement.setString(1, getEffect().getName());
+                statement.setDouble(2, getReloadTime());
+                statement.setInt(3, getPlayerKill());
+                statement.setInt(4, getCoins());
+                statement.setInt(5, getWon());
+                statement.setInt(6, getKillStreak());
+                statement.setInt(7, getDeath());
+                statement.setString(8, getUUID().toString());
+                Quake.config.executePreparedStatement(statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Won, KillStreak, Death) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                statement.setString(1, getUUID().toString());
+                statement.setString(2, getEffect().getName());
+                statement.setDouble(3, getReloadTime());
+                statement.setInt(4, getPlayerKill());
+                statement.setInt(5, getCoins());
+                statement.setInt(6, getWon());
+                statement.setInt(7, getKillStreak());
+                statement.setInt(8, getDeath());
+                Quake.config.executePreparedStatement(statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    private class SaveTask implements Runnable {
+    private class LoadTask implements Runnable {
 
         private PlayerInfo info;
 
-        public SaveTask(PlayerInfo info) {
+        public LoadTask(PlayerInfo info) {
             this.info = info;
         }
 
         @Override
         public void run() {
-            //setInfo();
-        }
-
-        /**
-         * For the first connection !
-         */
-        private void setInfo() {
-            try {
-                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Won, KillStreak, Death) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                statement.setString(1, info.getUUID().toString());
-                statement.setString(2, info.getEffect().getName());
-                statement.setDouble(3, info.getReloadTime());
-                statement.setInt(4, info.getPlayerKill());
-                statement.setInt(5, info.getCoins());
-                statement.setInt(6, info.getWon());
-                statement.setInt(7, info.getKillStreak());
-                statement.setInt(8, info.getDeath());
-                Quake.config.set(statement);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (Quake.config.ifStringExist(info.getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
+                load();
             }
         }
 
-        /**
-         * For the next of time !
-         */
-        private void updateInfo() {
+        public void load() {
+            try {
+                Statement statement = Quake.config.openConnection().createStatement();
+                ResultSet set = statement.executeQuery("SELECT * FROM " + Config.Table.PLAYERS.getTable() + " WHERE UUID = '" + info.getUUID().toString() +"'");
+                if (set.next()) {
+                    setEffect(ParticleEffect.fromName(set.getString("Effect")));
+                    setReload(set.getDouble("Reload"));
+                    setPlayerKill(set.getInt("PlayerKill"));
+                    setCoins(set.getInt("Coins"));
+                    setWon(set.getInt("Won"));
+                    setKillStreak(set.getInt("KillStreak"));
+                    setDeath(set.getInt("Death"));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
+            info.getPlayer().setScoreboard(info.getPlayerScoreboard());
         }
     }
 }

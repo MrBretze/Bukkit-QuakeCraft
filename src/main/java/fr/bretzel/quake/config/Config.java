@@ -4,9 +4,7 @@ import fr.bretzel.quake.config.local.LocalConfig;
 import fr.bretzel.quake.config.online.OnlineConfig;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Config {
 
@@ -32,12 +30,26 @@ public class Config {
     public Connection openConnection() {
         try {
             return config.openConnection();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean ifStringExist(String value, String colon, Table table) {
+        try {
+            Statement statement = openConnection().createStatement();
+            String query = "SELECT " + colon + " FROM " + table.getTable() + " WHERE " + colon + " = '" + value + "'";
+            ResultSet set = statement.executeQuery(query);
+            if (set.next()) {
+                String v = set.getString(colon);
+                if (v.equalsIgnoreCase(value))
+                    return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private Type getConfigType() {
@@ -74,7 +86,7 @@ public class Config {
         getConfig().setDouble(queryBaseSet.replace("%table%", table.getTable()).replace("(%colon%)", "(" + colon + ")").replace("%where%", where), value);
     }
 
-    public void set(PreparedStatement statement) {
+    public void executePreparedStatement(PreparedStatement statement) {
         try {
             statement.executeUpdate();
         } catch (SQLException e) {

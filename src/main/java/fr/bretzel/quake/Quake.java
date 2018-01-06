@@ -29,14 +29,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Locale;
 
@@ -52,6 +51,11 @@ public class Quake extends JavaPlugin {
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
     private static LanguageManager languageManager;
     private static boolean debug = false;
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        return super.getDefaultWorldGenerator(worldName, id);
+    }
 
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
@@ -150,13 +154,10 @@ public class Quake extends JavaPlugin {
         } else {
             this.config = new Config(new File(getDataFolder(), "database.sql"));
         }
-
     }
 
     @Override
     public void onDisable() {
-        saveConfig();
-
         for (PlayerInfo playerInfo : playerInfos) {
             playerInfo.save();
         }
@@ -183,9 +184,13 @@ public class Quake extends JavaPlugin {
         }
         if (label.equalsIgnoreCase("sqlGet")) {
             if (sender instanceof Player) {
-                String str = config.getString("Test", "WHERE Test = '" + args[0] + "'", Config.Table.TEST);
-                sender.sendMessage(str);
-                return true;
+                if (config.ifStringExist(args[0], "Test", Config.Table.TEST)) {
+                    String str = config.getString("Test", "WHERE Test = '" + args[0] + "'", Config.Table.TEST);
+                    sender.sendMessage("Le message % est dans la BDD".replace("%", str));
+                    return true;
+                } else {
+                    sender.sendMessage("Ce message n'est pas enregistré dans la BDD");
+                }
             } else return true;
         }
         return true;
