@@ -134,6 +134,9 @@
         },
         {
           "usage": "&cUsage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | addkill | removekill | setkillsteak | addkillstreak | removekillstreak | setwon | addwon | removewon>"
+        },
+        {
+          "notAValidNumber": ""
         }
       ]
     },

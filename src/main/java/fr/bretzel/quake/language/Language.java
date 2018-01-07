@@ -1,125 +1,124 @@
-/**
- * Copyright 2015 Loïc Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake.language;
 
-
-import fr.bretzel.json.JSONArray;
-import fr.bretzel.json.JSONObject;
+import com.google.common.base.Strings;
 import fr.bretzel.quake.Quake;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.*;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
 
 /**
- * Created by MrBretzel on 09/07/2015.
+ * Created by MrBretzel on 25/03/2017.
  */
 public class Language {
 
-    private static HashMap<String, String> maps = new HashMap<>();
-    private JSONObject object;
+    public HashMap<String, String> stringToComponent = new HashMap<>();
+    private Locale locale = Locale.EN;
+
+    public static Language defaultLanguage;
+
+    private static HashMap<Locale, Language> localeToLanguage = new HashMap<>();
 
     public Language(Locale locale) {
-        maps.clear();
-        //object = new JSONObject(fileToJson(getClass().getResourceAsStream("/lang/" + locale.getLanguage() + "_" + locale.getCountry() + ".json")));
-        try {
-            object = new JSONObject(fileToJson(new File(Quake.quake.getDataFolder() + "/lang/", locale.getLanguage() + "_" + locale.getCountry() + ".json")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        addJsonObject(object, "");
+        this.locale = locale;
     }
 
+    public boolean has(String k) {
+        if (stringToComponent.containsKey(k))
+            return true;
+        if (defaultLanguage == null)
+            return false;
+        return defaultLanguage.stringToComponent.containsKey(k);
+    }
 
-    private void addJsonArray(JSONArray array, String key) {
-        Iterator<Object> o = array.iterator();
-        while (o.hasNext()) {
-            Object object = o.next();
-            if(object instanceof JSONObject) {
-                JSONObject jsonObject = (JSONObject) object;
-                for(String k : jsonObject.keySet()) {
-                    Object obj = jsonObject.get(k);
-                    if(obj instanceof JSONArray) {
-                        JSONArray a = (JSONArray) obj;
-                        addJsonArray(a, key + k + ".");
+    public String get(String k) {
+        if (has(k))
+            return stringToComponent.get(k);
+        else
+            return defaultLanguage.get(k);
+    }
 
-                    } else if(obj instanceof JSONObject) {
-                        JSONObject t = (JSONObject) obj;
-                        addJsonObject(t, k + ".");
-                    } else if (obj instanceof String) {
-                        String s = (String) obj;
-                        add(formatizeKey(key + k + "."), s);
+    /**
+     * This method return to language is local is null return to the default language !
+     *
+     * @param locale
+     * @return a language
+     */
+    public static Language getLanguage(Locale locale) {
+        if (localeToLanguage.containsKey(locale))
+            return localeToLanguage.get(locale);
+        return defaultLanguage;
+    }
+
+    public String getLanguageName() {
+        return locale.name();
+    }
+
+    public static void enable() throws IOException {
+        for (Locale locale : Locale.values()) {
+            Language language = new Language(locale);
+            File path = new File(Quake.quake.getDataFolder() + "/lang/" + locale.name().toLowerCase() + "_" + locale.name() + ".lang".trim());
+            if (path.exists()) {
+                BufferedReader reader = new BufferedReader(new FileReader(path));
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+
+                    if (Strings.isNullOrEmpty(line) || line.charAt(0) == '#') {
+                        continue;
+                    }
+
+                    String[] args = line.split("=");
+                    String k = args[0];
+                    TextType type = TextType.fromString(args[1]);
+                    String value = args[2];
+
+                    if (type == TextType.JSON) {
+                        if (language.has(k)) {
+                            Bukkit.getLogger().info("The key: " + k + " is already init !");
+                        } else {
+                            language.stringToComponent.put(k, value);
+                        }
+                    } else if (type == TextType.TXT) {
+                        if (language.has(k)) {
+                            Bukkit.getLogger().info("The key: " + k + " is already init !");
+                        } else {
+                            language.stringToComponent.put(k, simpleJson(value));
+                        }
                     }
                 }
+                reader.close();
+                localeToLanguage.put(locale, language);
+
             }
         }
+
+        Language.defaultLanguage = Language.getLanguage(Locale.EN);
+
+        Bukkit.broadcastMessage(defaultLanguage.getLanguageName());
     }
 
-    private void addJsonObject(JSONObject jsonObject, String key) {
-        for (String k : jsonObject.keySet()) {
-            Object o = jsonObject.get(k);
-            if(o instanceof JSONArray) {
-                JSONArray a = (JSONArray) o;
-                addJsonArray(a, key + "." + k + ".");
-            } else if(o instanceof JSONObject) {
-                JSONObject o2 = (JSONObject) o;
-                addJsonObject(o2, key + "." + k + ".");
-            } else if(o instanceof String) {
-                String s = (String) o;
-                add(formatizeKey(key + "." + k + "."), s);
+    private static String simpleJson(String str) {
+        return "[\"\",{\"text\":\"" + str +"\"}]";
+    }
+
+    public enum Locale {
+        FR,
+        EN;
+
+        public static Locale fromString(String s) {
+            switch (s.trim()) {
+                case "EN":
+                case "en":
+                case "en_EN":
+                    return Locale.EN;
+                case "FR":
+                case "fr":
+                case "fr_FR":
+                    return Locale.FR;
+                default:
+                    return Locale.EN;
             }
         }
-    }
-
-    private String formatizeKey(String key) {
-        if (key.startsWith(".")) {
-            key = key.replaceFirst(".", "");
-        }
-        if (key.endsWith(".") && key.length() > 0) {
-            key = key.substring(0, key.length() - 1);
-        }
-        return key.replace("..", ".").trim();
-    }
-
-    private void add(String key, String value) {
-        if (!maps.containsKey(key)) {
-            maps.put(key, ChatColor.translateAlternateColorCodes('&', value));
-        } else {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "The language {Key:" + key + ", Value:" + maps.get(key) + "} is already registered !");
-        }
-    }
-
-    private String fileToJson(File file) throws IOException {
-        return new String(Files.readAllBytes(file.toPath()));
-    }
-
-    public boolean hasKey(String key) {
-        return maps.containsKey(key);
-    }
-
-    public String get(String key) {
-        if (maps.containsKey(key))
-            return maps.get(key);
-        return key;
     }
 }
