@@ -1,4 +1,4 @@
-package fr.bretzel.quake.command.partial;
+package fr.bretzel.quake.command.partial.game;
 
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
@@ -26,7 +26,7 @@ public class Create extends PartialCommand {
         PlayerInfo info = Quake.getPlayerInfo(player);
         if ("null".equals(games)) {
             setValue(true);
-            getSender().sendMessage(getI18("command.game.create.nameIsNull"));
+            getSender().sendMessage(getI18n("command.game.create.nameIsNull"));
             return this;
         }
         Quake.gameManager.registerGame(player, games, info.getFirstLocation(), info.getSecondLocation());

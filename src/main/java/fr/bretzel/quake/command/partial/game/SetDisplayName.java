@@ -3,6 +3,7 @@ package fr.bretzel.quake.command.partial.game;
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,7 +12,7 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class SetDisplayName extends IGame {
+public class SetDisplayName extends ICommandGame {
 
     public SetDisplayName(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
@@ -27,11 +28,11 @@ public class SetDisplayName extends IGame {
 
             String name = ChatColor.translateAlternateColorCodes('&', buildName.toString());
             getGame().setDisplayName(name);
-            getSender().sendMessage(getI18("command.game.setdisplayname.valid").replace("%value%", name));
+            JsonBuilder.sendJson(getPlayer(), getI18n("command.game.setdisplayname.valid").replace("%game%", getGame().getName()));
             Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
             return this;
         } else {
-            getSender().sendMessage(getI18("command.game.setdisplayname.usage"));
+            getSender().sendMessage(getI18n("command.game.setdisplayname.usage"));
             return this;
         }
     }

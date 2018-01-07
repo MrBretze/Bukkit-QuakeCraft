@@ -9,9 +9,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 20/10/2015.
  */
-public class View extends IGame {
+public class ViewRespawn extends ICommandGame {
 
-    public View(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public ViewRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
     }
 

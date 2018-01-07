@@ -18,10 +18,11 @@ package fr.bretzel.quake.command;
 
 import fr.bretzel.quake.Permission;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.command.partial.Create;
-import fr.bretzel.quake.command.partial.Delete;
-import fr.bretzel.quake.command.partial.game.PartialGame;
-import fr.bretzel.quake.command.partial.player.PartialPlayer;
+import fr.bretzel.quake.command.partial.game.CommandCreateGame;
+import fr.bretzel.quake.command.partial.game.CommandDeleteGame;
+import fr.bretzel.quake.command.partial.game.PartialCommandGame;
+import fr.bretzel.quake.command.partial.player.PartialCommandPlayer;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,31 +38,21 @@ import java.util.List;
 public class Command extends CommandExe {
 
     @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
-        if(sender instanceof Player) {
+    public boolean onCommand(CommandSender s, org.bukkit.command.Command command, String label, String[] args) {
+        if(s instanceof Player) {
+            Player sender = (Player) s;
             if(args.length > 0) {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
-                        if (!sender.hasPermission("quake.game")) {
-                            sender.sendMessage("You dont have the permission !");
-                            return false;
-                        }
-                        if (Quake.gameManager.containsGame(args[1])) {
-                            // /quake args0 args1  args2         args3...
-                            // /quake game  <game> setmineplayer 87
-                            return new PartialGame(sender, command, Permission.COMMAND_GAME, args, Quake.gameManager.getGameByName(args[1])).execute().value();
-                        } else {
-                            sender.sendMessage(getI18n("util.gameNotFound"));
-                            return true;
-                        }
+                            return new PartialCommandGame(sender, command, Permission.COMMAND_GAME, args).execute().value();
                     } else {
-                        sender.sendMessage(getI18n("command.game.usage"));
+                        JsonBuilder.sendJson(sender, getI18n("command.game.usage").replace("%game%", "<game>"));
                         return true;
                     }
                 } else if(args[0].equalsIgnoreCase("players")) {
                     if(args.length > 1) {
                         if (Bukkit.getPlayer(args[1]) != null) {
-                            return new PartialPlayer(sender, command, Permission.COMMAND_PLAYER, args, Bukkit.getPlayer(args[1])).execute().value();
+                            return new PartialCommandPlayer(sender, command, Permission.COMMAND_PLAYER, args, Bukkit.getPlayer(args[1])).execute().value();
                         } else {
                             sender.sendMessage(ChatColor.RED + "Player can not bee found !");
                             return true;
@@ -70,46 +61,21 @@ public class Command extends CommandExe {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
-                } else if (args[0].equalsIgnoreCase("create")) {
-                    if (!sender.hasPermission("quake.create")) {
-                        sender.sendMessage("You dont have the permission !");
-                        return false;
-                    }
-                    if (args.length > 1) {
-                        if (Quake.gameManager.getGameByName(args[1]) == null) {
-                            return new Create(sender, command, null, args, args[1]).execute().value();
-                        } else {
-                            sender.sendMessage(getI18n("util.gameAlreadyCreate"));
-                            return true;
-                        }
-                    } else {
-                        sender.sendMessage(getI18n("command.game.create.usage"));
-                        return true;
-                    }
-                } else if (args[0].equalsIgnoreCase("delete")) {
-                    if (!sender.hasPermission("quake.game")) {
-                        sender.sendMessage("You dont have the permission !");
-                        return false;
-                    }
-                    if (args.length > 1) {
-                        if (Quake.gameManager.getGameByName(args[1]) != null) {
-                            return new Delete(sender, command, null, args, args[1]).execute().value();
-                        } else {
-                            sender.sendMessage(getI18n("util.gameNotFound"));
-                            return true;
-                        }
-                    } else {
-                        sender.sendMessage(getI18n("command.game.delete.usage"));
-                        return true;
-                    }
+                } else if(args[0].equalsIgnoreCase("lobby") || args[0].equalsIgnoreCase("hub")) {
+
+
+
+
+                    return true;
                 } else if (args[0].equalsIgnoreCase("help")) {
-                    for(String s : getHelps()) {
-                        sender.sendMessage(s);
+                    for(String str : getHelps()) {
+                        sender.sendMessage(str);
                     }
                     return true;
                 } else {
-                    //Other command !
-                    sender.sendMessage("Not a valid command");
+                    for (String str : getHelps()) {
+                        JsonBuilder.sendJson(sender, str);
+                    }
                     return true;
                 }
             } else {
@@ -117,7 +83,7 @@ public class Command extends CommandExe {
                 return true;
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "It must be a player !");
+            s.sendMessage(ChatColor.RED + "It must be a player !");
             return true;
         }
     }

@@ -168,7 +168,6 @@ public class PlayerInfo {
     public void dash() {
         if (isDash()) {
             Game game = Quake.gameManager.getGameByPlayer(getPlayer());
-            Quake.logDebug("Dash for player " + getPlayer().getDisplayName() + " in game " + game.getDisplayName());
             if (game.getState() == State.STARTED) {
                 PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
                 Bukkit.getPluginManager().callEvent(event);
@@ -176,14 +175,9 @@ public class PlayerInfo {
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
                 Vector pVector = player.getEyeLocation().getDirection();
                 Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
-                Quake.logDebug("The vector for the dash is: " + vector);
                 getPlayer().setVelocity(vector);
                 getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
-            } else {
-                Quake.logDebug("The game is not started, the dash is annulled");
             }
-        } else {
-            Quake.logDebug("The dash is annulled because the cooldown is not finish");
         }
     }
 
@@ -259,6 +253,7 @@ public class PlayerInfo {
                         new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
 
                         addWin(1);
+
                         game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
                         game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has win the game !");
                     }

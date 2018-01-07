@@ -3,6 +3,7 @@ package fr.bretzel.quake.command.partial.game;
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -10,7 +11,7 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class SetMaxPlayer extends IGame {
+public class SetMaxPlayer extends ICommandGame {
 
     public SetMaxPlayer(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
         super(sender, command, permission, args, game);
@@ -23,19 +24,19 @@ public class SetMaxPlayer extends IGame {
             try {
                 i = Integer.valueOf(getArgs()[3]);
             } catch (Exception e) {
-                getSender().sendMessage(getI18("command.game.setmaxplayer.error"));
+                JsonBuilder.sendJson(getPlayer(), getI18n("command.game.setmaxplayer.error.1"));
                 return this;
             }
             if (i < 2) {
-                getSender().sendMessage(getI18("command.game.setmaxplayer.error2"));
+                JsonBuilder.sendJson(getPlayer(), getI18n("command.game.setmaxplayer.error.2"));
                 return this;
             }
             getGame().setMaxPlayer(i);
             Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
-            getSender().sendMessage(getI18("command.game.setmaxplayer.valid").replace("%value%", String.valueOf(i)));
+            JsonBuilder.sendJson(getPlayer(), getI18n("command.game.setmaxplayer.valid").replace("%game%", getGame().getName()).replace("%value%", "" + i));
             return this;
         } else {
-            getSender().sendMessage(getI18("command.game.setmaxplayer.usage"));
+            JsonBuilder.sendJson(getPlayer(), getI18n("command.game.setmaxplayer.usage").replace("%game%", getGame().getName()));
             return this;
         }
     }

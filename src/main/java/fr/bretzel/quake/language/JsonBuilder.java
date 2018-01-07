@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
+
 public class JsonBuilder {
 
     public static void sendJson(Player p, String str) {

@@ -76,8 +76,6 @@ public class GameReader {
     public static Game read (NBTTagCompound compound, File file) {
         Game game = new Game();
 
-        System.out.print("Init new game by file: " + file.toString());
-
         game.setName(file.getName().replace(".dat", ""));
         game.setFile(file);
         game.setFirstLocation(Util.toLocationString(compound.getString("location1")));

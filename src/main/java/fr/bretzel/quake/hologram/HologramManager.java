@@ -91,6 +91,9 @@ public class HologramManager implements Listener {
         if (!exist(location, range))
             return;
         Hologram hologram = getHologram(location, range);
+        if (hologram == null) {
+            throw new NullPointerException();
+        }
         for (HoloEntity e : hologram.getHoloEntities())
             if (e.getStand() != null)
                 e.getStand().remove();

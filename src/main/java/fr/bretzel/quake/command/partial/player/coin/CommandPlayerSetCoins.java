@@ -10,14 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 /**
- * Created by Loic on 31/07/2015.
+ * Created by mrbretzel on 21/07/15.
  */
 
-public class PlayerRemoveCoins extends IPlayer {
+public class PlayerSetCoins extends IPlayer {
 
     private int i = 0;
 
-    public PlayerRemoveCoins(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public PlayerSetCoins(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
         super(sender, command, permission, args, player);
         this.i = i;
     }
@@ -25,8 +25,8 @@ public class PlayerRemoveCoins extends IPlayer {
     @Override
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
-        info.removeCoins(i);
-        getPlayer().sendMessage(getI18("command.players.removecoins.valid").replace("%coins%", "" + i));
+        info.setCoins(i);
+        getPlayer().sendMessage(getI18n("command.players.setcoins.valid").replace("%coins%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;
     }

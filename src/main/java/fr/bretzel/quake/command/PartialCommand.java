@@ -1,5 +1,6 @@
 package fr.bretzel.quake.command;
 
+import fr.bretzel.quake.language.JsonBuilder;
 import fr.bretzel.quake.language.Language;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -59,7 +60,7 @@ public abstract class PartialCommand {
         this.value = value;
     }
 
-    public String getI18(String key) {
+    public String getI18n(String key) {
         return Language.defaultLanguage.get(key);
     }
 
@@ -69,5 +70,11 @@ public abstract class PartialCommand {
 
     public boolean isPlayer() {
         return isplayer;
+    }
+
+    public void sendMessage(String str) {
+        if (isplayer) {
+            JsonBuilder.sendJson(getPlayer(), str);
+        }
     }
 }

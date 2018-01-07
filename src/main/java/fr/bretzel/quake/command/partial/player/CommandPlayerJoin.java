@@ -33,7 +33,7 @@ public class PlayerJoin extends IPlayer {
         }
         getPlayer().teleport(game.getSpawn());
         game.addPlayer(getPlayer());
-        getSender().sendMessage(getI18("command.players.join.valid"));
+        getSender().sendMessage(getI18n("command.players.join.valid"));
         e.actualiseJoinSignForGame(game);
         if (e.lastPlayerInGame.equalsIgnoreCase("lastInGame")) {
             e.lastPlayerInGame = e.getInfoPlayer(game);

@@ -1,4 +1,4 @@
-package fr.bretzel.quake.command.partial;
+package fr.bretzel.quake.command.partial.game;
 
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
@@ -23,9 +23,9 @@ public class Delete extends PartialCommand {
     @Override
     public PartialCommand execute() {
         Player player = (Player) getSender();
-        if ("null".equals(games)) {
+        if (games.equals("null")) {
             setValue(true);
-            getSender().sendMessage(getI18("command.game.create.nameIsNull"));
+            getSender().sendMessage(getI18n("command.game.create.nameIsNull"));
             return this;
         }
         Quake.gameManager.deleteGame(Quake.gameManager.getGameByName(games), player);

@@ -1,1 +1,48 @@
-test.command.bite=TXT=Test
+#Command Basic
+command.quake.no.permission=TXT=&cYou d'ont have the permission.
+
+#Command help
+command.help.1=TXT=1
+command.help.2=TXT=2
+command.help.3=TXT=3
+command.help.4=TXT=4
+command.help.5=TXT=5
+
+#Command Game
+command.game.usage=JSON=["",{"text":"Usage: /quake game","color":"red"},{"text":" < %game% | Create | Remove > ","color":"red"},{"text":"<","color":"red"},{"text":"addRespawn","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% addRespawn"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Remove respawn at your position.","color":"red"}]}}},{"text":"|","color":"red"},{"text":"removeRespawn","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% removeRespawn"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Remove respawn at your position.","color":"red"}]}}},{"text":"|","color":"red"},{"text":"viewRespawn","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% viewRespawn"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"View your respawn.","color":"red"}]}}},{"text":"|","color":"red"},{"text":"setDisplayName","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setDisplayName"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Change the display name of your game.","color":"red"}]}}},{"text":"|","color":"red"},{"text":"setMaxPlayer","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setMaxPlayer"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Set the max player of the game.","color":"red"}]}}},{"text":"|","color":"red"},{"text":"setMinPlayer","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setMinPlayer"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Set the minimum player for the game will start","color":"red"}]}}},{"text":"|","color":"red"},{"text":"setSpawn","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setSpawn"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Set the spawn of the game.","color":"red"}]}}},{"text":">","color":"red"}]
+
+command.game.setdisplayname.usage=JSON=["",{"text":"Usage: /quake game","color":"red"},{"text":" %game% ","color":"red",{"text":"<","color":"red"},{"text":"setDisplayName","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setDisplayName"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Change the display name of your game.","color":"red"}]}}},{"text":"> ","color":"red"},{"text":"<name>","color":"red"}]
+command.game.setdisplayname.valid=TXT=&aThe display name of %game% has been changed.
+
+command.game.setmaxplayer.usage=JSON=["",{"text":"Usage: /quake game","color":"red"},{"text":" %game% ","color":"red"},{"text":"<","color":"red"},{"text":"setMaxPlayer","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setMaxPlayer <value>"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Set the max player","color":"red"}]}}},{"text":"> ","color":"red"},{"text":"<value>","color":"red"}]
+command.game.setmaxplayer.error.1=TXT=&cPlease insert a correct number.
+command.game.setmaxplayer.error.2=TXT=&cMinimum players is 2.
+command.game.setmaxplayer.valid=TXT=&aMax player for %game% is %value% .
+
+command.game.setminplayer.usage=JSON=["",{"text":"Usage: /quake game","color":"red"},{"text":" %game% ","color":"red"},{"text":"<","color":"red"},{"text":"setMinPlayer","color":"red","clickEvent":{"action":"suggest_command","value":"/quake game %game% setMinPlayer <value>"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Set the min player","color":"red"}]}}},{"text":"> ","color":"red"},{"text":"<value>","color":"red"}]
+command.game.setminplayer.error.1=TXT=&cPlease insert a correct number.
+command.game.setminplayer.error.2=TXT=&cMinimum players is 2.
+command.game.setminplayer.valid=TXT=&aMinimum player for %game% is %value% .
+
+command.game.viewrespawn.valid.true=TXT=&aYou view all respawn point for %game% .
+command.game.viewrespawn.valid.false=TXT=&aYou don't view all respawn point for %game% .
+
+command.game.addrespawn.error=TXT=&cThis position is already used.
+command.game.addrespawn.valid=TXT=&aRespawn %value% has been added.
+
+command.game.removerespawn.error=TXT=&cNo respawn at this position.
+command.game.removerespawn.valid=TXT=&aRespawn has been removed.
+
+command.game.setspawn.valid=TXT=&aThe spawn has been set to your location.
+
+command.game.create.valid=TXT=&aYou have create %game%
+command.game.create.error=TXT=&cThe game is already exist.
+command.game.create.usage=TXT=&cUsage: /quake game create <game>
+
+command.game.delete.valid=TXT=&aYou have delete %game%
+command.game.delete.error=TXT=&cThe don't game exist.
+command.game.delete.usage=TXT=&cUsage: /quake game delete <game>
+
+#Util
+util.quake.game.notfound=TXT=&cThe game %game% is not found.
+util.quake.game.isnull=TXT=&cThe game is null.

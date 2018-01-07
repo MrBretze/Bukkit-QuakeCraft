@@ -25,7 +25,7 @@ public class PlayerAddCoins extends IPlayer {
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.addCoins(i);
-        getPlayer().sendMessage(getI18("command.players.addcoins.valid").replace("%coins%", "" + i));
+        getPlayer().sendMessage(getI18n("command.players.addcoins.valid").replace("%coins%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;
     }

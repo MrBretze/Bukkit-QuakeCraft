@@ -84,15 +84,13 @@ public class GameManager implements Listener {
         if (event.isCancelled()) {
             return;
         }
-        creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
     }
 
     public void deleteGame(Game game, Player deleter) {
         if(game != null) {
             game.delete();
-            deleter.sendMessage(ChatColor.GREEN + "The game has been deleted !");
         } else {
-            deleter.sendMessage(ChatColor.RED + "The game has been not found !");
+            deleter.sendMessage(ChatColor.RED + "ERROR THE GAME HAS BEEN NOT FOUND !");
         }
     }
 
@@ -213,7 +211,8 @@ public class GameManager implements Listener {
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
             if (!game.isInArea(event.getTo())) {
-                player.teleport(event.getFrom().setDirection(player.getEyeLocation().getDirection()));
+                Location to = event.getFrom();
+                player.teleport(to);
             }
         }
     }

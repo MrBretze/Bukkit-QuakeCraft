@@ -284,11 +284,7 @@ public class Game implements Serializable {
     }
 
     public void view() {
-        if(this.respawnview) {
-            view(false);
-        } else {
-            view(true);
-        }
+        view(!isView());
     }
 
     public boolean isView() {

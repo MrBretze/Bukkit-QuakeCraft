@@ -37,7 +37,7 @@ public class PartialPlayer extends IPlayer {
                 if (info.isInGame()) {
                     return new PlayerQuit(getSender(), getCommand(), getPermission(), getArgs(), getPlayer()).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.playerNotInAGame"));
+                    getSender().sendMessage(getI18n("command.players.playerNotInAGame"));
                     setValue(true);
                     return this;
                 }
@@ -54,15 +54,15 @@ public class PartialPlayer extends IPlayer {
                         if (Quake.gameManager.getGameByName(getArgs()[3]) != null) {
                             return new PlayerJoin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), Quake.gameManager.getGameByName(getArgs()[3])).execute();
                         } else {
-                            getSender().sendMessage(getI18("command.players.gameNotFound"));
+                            getSender().sendMessage(getI18n("command.players.gameNotFound"));
                             return this;
                         }
                     } else {
-                        getSender().sendMessage(getI18("command.players.usageJoin"));
+                        getSender().sendMessage(getI18n("command.players.usageJoin"));
                         return this;
                     }
                 } else {
-                    getSender().sendMessage(getI18("command.players.alReadyInAGame"));
+                    getSender().sendMessage(getI18n("command.players.alReadyInAGame"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setcoins")) {
@@ -71,16 +71,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (i < 0) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.setcoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.setcoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("addcoins")) {
@@ -89,16 +89,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerAddCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.addcoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.addcoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("removecoins")) {
@@ -107,16 +107,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerRemoveCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setkill")) {
@@ -125,16 +125,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.setkill.usage"));
+                    getSender().sendMessage(getI18n("command.players.setkill.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("addkill")) {
@@ -143,16 +143,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerAddKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("removekill")) {
@@ -161,16 +161,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerRemoveKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setkillstreak")) {
@@ -179,16 +179,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.setkillstreak.usage"));
+                    getSender().sendMessage(getI18n("command.players.setkillstreak.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("addkillstreak")) {
@@ -197,16 +197,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("removekillstreak")) {
@@ -215,16 +215,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removecoins.usage"));
+                    getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("setwon")) {
@@ -233,16 +233,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerSetWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.setwon.usage"));
+                    getSender().sendMessage(getI18n("command.players.setwon.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("addwon")) {
@@ -251,16 +251,16 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerAddWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.addwon.usage"));
+                    getSender().sendMessage(getI18n("command.players.addwon.usage"));
                     return this;
                 }
             } else if (getArgs()[2].equalsIgnoreCase("removewon")) {
@@ -269,25 +269,25 @@ public class PartialPlayer extends IPlayer {
                     try {
                         i = Integer.valueOf(getArgs()[3]);
                     } catch (Exception e) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
                     if (!(i > 0)) {
-                        getSender().sendMessage(getI18("command.players.notAValidNumber"));
+                        getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
                     return new PlayerRemoveWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
-                    getSender().sendMessage(getI18("command.players.removewon.usage"));
+                    getSender().sendMessage(getI18n("command.players.removewon.usage"));
                     return this;
                 }
             } else {
-                getSender().sendMessage(getI18("command.players.usage"));
+                getSender().sendMessage(getI18n("command.players.usage"));
                 setValue(true);
                 return this;
             }
         } else {
-            getSender().sendMessage(getI18("command.players.usage"));
+            getSender().sendMessage(getI18n("command.players.usage"));
             setValue(true);
             return this;
         }
