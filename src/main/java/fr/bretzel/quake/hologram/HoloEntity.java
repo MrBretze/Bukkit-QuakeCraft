@@ -14,7 +14,7 @@
  * permissions and limitations under the License. See accompanying
  * LICENSE file.
  */
-package fr.bretzel.hologram;
+package fr.bretzel.quake.hologram;
 
 import org.bukkit.Location;
 import org.bukkit.World;
