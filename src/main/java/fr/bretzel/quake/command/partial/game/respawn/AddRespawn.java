@@ -1,7 +1,12 @@
-package fr.bretzel.quake.command.partial.game;
+package fr.bretzel.quake.command.partial.game.respawn;
 
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.command.partial.game.ICommandGame;
 import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.hologram.Hologram;
+import fr.bretzel.quake.hologram.HologramManager;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -18,14 +23,18 @@ public class AddRespawn extends ICommandGame {
     @Override
     public PartialCommand execute() {
         if (getGame().hasRespawn(getPlayer().getLocation())) {
-            getSender().sendMessage(getI18("command.game.addrespawn.error"));
+            JsonBuilder.sendJson(getPlayer(), getI18n("command.game.addrespawn.error"));
             return this;
         }
         getGame().addRespawn(getPlayer().getLocation());
+        int s = getGame().getRespawns().size();
+
         if (getGame().isView()) {
-            getGame().view(true);
+            Hologram hologram = new Hologram(getPlayer().getLocation(), "Respawn: " + s, Quake.holoManager);
+            hologram.display(true);
         }
-        getSender().sendMessage("command.game.addrespawn.valid");
+
+        JsonBuilder.sendJson(getPlayer(), getI18n("command.game.addrespawn.valid").replace("%value%", "" + s));
         return this;
     }
 }

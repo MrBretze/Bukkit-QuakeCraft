@@ -3,7 +3,7 @@ package fr.bretzel.quake.command.partial.player.killstreak;
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.command.partial.player.IPlayer;
+import fr.bretzel.quake.command.partial.player.ICommandPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,11 +12,11 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 08/08/2015.
  */
-public class PlayerRemoveKillStreak extends IPlayer {
+public class CommandPlayerRemoveKillStreak extends ICommandPlayer {
 
     private int i;
 
-    public PlayerRemoveKillStreak(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public CommandPlayerRemoveKillStreak(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
         super(sender, command, permission, args, player);
         this.i = i;
     }
@@ -25,7 +25,7 @@ public class PlayerRemoveKillStreak extends IPlayer {
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.removeKillStreak(i);
-        getPlayer().sendMessage(getI18("command.players.removekillsteak.valid").replace("%killstreak%", "" + i));
+        getPlayer().sendMessage(getI18n("command.players.removekillsteak.valid").replace("%killstreak%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;
     }

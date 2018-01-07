@@ -2,6 +2,7 @@ package fr.bretzel.quake.command.partial.game;
 
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,11 +12,11 @@ import org.bukkit.permissions.Permission;
  * Created by mrbretzel on 20/07/15.
  */
 
-public class Delete extends PartialCommand {
+public class CommandDeleteGame extends PartialCommand {
 
     private String games = "null";
 
-    public Delete(CommandSender sender, Command command, Permission permission, String[] args, String games) {
+    public CommandDeleteGame(CommandSender sender, Command command, Permission permission, String[] args, String games) {
         super(sender, command, permission, args);
         this.games = games;
     }
@@ -24,12 +25,11 @@ public class Delete extends PartialCommand {
     public PartialCommand execute() {
         Player player = (Player) getSender();
         if (games.equals("null")) {
-            setValue(true);
-            getSender().sendMessage(getI18n("command.game.create.nameIsNull"));
+            JsonBuilder.sendJson(getPlayer(), getI18n("util.quake.game.isnull"));
             return this;
         }
+
         Quake.gameManager.deleteGame(Quake.gameManager.getGameByName(games), player);
-        setValue(true);
         return this;
     }
 }

@@ -3,18 +3,18 @@ package fr.bretzel.quake.command.partial.player;
 import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.command.partial.player.coin.PlayerAddCoins;
-import fr.bretzel.quake.command.partial.player.coin.PlayerRemoveCoins;
-import fr.bretzel.quake.command.partial.player.coin.PlayerSetCoins;
-import fr.bretzel.quake.command.partial.player.kill.PlayerAddKill;
-import fr.bretzel.quake.command.partial.player.kill.PlayerRemoveKill;
-import fr.bretzel.quake.command.partial.player.kill.PlayerSetKill;
-import fr.bretzel.quake.command.partial.player.killstreak.PlayerAddKillStreak;
-import fr.bretzel.quake.command.partial.player.killstreak.PlayerRemoveKillStreak;
-import fr.bretzel.quake.command.partial.player.killstreak.PlayerSetKillStreak;
-import fr.bretzel.quake.command.partial.player.win.PlayerAddWin;
-import fr.bretzel.quake.command.partial.player.win.PlayerRemoveWin;
-import fr.bretzel.quake.command.partial.player.win.PlayerSetWin;
+import fr.bretzel.quake.command.partial.player.coin.CommandPlayerAddCoins;
+import fr.bretzel.quake.command.partial.player.coin.CommandPlayerRemoveCoins;
+import fr.bretzel.quake.command.partial.player.coin.CommandPlayerSetCoins;
+import fr.bretzel.quake.command.partial.player.kill.CommandPlayerAddKill;
+import fr.bretzel.quake.command.partial.player.kill.CommandPlayerRemoveKill;
+import fr.bretzel.quake.command.partial.player.kill.CommandPlayerSetKill;
+import fr.bretzel.quake.command.partial.player.killstreak.CommandPlayerAddKillStreak;
+import fr.bretzel.quake.command.partial.player.killstreak.CommandPlayerRemoveKillStreak;
+import fr.bretzel.quake.command.partial.player.killstreak.CommandPlayerSetKillStreak;
+import fr.bretzel.quake.command.partial.player.win.CommandPlayerAddWin;
+import fr.bretzel.quake.command.partial.player.win.CommandPlayerRemoveWin;
+import fr.bretzel.quake.command.partial.player.win.CommandPlayerSetWin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,9 +23,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 20/07/15.
  */
-public class PartialPlayer extends IPlayer {
+public class PartialCommandPlayer extends ICommandPlayer {
 
-    public PartialPlayer(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
+    public PartialCommandPlayer(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
         super(sender, command, permission, args, player);
     }
 
@@ -35,24 +35,18 @@ public class PartialPlayer extends IPlayer {
             PlayerInfo info = Quake.getPlayerInfo(getPlayer());
             if (getArgs()[2].equalsIgnoreCase("quit")) {
                 if (info.isInGame()) {
-                    return new PlayerQuit(getSender(), getCommand(), getPermission(), getArgs(), getPlayer()).execute();
+                    return new CommandPlayerQuit(getSender(), getCommand(), getPermission(), getArgs(), getPlayer()).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.playerNotInAGame"));
                     setValue(true);
                     return this;
                 }
             }
-
-            if (!getSender().hasPermission("quake.players")) {
-                getSender().sendMessage("You dont have the permission !");
-                return this;
-            }
-
             if (getArgs()[2].equalsIgnoreCase("join")) {
                 if (!info.isInGame()) {
                     if (getArgs().length > 3) {
                         if (Quake.gameManager.getGameByName(getArgs()[3]) != null) {
-                            return new PlayerJoin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), Quake.gameManager.getGameByName(getArgs()[3])).execute();
+                            return new CommandPlayerJoin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), Quake.gameManager.getGameByName(getArgs()[3])).execute();
                         } else {
                             getSender().sendMessage(getI18n("command.players.gameNotFound"));
                             return this;
@@ -78,7 +72,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerSetCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.setcoins.usage"));
                     return this;
@@ -96,7 +90,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerAddCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerAddCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.addcoins.usage"));
                     return this;
@@ -114,7 +108,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerRemoveCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerRemoveCoins(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
@@ -132,7 +126,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerSetKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.setkill.usage"));
                     return this;
@@ -150,7 +144,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerAddKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerAddKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
@@ -168,7 +162,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerRemoveKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerRemoveKill(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
@@ -186,7 +180,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerSetKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.setkillstreak.usage"));
                     return this;
@@ -204,7 +198,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerAddKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
@@ -222,7 +216,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerRemoveKillStreak(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removecoins.usage"));
                     return this;
@@ -240,7 +234,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerSetWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.setwon.usage"));
                     return this;
@@ -258,7 +252,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerAddWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerAddWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.addwon.usage"));
                     return this;
@@ -276,7 +270,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18n("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerRemoveWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new CommandPlayerRemoveWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18n("command.players.removewon.usage"));
                     return this;

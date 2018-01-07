@@ -13,9 +13,9 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by mrbretzel on 20/07/15.
  */
-public class PlayerQuit extends IPlayer {
+public class CommandPlayerQuit extends ICommandPlayer {
 
-    public PlayerQuit(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
+    public CommandPlayerQuit(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
         super(sender, command, permission, args, player);
     }
 

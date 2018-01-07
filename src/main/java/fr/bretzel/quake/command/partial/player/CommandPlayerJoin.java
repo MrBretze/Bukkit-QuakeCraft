@@ -14,12 +14,12 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by mrbretzel on 20/07/15.
  */
-public class PlayerJoin extends IPlayer {
+public class CommandPlayerJoin extends ICommandPlayer {
 
     private Game game;
     private SignEvent e = Quake.gameManager.signEvent;
 
-    public PlayerJoin(CommandSender sender, Command command, Permission permission, String[] args, Player player, Game game) {
+    public CommandPlayerJoin(CommandSender sender, Command command, Permission permission, String[] args, Player player, Game game) {
         super(sender, command, permission, args, player);
         this.game = game;
     }

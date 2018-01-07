@@ -1,7 +1,9 @@
-package fr.bretzel.quake.command.partial.game;
+package fr.bretzel.quake.command.partial.game.respawn;
 
 import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.command.partial.game.ICommandGame;
 import fr.bretzel.quake.game.Game;
+import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -17,21 +19,8 @@ public class ViewRespawn extends ICommandGame {
 
     @Override
     public PartialCommand execute() {
-        if (getArgs().length > 3) {
-            boolean b;
-            try {
-                b = Boolean.valueOf(getArgs()[3]);
-            } catch (Exception e) {
-                getSender().sendMessage(getI18("command.game.view.error").replace("%value%", getArgs()[3]));
-                return this;
-            }
-            getGame().view(b);
-            if (b) getSender().sendMessage(getI18("command.game.view.validTrue"));
-            else getSender().sendMessage(getI18("command.game.view.validFalse"));
-        } else {
-            getSender().sendMessage(getI18("command.game.view.usage"));
-            return this;
-        }
+        getGame().view();
+        JsonBuilder.sendJson(getPlayer(), getI18n("command.game.viewrespawn.valid." + getGame().isView()).replace("%game%", getGame().getName()));
         return this;
     }
 }
