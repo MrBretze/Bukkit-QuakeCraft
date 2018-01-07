@@ -134,10 +134,6 @@ public class GameManager implements Listener {
         return gameChrono;
     }
 
-    public Chrono getChronoGame(Game game) {
-        return getGameChrono().get(game);
-    }
-
     public GameTask getTaskByGame(Game game) {
         return getQuakeTaskHashMap().get(game);
     }
@@ -311,7 +307,7 @@ public class GameManager implements Listener {
         final Player player = event.getPlayer();
         final PlayerInfo info = Quake.getPlayerInfo(player);
         if (game.getState() == State.STARTED) {
-            if (game.getPlayerList().size() - 1 == 0) {
+            if (game.getPlayerList().size() <= 1) {
                 game.stop();
             }
         }
@@ -323,7 +319,8 @@ public class GameManager implements Listener {
 
             @Override
             public void run() {
-                player.setScoreboard(info.getPlayerScoreboard());
+                if (player.isOnline())
+                    player.setScoreboard(info.getPlayerScoreboard());
             }
         }.runTaskLater(Quake.quake, 10L);
     }

@@ -38,11 +38,11 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
-import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -60,9 +60,11 @@ public class PlayerInfo {
     private Location secondLocation = null;
     private boolean shoot = true;
     private boolean dash = true;
-    private int playerkill = 0;
+    private String name;
+    private Date date;
+    private int kill = 0;
     private int coins = 0;
-    private int won = 0;
+    private int win = 0;
     private int killstreak = 0;
     private int death = 0;
     private int respawn = 0;
@@ -70,8 +72,25 @@ public class PlayerInfo {
 
     public PlayerInfo(Player player) {
         setPlayer(player);
-
+        setName(getPlayer().getName());
+        setDate(new Date());
         Bukkit.getScheduler().runTask(Quake.quake, new LoadTask(this));
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public double getReloadTime() {
@@ -216,7 +235,7 @@ public class PlayerInfo {
                         addKillStreak(1);
                     }
 
-                    addPlayerKill(shoot.getKill());
+                    addKill(shoot.getKill());
                     addCoins(5 * shoot.getKill());
                     game.addKill(getPlayer(), shoot.getKill());
                     game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
@@ -239,29 +258,29 @@ public class PlayerInfo {
 
                         new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
 
-                        addWoon(1);
+                        addWin(1);
                         game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
-                        game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has won the game !");
+                        game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has win the game !");
                     }
                 }
             }
         }
     }
 
-    public int getPlayerKill() {
-        return playerkill;
+    public int getKill() {
+        return kill;
     }
 
-    public void setPlayerKill(int playerkill) {
-        this.playerkill = playerkill;
+    public void setKill(int playerkill) {
+        this.kill = playerkill;
     }
 
-    public void addPlayerKill(int kill) {
-        setPlayerKill(getPlayerKill() + kill);
+    public void addKill(int kill) {
+        setKill(getKill() + kill);
     }
 
     public void removePlayerKill(int kill) {
-        setPlayerKill(getPlayerKill() - kill);
+        setKill(getKill() - kill);
     }
 
     public int getCoins() {
@@ -304,9 +323,9 @@ public class PlayerInfo {
         objective.getScore(ChatColor.RESET.toString()).setScore(10);
         objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
         objective.getScore(ChatColor.RESET + ChatColor.RESET.toString()).setScore(8);
-        objective.getScore("Kills: " + ChatColor.BLUE + getPlayerKill()).setScore(7);
+        objective.getScore("Kills: " + ChatColor.BLUE + getKill()).setScore(7);
         objective.getScore(ChatColor.RESET + "                            " + ChatColor.RESET).setScore(6);
-        objective.getScore("Win: " + ChatColor.BLUE + getWon()).setScore(5);
+        objective.getScore("Win: " + ChatColor.BLUE + getWin()).setScore(5);
         objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(4);
         objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
         objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(2);
@@ -326,20 +345,20 @@ public class PlayerInfo {
         setRespawn(getRespawn() + respawn);
     }
 
-    public int getWon() {
-        return won;
+    public int getWin() {
+        return win;
     }
 
-    public void setWon(int won) {
-        this.won = won;
+    public void setWin(int win) {
+        this.win = win;
     }
 
-    public void addWoon(int woon) {
-        setWon(getWon() + woon);
+    public void addWin(int win) {
+        setWin(getWin() + win);
     }
 
-    public void removeWoon(int woon) {
-        setWon(getWon() - woon);
+    public void removeWin(int win) {
+        setWin(getWin() - win);
     }
 
     public int getDeath() {
@@ -357,30 +376,35 @@ public class PlayerInfo {
     public void save() {
         if (Quake.config.ifStringExist(getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
             try {
-                PreparedStatement statement = Quake.config.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET Effect = ?, Reload = ?, PlayerKill = ?, Coins = ?, Won = ?, KillStreak = ?, Death = ? WHERE UUID = ?");
+                PreparedStatement statement = Quake.config.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET Effect = ?, Reload = ?, PlayerKill = ?, Coins = ?, Win = ?," +
+                        " KillStreak = ?, Death = ?, Name = ?," + " LastConnection = ? WHERE UUID = ?");
                 statement.setString(1, getEffect().getName());
                 statement.setDouble(2, getReloadTime());
-                statement.setInt(3, getPlayerKill());
+                statement.setInt(3, getKill());
                 statement.setInt(4, getCoins());
-                statement.setInt(5, getWon());
+                statement.setInt(5, getWin());
                 statement.setInt(6, getKillStreak());
                 statement.setInt(7, getDeath());
-                statement.setString(8, getUUID().toString());
+                statement.setString(8, getName());
+                statement.setDate(9, new java.sql.Date(getDate().getTime()));
+                statement.setString(10, getUUID().toString());
                 Quake.config.executePreparedStatement(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Won, KillStreak, Death) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Win, KillStreak, Death, Name, LastConnection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 statement.setString(1, getUUID().toString());
                 statement.setString(2, getEffect().getName());
                 statement.setDouble(3, getReloadTime());
-                statement.setInt(4, getPlayerKill());
+                statement.setInt(4, getKill());
                 statement.setInt(5, getCoins());
-                statement.setInt(6, getWon());
+                statement.setInt(6, getWin());
                 statement.setInt(7, getKillStreak());
                 statement.setInt(8, getDeath());
+                statement.setString(9, getName());
+                statement.setDate(10, new java.sql.Date(getDate().getTime()));
                 Quake.config.executePreparedStatement(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -410,9 +434,9 @@ public class PlayerInfo {
                 if (set.next()) {
                     setEffect(ParticleEffect.fromName(set.getString("Effect")));
                     setReload(set.getDouble("Reload"));
-                    setPlayerKill(set.getInt("PlayerKill"));
+                    setKill(set.getInt("PlayerKill"));
                     setCoins(set.getInt("Coins"));
-                    setWon(set.getInt("Won"));
+                    setWin(set.getInt("Win"));
                     setKillStreak(set.getInt("KillStreak"));
                     setDeath(set.getInt("Death"));
                 }

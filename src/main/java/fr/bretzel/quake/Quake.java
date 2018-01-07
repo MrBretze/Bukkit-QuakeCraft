@@ -17,11 +17,12 @@
 package fr.bretzel.quake;
 
 import fr.bretzel.quake.config.Config;
-import fr.bretzel.hologram.HologramManager;
+import fr.bretzel.quake.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.language.LanguageManager;
+import fr.bretzel.quake.language.JsonBuilder;
+import fr.bretzel.quake.language.Language;
 import fr.bretzel.quake.reader.GameReader;
 
 import org.bukkit.Bukkit;
@@ -37,7 +38,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Locale;
+import java.util.Objects;
 
 
 public class Quake extends JavaPlugin {
@@ -49,7 +50,6 @@ public class Quake extends JavaPlugin {
     public static Quake quake;
     public static HologramManager holoManager;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
-    private static LanguageManager languageManager;
     private static boolean debug = false;
 
     @Override
@@ -72,19 +72,6 @@ public class Quake extends JavaPlugin {
         return playerInfos;
     }
 
-    public static String getI18n(String key) {
-        return languageManager.getI18n(key);
-    }
-
-    public static boolean isDebug() {
-        return debug;
-    }
-
-    public static void logDebug(String msg) {
-        if (isDebug())
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GOLD + "[DEBUG]" + ChatColor.RESET + ": " + ChatColor.WHITE + msg);
-    }
-
     public static void logInfo(String msg) {
         Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_GRAY + "[INFO]: " + msg);
     }
@@ -95,8 +82,18 @@ public class Quake extends JavaPlugin {
 
 
         logInfo("Registering Lang");
-        LanguageManager.init(this);
+        try {
+            Language.enable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Language.Locale locale = Language.Locale.fromString(getConfig().getString("Language") + "_" + getConfig().getString("Region"));
+
+        Language.defaultLanguage = Language.getLanguage(locale);
+
         logInfo("End");
+
 
 
         if (!new File(getDataFolder(), "config.yml").exists()) {
@@ -106,12 +103,6 @@ public class Quake extends JavaPlugin {
 
         reloadConfig();
         debug = getConfig().getBoolean("debug");
-
-
-        logInfo("Starting initialing LanguageManager");
-        Locale locale = new Locale(getConfig().getString("language.Language"), getConfig().getString("language.Region"));
-        languageManager = new LanguageManager(locale);
-        logInfo("End initialing LanguageManager");
 
 
         logInfo("Starting initialing Holomanager");
@@ -136,7 +127,7 @@ public class Quake extends JavaPlugin {
         logInfo("Registering Game");
         File file = new File(getDataFolder(), File.separator + "game" + File.separator);
         if (file.exists() && file.isDirectory()) {
-            if (file.listFiles().length > 0) {
+            if (Objects.requireNonNull(file.listFiles()).length > 0) {
                 initGame(file);
             }
         }
@@ -145,14 +136,22 @@ public class Quake extends JavaPlugin {
         boolean isMySQLconf = getConfig().getBoolean("mysql.Enabled");
 
         if (isMySQLconf) {
-            this.config = new Config(getConfig().getString("mysql.Hotsname"),
+            config = new Config(getConfig().getString("mysql.Hotsname"),
                     getConfig().getString("mysql.Username"),
                     getConfig().getString("mysql.Password"),
                     getConfig().getString("mysql.Port"),
                     getConfig().getString("mysql.Database")) {
             };
         } else {
-            this.config = new Config(new File(getDataFolder(), "database.sql"));
+            File f = new File(getDataFolder(), "database.db");
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            config = new Config(f);
         }
     }
 
@@ -172,7 +171,8 @@ public class Quake extends JavaPlugin {
         if (label.equalsIgnoreCase("test")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                Util.spawnFirework(Util.getCircle(player.getLocation(), 3, 8));
+                player.sendMessage(Language.defaultLanguage.get("test.command.bite"));
+                JsonBuilder.sendJson(player, Language.defaultLanguage.get("test.command.bite"));
                 return true;
             } else return true;
         }
@@ -200,7 +200,7 @@ public class Quake extends JavaPlugin {
         for (File f : file.listFiles()) {
             try {
                 Game game = GameReader.read(NBTCompressedStreamTools.read(new FileInputStream(f)), f);
-                logDebug("Initialing game: " + game.getDisplayName());
+                logInfo("Initialing game: " + game.getDisplayName());
                 gameManager.getGameLinkedList().add(game);
                 gameManager.signEvent.actualiseJoinSignForGame(game);
             } catch (IOException e) {

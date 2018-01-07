@@ -6,3 +6,4 @@ commands:
       description: The quake command !
    sqlSet:
    sqlGet:
+   test:

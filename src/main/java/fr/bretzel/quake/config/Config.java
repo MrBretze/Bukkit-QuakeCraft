@@ -8,6 +8,18 @@ import java.sql.*;
 
 public class Config {
 
+    public static String SQL_CREATE_QUAKE_TABLE = "CREATE TABLE Players ( " +
+            "UUID VARCHAR(42), " +
+            "Effect VARCHAR(42), " +
+            "Reload DOUBLE, " +
+            "PlayerKill INTEGER, " +
+            "Coins INTEGER, " +
+            "Win INTEGER, " +
+            "KillStreak INTEGER, " +
+            "Death INTEGER," +
+            "Name VARCHAR(42), " +
+            "LastConnection DATE )";
+
     private Type configType;
     private IConfig config;
 
@@ -24,7 +36,11 @@ public class Config {
 
     public Config(File conf) {
         this.configType = Type.LOCAL_SQL;
-        config = new LocalConfig().init(this);
+        try {
+            config = new LocalConfig(conf).init(this);
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public Connection openConnection() {
@@ -137,7 +153,7 @@ public class Config {
 
 /**
  *
- * CREATE TABLE `QuakeCraft`.`Players` ( `UUID` VARCHAR(36) NULL DEFAULT NULL COMMENT 'UUID Of MC Player' , `Effect` VARCHAR(20) NOT NULL DEFAULT 'fireworksSpark' COMMENT 'Effect player shoot' , `Reload` VARCHAR(5) NOT NULL DEFAULT '1.5' COMMENT 'Reload time for player' , `PlayerKill` INT NOT NULL DEFAULT '0' COMMENT 'Number of player Kill' , `Coins` INT NOT NULL DEFAULT '0' COMMENT 'Coins of Player' , `Won` INT NOT NULL DEFAULT '0' COMMENT 'Number of won' , `KillStreak` INT NOT NULL DEFAULT '0' COMMENT 'Number of KillStreak' , `Death` INT NOT NULL DEFAULT '0' COMMENT 'Death' ) ENGINE = InnoDB;
+ * CREATE TABLE `QuakeCraft`.`Players` ( `UUID` VARCHAR(36) NULL DEFAULT NULL COMMENT 'UUID Of MC Player' , `Effect` VARCHAR(20) NOT NULL DEFAULT 'fireworksSpark' COMMENT 'Effect player shoot' , `Reload` VARCHAR(5) NOT NULL DEFAULT '1.5' COMMENT 'Reload time for player' , `PlayerKill` INT NOT NULL DEFAULT '0' COMMENT 'Number of player Kill' , `Coins` INT NOT NULL DEFAULT '0' COMMENT 'Coins of Player' , `Won` INT NOT NULL DEFAULT '0' COMMENT 'Number of win' , `KillStreak` INT NOT NULL DEFAULT '0' COMMENT 'Number of KillStreak' , `Death` INT NOT NULL DEFAULT '0' COMMENT 'Death' ) ENGINE = InnoDB;
  *
  *
  */
