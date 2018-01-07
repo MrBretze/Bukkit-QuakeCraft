@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;

@@ -1,10 +1,9 @@
 package fr.bretzel.quake.command.partial.player.coin;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.IPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

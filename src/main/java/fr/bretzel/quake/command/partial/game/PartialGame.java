@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -16,7 +16,7 @@
  */
 package fr.bretzel.quake.command.partial.game;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

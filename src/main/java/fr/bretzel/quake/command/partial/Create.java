@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import org.bukkit.command.Command;

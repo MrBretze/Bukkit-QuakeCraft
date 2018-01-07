@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.coin.PlayerAddCoins;
@@ -12,9 +12,9 @@ import fr.bretzel.quake.command.partial.player.kill.PlayerSetKill;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerAddKillStreak;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerRemoveKillStreak;
 import fr.bretzel.quake.command.partial.player.killstreak.PlayerSetKillStreak;
-import fr.bretzel.quake.command.partial.player.won.PlayerAddWon;
-import fr.bretzel.quake.command.partial.player.won.PlayerRemoveWon;
-import fr.bretzel.quake.command.partial.player.won.PlayerSetWon;
+import fr.bretzel.quake.command.partial.player.win.PlayerAddWin;
+import fr.bretzel.quake.command.partial.player.win.PlayerRemoveWin;
+import fr.bretzel.quake.command.partial.player.win.PlayerSetWin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -74,7 +74,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18("command.players.notAValidNumber").replace("%number%", getArgs()[3]));
                         return this;
                     }
-                    if (!(i > 0)) {
+                    if (i < 0) {
                         getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
@@ -240,7 +240,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerSetWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new PlayerSetWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18("command.players.setwon.usage"));
                     return this;
@@ -258,7 +258,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerAddWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new PlayerAddWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18("command.players.addwon.usage"));
                     return this;
@@ -276,7 +276,7 @@ public class PartialPlayer extends IPlayer {
                         getSender().sendMessage(getI18("command.players.notAValidNumber"));
                         return this;
                     }
-                    return new PlayerRemoveWon(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
+                    return new PlayerRemoveWin(getSender(), getCommand(), getPermission(), getArgs(), getPlayer(), i).execute();
                 } else {
                     getSender().sendMessage(getI18("command.players.removewon.usage"));
                     return this;

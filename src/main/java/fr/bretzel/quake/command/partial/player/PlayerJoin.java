@@ -1,12 +1,11 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.SignEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

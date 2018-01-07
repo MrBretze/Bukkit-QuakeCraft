@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.player.kill;
 
-import fr.bretzel.commands.PartialCommand;
+import fr.bretzel.quake.command.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.IPlayer;
@@ -24,7 +24,7 @@ public class PlayerAddKill extends IPlayer {
     @Override
     public PartialCommand execute() {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
-        info.addPlayerKill(i);
+        info.addKill(i);
         getPlayer().sendMessage(getI18("command.players.addkill.valid").replace("%kill%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());
         return this;

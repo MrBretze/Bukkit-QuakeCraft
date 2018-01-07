@@ -16,7 +16,6 @@
  */
 package fr.bretzel.quake.command;
 
-import fr.bretzel.commands.CommandExe;
 import fr.bretzel.quake.Permission;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.Create;
