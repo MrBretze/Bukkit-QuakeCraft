@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Lo�c Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -24,11 +24,11 @@ import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.inventory.BasicGun;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Team;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -51,7 +51,7 @@ public class GameStartTask extends GameTask {
 
     @Override
     public void run() {
-        if(getGame().getPlayerList().size() < getGame().getMinPlayer()) {
+        if (getGame().getPlayerList().size() < getGame().getMinPlayer()) {
             getGame().getScoreboardManager().getScoreboard().resetScores(this.last);
             getGame().getScoreboardManager().getObjective().getScore("Waiting...").setScore(5);
             cancel();
@@ -59,9 +59,9 @@ public class GameStartTask extends GameTask {
         }
         if (minSecQuake <= 5 || minSecQuake == 10) {
             getGame().broadcastMessage(ChatColor.BLUE + "The game start in: " + Util.getChatColorByInt(minSecQuake) + String.valueOf(minSecQuake));
-            for(UUID id : getGame().getPlayerList()) {
-                Player p = Bukkit.getPlayer(id);
-                if(p != null && p.isOnline()) {
+            for (PlayerInfo id : getGame().getPlayerList()) {
+                Player p = id.getPlayer();
+                if (p != null && p.isOnline()) {
                     Util.playSound(p.getLocation(), Sound.BLOCK_NOTE_PLING, 2.0F, 2.0F);
                 }
             }
@@ -82,7 +82,7 @@ public class GameStartTask extends GameTask {
         if (minSecQuake <= 0 && getGame().getState() == State.WAITING) {
             GameStartEvent event = new GameStartEvent(getGame());
             Bukkit.getPluginManager().callEvent(event);
-            if(event.isCancelled()) {
+            if (event.isCancelled()) {
                 getGame().stop();
                 cancel();
                 return;
@@ -92,17 +92,29 @@ public class GameStartTask extends GameTask {
             scoreboardAPI.getObjective().unregister();
             scoreboardAPI.setObjective(scoreboardAPI.getScoreboard().registerNewObjective("quake", "dummy"));
             scoreboardAPI.getObjective().setDisplaySlot(DisplaySlot.SIDEBAR);
-            for(UUID id : getGame().getPlayerList()) {
-                Player p = Bukkit.getPlayer(id);
-                if((p != null) && (p.isOnline())) {
-                    getGame().respawnAtStart(p);
+
+            int locuse = 0;
+
+            for (PlayerInfo id : getGame().getPlayerList()) {
+                Player p = id.getPlayer();
+                if ((p != null) && (p.isOnline())) {
+                    for (Location respawn : getGame().getRespawns()) {
+                        if (locuse >= getGame().getPlayerList().size()) {
+                            locuse = -1;
+                            continue;
+                        }
+                        p.teleport(getGame().getRespawns().get(locuse));
+                        locuse++;
+                        break;
+                    }
+
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
                     Chrono chrono = new Chrono();
                     p.getInventory().setHeldItemSlot(0);
                     chrono.start();
                     Quake.gameManager.getGameChrono().put(getGame(), chrono);
-                    getGame().setKill(p.getUniqueId(), 0);
+                    getGame().setKill(id, 0);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(1);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(getGame().getKill(p));
                 }

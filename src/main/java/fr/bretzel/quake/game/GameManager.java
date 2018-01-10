@@ -20,8 +20,8 @@ import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
-import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.GameStartTask;
+import fr.bretzel.quake.game.task.GameTask;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -166,7 +166,7 @@ public class GameManager implements Listener {
 
     public Game getGameByPlayer(Player player) {
         for (Game a : getGameLinkedList()) {
-            if (a.getPlayerList().contains(player.getUniqueId())) {
+            if (a.getPlayerList().contains(Quake.getPlayerInfo(player))) {
                 return a;
             }
         }
@@ -179,7 +179,7 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         PlayerInfo pi = Quake.getPlayerInfo(player);
 
-        if (player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
+        if (player.hasPermission("quake.player.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
             switch (action) {
                 case LEFT_CLICK_BLOCK:
                     leftClick(player, event);
@@ -190,14 +190,14 @@ public class GameManager implements Listener {
             }
         }
 
-        if (player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
+        if (player.hasPermission("quake.player.shoot") && player.getItemInHand() != null && pi.isInGame()) {
             Game game = getGameByPlayer(player);
             if (game.getState() == State.STARTED) {
                 if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                     pi.dash();
                     event.setCancelled(true);
                 } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                    pi.shoot();
+                    game.shootPlayer(pi);
                     event.setCancelled(true);
                 }
             }
@@ -340,7 +340,7 @@ public class GameManager implements Listener {
         return maxMinute;
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerShoot(PlayerShootEvent event) {
         Player player = event.getPlayer();
         Game game = event.getGame();
@@ -360,7 +360,7 @@ public class GameManager implements Listener {
                 game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
             }
         }
-    }
+    }*/
 
     @EventHandler
     public void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {

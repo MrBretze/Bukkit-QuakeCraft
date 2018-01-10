@@ -89,9 +89,9 @@ public class Util {
         return entities;
     }
 
-    public static void playSound(Location location, Sound sound, float f1, float f2) {
+    public static void playSound(Location location, Sound sound, float volume, float pitch) {
         for(Player player : location.getWorld().getPlayers()) {
-            player.playSound(location, sound, f1, f2);
+            player.playSound(location, sound, volume, pitch);
         }
     }
 

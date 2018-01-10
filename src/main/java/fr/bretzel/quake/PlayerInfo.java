@@ -19,12 +19,8 @@ package fr.bretzel.quake;
 import fr.bretzel.quake.config.Config;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
-import fr.bretzel.quake.game.event.GameEndEvent;
 import fr.bretzel.quake.game.event.PlayerDashEvent;
-import fr.bretzel.quake.game.event.PlayerShootEvent;
 import fr.bretzel.quake.game.task.DashTask;
-import fr.bretzel.quake.game.task.GameEndTask;
-import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.inventory.Gun;
 
 import org.bukkit.Bukkit;
@@ -33,7 +29,6 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
@@ -43,7 +38,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -74,7 +68,7 @@ public class PlayerInfo {
         setPlayer(player);
         setName(getPlayer().getName());
         setDate(new Date());
-        Bukkit.getScheduler().runTask(Quake.quake, new LoadTask(this));
+        new LoadTask(this).start();
     }
 
     public void setDate(Date date) {
@@ -165,103 +159,6 @@ public class PlayerInfo {
         this.dash = dash;
     }
 
-    public void dash() {
-        if (isDash()) {
-            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
-            if (game.getState() == State.STARTED) {
-                PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
-                Bukkit.getPluginManager().callEvent(event);
-                setDash(false);
-                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
-                Vector pVector = player.getEyeLocation().getDirection();
-                Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
-                getPlayer().setVelocity(vector);
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
-            }
-        }
-    }
-
-    public void shoot() {
-        if (isShoot()) {
-            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
-            List<Location> locs = Util.getLocationByDirection(getPlayer(), 200, 0.59D);
-            PlayerShootEvent shoot = new PlayerShootEvent(getPlayer(), game, locs, Util.getPlayerListInDirection(locs, getPlayer(), 0.59D));
-            Bukkit.getPluginManager().callEvent(shoot);
-            if (shoot.isCancelled()) {
-                return;
-            }
-            if (game.getState() == State.STARTED) {
-                setShoot(false);
-                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(this), (long) (this.getReloadTime() * 20));
-                Util.playSound(getPlayer().getEyeLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 2F, 1F);
-                for (Location location : locs) {
-                    new ParticleEffect.ParticlePacket(getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(location, 200D);
-                }
-                if (shoot.getKill() > 0) {
-                    for (Player p : shoot.getPlayers()) {
-                        shoot.getGame().setKillSteak(p, 0);
-                        Util.playSound(p.getLocation(), Sound.ENTITY_BLAZE_DEATH, 2F, 2F);
-                        shoot.getGame().respawn(p);
-                        Quake.getPlayerInfo(p).addDeath(1);
-                    }
-                    int kill;
-                    if (Integer.valueOf(game.getKill(getPlayer())) == null) {
-                        kill = shoot.getKill();
-                    } else {
-                        kill = game.getKill(getPlayer()) + shoot.getKill();
-                    }
-
-                    shoot.getGame().addKillStreak(getPlayer(), shoot.getKill());
-
-                    int killStreak = shoot.getGame().getKillStreak(getPlayer());
-
-                    if (killStreak == 5) {
-                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS KILLING SPREE !");
-                        addKillStreak(1);
-                    } else if (killStreak == 10) {
-                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A RAMPAGE !");
-                        addKillStreak(1);
-                    } else if (killStreak == 15) {
-                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " IS A DEMON !");
-                        addKillStreak(1);
-                    } else if (killStreak == 20) {
-                        game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + getPlayer().getDisplayName() + " MONSTER KIL !!");
-                        addKillStreak(1);
-                    }
-
-                    addKill(shoot.getKill());
-                    addCoins(5 * shoot.getKill());
-                    game.addKill(getPlayer(), shoot.getKill());
-                    game.getScoreboardManager().getObjective().getScore(getPlayer().getName()).setScore(kill);
-
-                    if (game.getKill(getPlayer()) >= game.getMaxKill()) {
-                        GameEndEvent event = new GameEndEvent(getPlayer(), game);
-                        Bukkit.getPluginManager().callEvent(event);
-                        if (event.isCancelled()) {
-                            return;
-                        }
-                        for (UUID id : game.getPlayerList()) {
-                            Player player = Bukkit.getPlayer(id);
-                            if (player != null && player.isOnline()) {
-                                PlayerInfo info = Quake.getPlayerInfo(player);
-                                player.getInventory().clear();
-                                info.setShoot(false);
-                                info.setDash(false);
-                            }
-                        }
-
-                        new GameEndTask(Quake.quake, 10L, 10L, game, getPlayer());
-
-                        addWin(1);
-
-                        game.getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
-                        game.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getName() + " Has win the game !");
-                    }
-                }
-            }
-        }
-    }
-
     public int getKill() {
         return kill;
     }
@@ -310,24 +207,6 @@ public class PlayerInfo {
         setKillStreak(getKillStreak() - killstreak);
     }
 
-    public Scoreboard getPlayerScoreboard() {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    " + ChatColor.RESET.toString());
-        objective.getScore(ChatColor.RESET.toString()).setScore(10);
-        objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
-        objective.getScore(ChatColor.RESET + ChatColor.RESET.toString()).setScore(8);
-        objective.getScore("Kills: " + ChatColor.BLUE + getKill()).setScore(7);
-        objective.getScore(ChatColor.RESET + "                            " + ChatColor.RESET).setScore(6);
-        objective.getScore("Win: " + ChatColor.BLUE + getWin()).setScore(5);
-        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(4);
-        objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
-        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(2);
-        objective.getScore("Death: " + ChatColor.BLUE + getDeath()).setScore(1);
-        return scoreboard;
-    }
-
     public int getRespawn() {
         return respawn;
     }
@@ -368,6 +247,53 @@ public class PlayerInfo {
         setDeath(getDeath() + death);
     }
 
+    public void syncDB() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                save();
+                if (!isInGame() && getPlayer().isOnline()) {
+                    getPlayer().setScoreboard(getPlayerScoreboard());
+                }
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+
+    public void dash() {
+        if (isDash()) {
+            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
+            if (game.getState() == State.STARTED) {
+                PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
+                Bukkit.getPluginManager().callEvent(event);
+                setDash(false);
+                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
+                Vector pVector = player.getEyeLocation().getDirection();
+                Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
+                getPlayer().setVelocity(vector);
+                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
+            }
+        }
+    }
+
+    public Scoreboard getPlayerScoreboard() {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "    Info    " + ChatColor.RESET.toString());
+        objective.getScore(ChatColor.RESET.toString()).setScore(10);
+        objective.getScore("Coins: " + ChatColor.BLUE + getCoins()).setScore(9);
+        objective.getScore(ChatColor.RESET + ChatColor.RESET.toString()).setScore(8);
+        objective.getScore("Kills: " + ChatColor.BLUE + getKill()).setScore(7);
+        objective.getScore(ChatColor.RESET + "                            " + ChatColor.RESET).setScore(6);
+        objective.getScore("Win: " + ChatColor.BLUE + getWin()).setScore(5);
+        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(4);
+        objective.getScore("KillStreak: " + ChatColor.BLUE + getKillStreak()).setScore(3);
+        objective.getScore(ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString() + ChatColor.RESET.toString()).setScore(2);
+        objective.getScore("Death: " + ChatColor.BLUE + getDeath()).setScore(1);
+        return scoreboard;
+    }
+
     public void save() {
         if (Quake.config.ifStringExist(getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
             try {
@@ -381,7 +307,9 @@ public class PlayerInfo {
                 statement.setInt(6, getKillStreak());
                 statement.setInt(7, getDeath());
                 statement.setString(8, getName());
-                statement.setDate(9, new java.sql.Date(getDate().getTime()));
+                Date date = new java.sql.Date(getDate().getTime());
+                Object param = new java.sql.Timestamp(date.getTime());
+                statement.setObject(9, param);
                 statement.setString(10, getUUID().toString());
                 Quake.config.executePreparedStatement(statement);
             } catch (SQLException e) {
@@ -399,7 +327,9 @@ public class PlayerInfo {
                 statement.setInt(7, getKillStreak());
                 statement.setInt(8, getDeath());
                 statement.setString(9, getName());
-                statement.setDate(10, new java.sql.Date(getDate().getTime()));
+                Date date = new java.sql.Date(getDate().getTime());
+                Object param = new java.sql.Timestamp(date.getTime());
+                statement.setObject(10, param);
                 Quake.config.executePreparedStatement(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -407,7 +337,7 @@ public class PlayerInfo {
         }
     }
 
-    private class LoadTask implements Runnable {
+    private class LoadTask extends Thread {
 
         private PlayerInfo info;
 
@@ -419,6 +349,7 @@ public class PlayerInfo {
         public void run() {
             if (Quake.config.ifStringExist(info.getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
                 load();
+                Thread.currentThread().interrupt();
             }
         }
 

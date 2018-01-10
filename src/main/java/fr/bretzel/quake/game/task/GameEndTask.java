@@ -16,7 +16,7 @@
  */
 package fr.bretzel.quake.game.task;
 
-import fr.bretzel.quake.GameTask;
+import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
@@ -48,21 +48,22 @@ public class GameEndTask extends GameTask {
         if (firewokSpawnable >= 0) {
             firewokSpawnable--;
             if (firewokSpawnable == 5) {
-                for (UUID uuid : getGame().getPlayerList()) {
-                    Player p = Bukkit.getPlayer(uuid);
+                for (PlayerInfo player : getGame().getPlayerList()) {
+                    Player p = player.getPlayer();
                     if (p != null && p.isOnline()) {
                         sendGameInfo(p);
                     }
+                    player.syncDB();
                 }
             }
-            Util.spawnFirework(Util.getCircle(player.getLocation().clone(), 0.4, 6));
+            Util.spawnFirework(Util.getCircle(player.getLocation().clone(), 1, 8));
         } else {
             Bukkit.getScheduler().runTaskLater(Quake.quake, new Runnable() {
                 @Override
                 public void run() {
                     getGame().stop();
                 }
-            }, 35L);
+            }, 50L);
             cancel();
         }
     }
@@ -78,8 +79,8 @@ public class GameEndTask extends GameTask {
     private void sendGameInfo(Player player) {
         NumberFormat formatter = new DecimalFormat("00");
         player.sendMessage(ChatColor.AQUA + "####################");
-        player.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player)) + ChatColor.AQUA + "            #");
-        player.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player) * 5) + ChatColor.AQUA + "          #");
+        player.sendMessage(ChatColor.AQUA + "#    Kills: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player)) + ChatColor.AQUA + "              #");
+        player.sendMessage(ChatColor.AQUA + "#    Coins: " + ChatColor.BLUE.toString() + formatter.format(getGame().getKill(player) * 5) + ChatColor.AQUA + "             #");
         player.sendMessage(ChatColor.AQUA + "####################");
     }
 }

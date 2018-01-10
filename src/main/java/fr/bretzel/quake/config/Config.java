@@ -18,7 +18,7 @@ public class Config {
             "KillStreak INTEGER, " +
             "Death INTEGER," +
             "Name VARCHAR(42), " +
-            "LastConnection DATE )";
+            "LastConnection DATETIME )";
 
     private Type configType;
     private IConfig config;

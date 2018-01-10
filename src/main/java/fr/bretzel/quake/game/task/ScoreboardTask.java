@@ -17,7 +17,6 @@
 package fr.bretzel.quake.game.task;
 
 import fr.bretzel.quake.ColorScroller;
-import fr.bretzel.quake.GameTask;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;

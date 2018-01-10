@@ -131,8 +131,9 @@ public class Quake extends JavaPlugin {
                 initGame(file);
             }
         }
-        logInfo("End");
+        logInfo("End.");
 
+        logInfo("Start loading database.");
         boolean isMySQLconf = getConfig().getBoolean("mysql.Enabled");
 
         if (isMySQLconf) {
@@ -153,6 +154,7 @@ public class Quake extends JavaPlugin {
             }
             config = new Config(f);
         }
+        logInfo("Successfully.");
     }
 
     @Override

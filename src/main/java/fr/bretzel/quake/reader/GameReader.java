@@ -17,6 +17,7 @@
 package fr.bretzel.quake.reader;
 
 import fr.bretzel.nbt.NBTTagCompound;
+import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Util;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
@@ -57,8 +58,8 @@ public class GameReader {
 
         int players = 0;
         NBTTagCompound p = new NBTTagCompound();
-        for (UUID uuid : game.getPlayerList()) {
-            p.setString(String.valueOf(players), uuid.toString());
+        for (PlayerInfo uuid : game.getPlayerList()) {
+            p.setString(String.valueOf(players), uuid.getUUID().toString());
             players++;
         }
         p.setInt("size", players);
@@ -107,7 +108,7 @@ public class GameReader {
             }
         }
 
-        if (compound.hasKey("players")) {
+        /*if (compound.hasKey("players")) {
             NBTTagCompound s = compound.getCompound("players");
             int size = s.getInt("size");
             int vsize = size - 1;
@@ -120,7 +121,7 @@ public class GameReader {
                     }
                 }
             }
-        }
+        }*/
 
         game.setDisplayName(compound.getString("displayName"));
         ScoreboardAPI api = new ScoreboardAPI(game);

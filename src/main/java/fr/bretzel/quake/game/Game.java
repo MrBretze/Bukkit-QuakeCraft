@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Lo?c Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -16,22 +16,28 @@
  */
 package fr.bretzel.quake.game;
 
+import com.google.common.collect.Lists;
+import fr.bretzel.quake.*;
+import fr.bretzel.quake.game.event.GameEndEvent;
+import fr.bretzel.quake.game.task.GameEndTask;
+import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
-import fr.bretzel.quake.PlayerInfo;
-import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.Serializable;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,13 +51,12 @@ import java.util.*;
 public class Game implements Serializable {
 
     private LinkedList<Location> respawn = new LinkedList<>();
-    private List<Location> usedLoc = new ArrayList<>();
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
     private String name;
     private File file;
-    private List<UUID> playerList = new ArrayList<>();
+    private List<PlayerInfo> playerList = new ArrayList<>();
     private LinkedList<Sign> signList = new LinkedList<>();
     private Random random = new Random();
     private Team team;
@@ -63,8 +68,10 @@ public class Game implements Serializable {
     private State state = State.WAITING;
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
-    private HashMap<UUID, Integer> playerKills = new HashMap<>();
-    private HashMap<UUID, Integer> killStreak = new HashMap<>();
+    private HashMap<PlayerInfo, Integer> playerKills = new HashMap<>();
+    private HashMap<PlayerInfo, Integer> playerDeath = new HashMap<>();
+    private HashMap<PlayerInfo, Integer> killStreak = new HashMap<>();
+    private HashMap<PlayerInfo, Integer> currentKillStreak = new HashMap<>();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -72,7 +79,7 @@ public class Game implements Serializable {
         setName(name);
         setDisplayName(name);
 
-        calculeSpawnBase();
+        setSpawn(getDefaultSpawn());
 
         File mk = new File(Quake.quake.getDataFolder(), File.separator + "game" + File.separator);
         mk.mkdir();
@@ -143,24 +150,26 @@ public class Game implements Serializable {
         this.minPlayer = minPlayer;
     }
 
-    public List<UUID> getPlayerList() {
+    public List<PlayerInfo> getPlayerList() {
         return playerList;
     }
 
-    public void setPlayerList(List<UUID> playerList) {
+    public void setPlayerList(List<PlayerInfo> playerList) {
         this.playerList = playerList;
     }
 
-    public void addPlayer(Player player) {
-        if(!getPlayerList().contains(player.getUniqueId())) {
-            getPlayerList().add(player.getUniqueId());
+    public void addPlayer(PlayerInfo player) {
+        if (!getPlayerList().contains(player)) {
+            getPlayerList().add(player);
         }
     }
 
+    public void addPlayer(Player player) {
+        addPlayer(Quake.getPlayerInfo(player));
+    }
+
     public void addPlayer(UUID uuid) {
-        if(!getPlayerList().contains(uuid)) {
-            getPlayerList().add(uuid);
-        }
+        addPlayer(Bukkit.getPlayer(uuid));
     }
 
     public String getDisplayName() {
@@ -252,9 +261,9 @@ public class Game implements Serializable {
     }
 
     public void broadcastMessage(String msg) {
-        for (UUID id : getPlayerList()) {
-            Player p = Bukkit.getPlayer(id);
-            if(p != null && p.isOnline()) {
+        for (PlayerInfo id : getPlayerList()) {
+            Player p = id.getPlayer();
+            if (p != null && p.isOnline()) {
                 p.sendMessage(msg);
             }
         }
@@ -267,7 +276,7 @@ public class Game implements Serializable {
             for (Location location : getRespawns()) {
                 s++;
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
-                if(hologram == null) {
+                if (hologram == null) {
                     hologram = new Hologram(location, "Respawn: " + s, Quake.holoManager);
                 }
                 if (!hologram.isVisible()) {
@@ -277,7 +286,7 @@ public class Game implements Serializable {
         } else {
             for (Location location : getRespawns()) {
                 Hologram hologram = Quake.holoManager.getHologram(location, 0.5);
-                if(hologram != null)
+                if (hologram != null)
                     hologram.display(false);
             }
         }
@@ -292,20 +301,27 @@ public class Game implements Serializable {
     }
 
     public int getKill(UUID player) {
-        return playerKills.get(player);
+        return getKill(Bukkit.getPlayer(player));
     }
 
     public int getKill(Player player) {
-        return getKill(player.getUniqueId());
+        return getKill(Quake.getPlayerInfo(player));
+    }
+
+    public int getKill(PlayerInfo player) {
+        if (!playerKills.containsKey(player)) {
+            playerKills.put(player, 0);
+        }
+        return playerKills.get(player);
     }
 
     public void addKill(Player player, int kill) {
-        addKill(player.getUniqueId(), kill);
+        addKill(Quake.getPlayerInfo(player), kill);
     }
 
-    public void addKill(UUID player, int kill) {
+    public void addKill(PlayerInfo player, int kill) {
         int i = 0;
-        if(playerKills.containsKey(player)) {
+        if (playerKills.containsKey(player)) {
             i = playerKills.get(player);
         }
         i += kill;
@@ -313,11 +329,47 @@ public class Game implements Serializable {
         playerKills.put(player, i);
     }
 
-    public void setKill(UUID uuid, int kill) {
-        if (playerKills.containsKey(uuid)) {
-            playerKills.remove(uuid);
+    public void setKill(PlayerInfo player, int kill) {
+        if (playerKills.containsKey(player)) {
+            playerKills.remove(player);
         }
-        playerKills.put(uuid, kill);
+        playerKills.put(player, kill);
+    }
+
+    public int getDeath(UUID player) {
+        return getDeath(Bukkit.getPlayer(player));
+    }
+
+    public int getDeath(Player player) {
+        return getDeath(Quake.getPlayerInfo(player));
+    }
+
+    public int getDeath(PlayerInfo player) {
+        if (!playerDeath.containsKey(player)) {
+            playerDeath.put(player, 0);
+        }
+        return playerDeath.get(player);
+    }
+
+    public void addDeath(Player player, int kill) {
+        addDeath(Quake.getPlayerInfo(player), kill);
+    }
+
+    public void addDeath(PlayerInfo player, int kill) {
+        int i = 0;
+        if (playerDeath.containsKey(player)) {
+            i = playerDeath.get(player);
+        }
+        i += kill;
+        playerDeath.remove(player);
+        playerDeath.put(player, i);
+    }
+
+    public void setDeath(PlayerInfo player, int kill) {
+        if (playerDeath.containsKey(player)) {
+            playerDeath.remove(player);
+        }
+        playerDeath.put(player, kill);
     }
 
     public Location getSpawn() {
@@ -328,7 +380,7 @@ public class Game implements Serializable {
         this.spawn = spawn;
     }
 
-    private void calculeSpawnBase() {
+    private Location getDefaultSpawn() {
         int x1 = getFirstLocation().getBlockX();
         int y1 = getFirstLocation().getBlockY();
         int z1 = getFirstLocation().getBlockZ();
@@ -341,7 +393,7 @@ public class Game implements Serializable {
         int y = (y1 + y2) / 2;
         int z = (z1 + z2) / 2;
 
-        setSpawn(new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z))));
+        return new Location(getFirstLocation().getWorld(), Double.valueOf(String.valueOf(x)), Double.valueOf(String.valueOf(y)), Double.valueOf(String.valueOf(z)));
     }
 
     public boolean isInArea(int x, int y, int z) {
@@ -366,31 +418,63 @@ public class Game implements Serializable {
     }
 
     public void addKillStreak(Player player, int kill) {
-        addKillStreak(player.getUniqueId(), kill);
+        addKillStreak(Quake.getPlayerInfo(player), kill);
     }
 
-    public void addKillStreak(UUID uuid, int kill) {
-        if (killStreak.containsKey(uuid)) {
-            killStreak.put(uuid, getKillStreak(uuid) + kill);
+    public void addKillStreak(PlayerInfo player, int kill) {
+        if (killStreak.containsKey(player)) {
+            killStreak.put(player, getKillStreak(player) + kill);
         } else {
-            killStreak.put(uuid, kill);
+            killStreak.put(player, kill);
         }
     }
 
     public int getKillStreak(Player player) {
-        return getKillStreak(player.getUniqueId());
+        return getKillStreak(Quake.getPlayerInfo(player));
     }
 
-    public int getKillStreak(UUID uuid) {
-        return killStreak.get(uuid);
+    public int getKillStreak(PlayerInfo player) {
+        if (!killStreak.containsKey(player))
+            return 0;
+        return killStreak.get(player);
     }
 
     public void setKillSteak(Player player, int kill) {
-        setKillSteak(player.getUniqueId(), kill);
+        setKillSteak(Quake.getPlayerInfo(player), kill);
     }
 
-    public void setKillSteak(UUID uuid, int kill) {
+    public void setKillSteak(PlayerInfo uuid, int kill) {
         killStreak.put(uuid, kill);
+    }
+
+    //
+
+    public void addCurrentKillStreak(Player player, int kill) {
+        addCurrentKillStreak(Quake.getPlayerInfo(player), kill);
+    }
+
+    public void addCurrentKillStreak(PlayerInfo player, int kill) {
+        if (currentKillStreak.containsKey(player)) {
+            currentKillStreak.put(player, getCurrentKillStreak(player) + kill);
+        } else {
+            currentKillStreak.put(player, kill);
+        }
+    }
+
+    public int getCurrentKillStreak(Player player) {
+        return getCurrentKillStreak(Quake.getPlayerInfo(player));
+    }
+
+    public int getCurrentKillStreak(PlayerInfo player) {
+        return currentKillStreak.get(player);
+    }
+
+    public void setCurrentKillSteak(Player player, int kill) {
+        setCurrentKillSteak(Quake.getPlayerInfo(player), kill);
+    }
+
+    public void setCurrentKillSteak(PlayerInfo uuid, int kill) {
+        currentKillStreak.put(uuid, kill);
     }
 
     public Team getTeam() {
@@ -401,22 +485,117 @@ public class Game implements Serializable {
         this.team = team;
     }
 
+    public void shootPlayer(PlayerInfo player) {
+        if (player.isShoot() && getState() == State.STARTED) {
+            player.setShoot(false);
+            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(player), (long) (player.getReloadTime() * 20));
+
+            Util.playSound(player.getPlayer().getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 7.5F, 0.8F);
+
+            int range = 200; //Quake.quake.getConfig().getInt("quake.shoot.range");
+
+            Location playerEyes = player.getPlayer().getEyeLocation();
+            org.bukkit.util.Vector direction = playerEyes.getDirection().normalize();
+            Location f = playerEyes.clone();
+            Vector progress = direction.clone().multiply(0.5);
+            int maxRange = 100 * range / 70;
+
+            List<UUID> killeds = Lists.newArrayList();
+
+            for (int loop = maxRange; loop > 0; loop--) {
+                new ParticleEffect.ParticlePacket(player.getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(f, 200D);
+                f.add(progress);
+                for (Entity e : f.getWorld().getEntities()) {
+                    if (e instanceof Player) {
+                        Player player_killed = (Player) e;
+                        Location h = player_killed.getLocation().add(0, 1, 0);
+
+                        double px = h.getX();
+                        double py = h.getY();
+                        double pz = h.getZ();
+                        boolean dX = Math.abs(f.getX() - px) < 0.957D * 0.59D;
+                        boolean dY = Math.abs(f.getY() - py) < 1.685D * 0.59D;
+                        boolean dZ = Math.abs(f.getZ() - pz) < 0.957D * 0.59D;
+
+                        if (dX && dY && dZ && player_killed != player.getPlayer() && !killeds.contains(player_killed.getUniqueId()) && !e.isDead()) {
+                            PlayerInfo info_killed = Quake.getPlayerInfo(player_killed);
+                            Util.shootFirework(info_killed.getPlayer().getEyeLocation());
+                            respawn(info_killed.getPlayer());
+                            addDeath(player_killed, 1);
+                            killeds.add(player_killed.getUniqueId());
+                            setCurrentKillSteak(info_killed, 0);
+                        }
+                    }
+                }
+            }
+
+            int killed = killeds.size();
+
+            if (killed > 0) {
+                addKill(player, killed);
+                addCurrentKillStreak(player, 1);
+
+                int killStreak = getCurrentKillStreak(player);
+
+                if (killStreak == 5) {
+                    broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + player.getPlayer().getDisplayName() + " IS KILLING SPREE !");
+                    addKillStreak(player, 1);
+                } else if (killStreak == 10) {
+                    broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + player.getPlayer().getDisplayName() + " IS A RAMPAGE !");
+                    addKillStreak(player, 1);
+                } else if (killStreak == 15) {
+                    broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + player.getPlayer().getDisplayName() + " IS A DEMON !");
+                    addKillStreak(player, 1);
+                } else if (killStreak == 20) {
+                    broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + player.getPlayer().getDisplayName() + " MONSTER KIL !!");
+                    addKillStreak(player, 1);
+                }
+
+                getScoreboardManager().getObjective().getScore(player.getPlayer().getName()).setScore(getKill(player));
+
+                if (getKill(player) >= getMaxKill()) {
+                    GameEndEvent event = new GameEndEvent(player.getPlayer(), this);
+                    Bukkit.getPluginManager().callEvent(event);
+                    if (event.isCancelled()) {
+                        return;
+                    }
+                    for (PlayerInfo id : getPlayerList()) {
+                        Player p = id.getPlayer();
+                        p.getInventory().clear();
+                        id.setShoot(false);
+                        id.setDash(false);
+                    }
+
+                    new GameEndTask(Quake.quake, 10L, 10L, this, player.getPlayer());
+
+                    player.addWin(1);
+
+                    getTeam().setNameTagVisibility(NameTagVisibility.ALWAYS);
+                    broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + player.getPlayer().getDisplayName() + " Has win the game !");
+                }
+            }
+        }
+    }
+
+    public void dashPlayer(PlayerInfo player) {
+
+    }
+
     public void stop() {
         setState(State.WAITING);
 
-        for(UUID uuid : getPlayerList()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if(p != null && p.isOnline()) {
-                PlayerInfo info = Quake.getPlayerInfo(p);
-                if (!Quake.gameManager.getLobby().getChunk().isLoaded()) {
-                    Quake.gameManager.getLobby().getChunk().load(false);
-                }
+        for (PlayerInfo info : getPlayerList()) {
+            Player p = info.getPlayer();
+            info.setDash(true);
+            info.setShoot(true);
+            info.addKill(getKill(info));
+            info.addDeath(getDeath(info));
+            info.addCoins(getKill(info) * 5);
+            if (p != null && p.isOnline()) {
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();
                 p.setWalkSpeed(0.2F);
                 p.setScoreboard(info.getPlayerScoreboard());
-                info.setDash(true);
-                info.setShoot(true);
             }
         }
 
@@ -437,45 +616,30 @@ public class Game implements Serializable {
         getPlayerList().clear();
         playerKills.clear();
         killStreak.clear();
-        usedLoc.clear();
         Quake.gameManager.signEvent.actualiseJoinSignForGame(this);
-    }
-
-    public void respawnAtStart(Player player) {
-        Location location = getRespawns().get(random.nextInt(getRespawns().size()));
-        PlayerInfo info = Quake.getPlayerInfo(player);
-        if(info.getRespawn() >= 5 && player.getWorld().getNearbyEntities(location, 10, 3, 10).size() <= 0) {
-            this.usedLoc.add(location);
-            player.teleport(location);
-            info.setRespawn(0);
-            return;
-        }
-        if(!this.usedLoc.contains(location)) {
-            this.usedLoc.add(location);
-            player.teleport(location);
-            info.setRespawn(0);
-            return;
-        } else {
-            respawnAtStart(player);
-            info.addRespawn(1);
-        }
     }
 
     public void respawn(Player p) {
         if (getState() == State.STARTED) {
-            PlayerInfo info = Quake.getPlayerInfo(p);
+            int test = 0;
             Location location = getRespawns().get(random.nextInt(getRespawns().size()));
-            int esize = location.getWorld().getNearbyEntities(location, 10.5D, 10.5D, 10.5D).size();
-            if (esize == 0) {
-                p.teleport(location);
-            } else if (info.getRespawn() >= 5) {
-                p.teleport(location);
-            } else {
-                info.addRespawn(1);
-                respawn(p);
-                return;
+            if (test >= getRespawns().size() * 2) {
+                for (Entity e : location.getWorld().getNearbyEntities(location, 60, 15, 60)) {
+                    if (e instanceof Player) {
+                        Player p2 = (Player) e;
+                        PlayerInfo info2 = Quake.getPlayerInfo(p2);
+                        if (info2.isInGame()) {
+                            Game g = Quake.gameManager.getGameByPlayer(info2);
+                            if (g.getName().equalsIgnoreCase(this.getName())) {
+                                test++;
+                                respawn(p);
+                                return;
+                            }
+                        }
+                    }
+                }
             }
-            info.setRespawn(0);
+            p.teleport(location);
         }
     }
 
