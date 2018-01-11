@@ -260,22 +260,6 @@ public class PlayerInfo {
         }).start();
     }
 
-    public void dash() {
-        if (isDash()) {
-            Game game = Quake.gameManager.getGameByPlayer(getPlayer());
-            if (game.getState() == State.STARTED) {
-                PlayerDashEvent event = new PlayerDashEvent(getPlayer(), game);
-                Bukkit.getPluginManager().callEvent(event);
-                setDash(false);
-                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(this), (long) (getReloadTime() * 35));
-                Vector pVector = player.getEyeLocation().getDirection();
-                Vector vector = new Vector(pVector.getX(), 0.4D, pVector.getZ()).multiply(1.2D);
-                getPlayer().setVelocity(vector);
-                getPlayer().getWorld().playSound(getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
-            }
-        }
-    }
-
     public Scoreboard getPlayerScoreboard() {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         Objective objective = scoreboard.registerNewObjective(getPlayer().getDisplayName(), "dummy");

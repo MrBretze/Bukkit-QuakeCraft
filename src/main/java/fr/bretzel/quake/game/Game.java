@@ -589,7 +589,7 @@ public class Game implements Serializable {
                 player.setDash(false);
                 Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(player), (long) (player.getReloadTime() * 35));
                 Vector pVector = player.getPlayer().getEyeLocation().getDirection();
-                Vector vector = new Vector(pVector.getX(), 0.52D, pVector.getZ()).multiply(1.4D);
+                Vector vector = new Vector(pVector.getX(), 0.4686D, pVector.getZ()).multiply(1.4D);
                 player.getPlayer().setVelocity(vector);
                 player.getPlayer().getWorld().playSound(player.getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
             }
@@ -603,9 +603,13 @@ public class Game implements Serializable {
             Player p = info.getPlayer();
             info.setDash(true);
             info.setShoot(true);
+
             info.addKill(getKill(info));
             info.addDeath(getDeath(info));
             info.addCoins(getKill(info) * 5);
+
+            info.syncDB();
+
             if (p != null && p.isOnline()) {
                 p.teleport(Quake.gameManager.getLobby());
                 p.getInventory().clear();

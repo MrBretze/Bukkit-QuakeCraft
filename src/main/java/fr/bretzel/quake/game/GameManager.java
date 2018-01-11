@@ -194,7 +194,7 @@ public class GameManager implements Listener {
             Game game = getGameByPlayer(player);
             if (game.getState() == State.STARTED) {
                 if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-                    pi.dash();
+                    game.dashPlayer(pi);
                     event.setCancelled(true);
                 } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
                     game.shootPlayer(pi);

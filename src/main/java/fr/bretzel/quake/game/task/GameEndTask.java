@@ -53,7 +53,6 @@ public class GameEndTask extends GameTask {
                     if (p != null && p.isOnline()) {
                         sendGameInfo(p);
                     }
-                    player.syncDB();
                 }
             }
             Util.spawnFirework(Util.getCircle(player.getLocation().clone(), 1, 8));
