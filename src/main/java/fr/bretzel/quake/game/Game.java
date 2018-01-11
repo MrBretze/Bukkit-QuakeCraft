@@ -19,6 +19,8 @@ package fr.bretzel.quake.game;
 import com.google.common.collect.Lists;
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameEndEvent;
+import fr.bretzel.quake.game.event.PlayerDashEvent;
+import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.GameEndTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
@@ -508,7 +510,8 @@ public class Game implements Serializable {
                 for (Entity e : f.getWorld().getEntities()) {
                     if (e instanceof Player) {
                         Player player_killed = (Player) e;
-                        Location h = player_killed.getLocation().add(0, 1, 0);
+                        Vector pDeplacement = player_killed.getVelocity();
+                        Location h = player_killed.getLocation().add(pDeplacement.getX(), 1, pDeplacement.getZ());
 
                         double px = h.getX();
                         double py = h.getY();
@@ -578,7 +581,19 @@ public class Game implements Serializable {
     }
 
     public void dashPlayer(PlayerInfo player) {
-
+        if (player.isDash()) {
+            Game game = Quake.gameManager.getGameByPlayer(player);
+            if (game.getState() == State.STARTED) {
+                PlayerDashEvent event = new PlayerDashEvent(player.getPlayer(), game);
+                Bukkit.getPluginManager().callEvent(event);
+                player.setDash(false);
+                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(player), (long) (player.getReloadTime() * 35));
+                Vector pVector = player.getPlayer().getEyeLocation().getDirection();
+                Vector vector = new Vector(pVector.getX(), 0.52D, pVector.getZ()).multiply(1.4D);
+                player.getPlayer().setVelocity(vector);
+                player.getPlayer().getWorld().playSound(player.getPlayer().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, random.nextFloat(), random.nextFloat());
+            }
+        }
     }
 
     public void stop() {
