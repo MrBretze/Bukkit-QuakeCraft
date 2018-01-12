@@ -500,7 +500,7 @@ public class Game implements Serializable {
         if (player.isShoot() && getState() == State.STARTED) {
             player.setShoot(false);
             //Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(player), (long) (player.getReloadTime() * 20));
-            Bukkit.getServer().getScheduler().runTaskTimer(Quake.quake, new ReloadTask(player), 20, 0);
+            new ReloadTask(Quake.quake, 20, 0, player);
 
             Util.playSound(player.getPlayer().getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 7.5F, 0.8F);
 

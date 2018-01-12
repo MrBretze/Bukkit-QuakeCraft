@@ -174,7 +174,7 @@ public class Quake extends JavaPlugin {
         if (label.equalsIgnoreCase("test")) {
             if (sender instanceof Player) {
                 final Player player = (Player) sender;
-                Bukkit.getScheduler().runTaskTimer(Quake.quake, new ReloadTask(Quake.getPlayerInfo(player)), 20, 0);
+                new ReloadTask(this, 20, 0, Quake.getPlayerInfo(player));
                 return true;
             } else return true;
         }

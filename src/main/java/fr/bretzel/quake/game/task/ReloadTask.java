@@ -20,42 +20,71 @@ import fr.bretzel.quake.SchootTask;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Title;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Created by MrBretzel on 22/06/2015.
  */
 public class ReloadTask extends SchootTask {
 
-    double reload_time = getInfo().getReloadTime();
-    double current_reload = 0;
-    String lengt = ChatColor.GREEN + "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||".trim();
+    private int id = -1;
+    private JavaPlugin javaPlugin;
 
-    double potion = 3;
+    private double reload_time = getInfo().getReloadTime();
 
-    long start;
+    private int time = (int) (reload_time * 20);
 
-    public ReloadTask(PlayerInfo info) {
+    private String bare = ChatColor.GREEN + "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||".trim();
+
+    private double position = 3;
+
+    private double remplissage = 5 / reload_time;
+
+    private long start;
+
+    public ReloadTask(JavaPlugin javaPlugin, long l, long l1, PlayerInfo info) {
         super(info);
         start = System.nanoTime();
-        Title.sendTimings(info.getPlayer(), 0, 5, 0);
+        Title.sendTimings(info.getPlayer(), 0, 50, 0);
+
+        this.javaPlugin = javaPlugin;
+        this.id = javaPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(javaPlugin, this, l, l1);
     }
+
+
+    //actualise tout les 0.05sec
+
+    private int current_time = 0;
 
     @Override
     public void run() {
-        StringBuilder builder = new StringBuilder(lengt);
+        StringBuilder builder = new StringBuilder(bare);
 
-        double adding = ((reload_time * lengt.length()) / 2000);
+        position += Math.round(bare.length() * remplissage / 100);
 
-        potion += adding;
 
-        if ((int)potion < 71) {
-            builder.insert((int) potion, ChatColor.GRAY);
-            Title.sendTitle(getInfo().getPlayer(), adding + "", builder.toString());
+        builder.insert((int) position, ChatColor.GRAY);
+
+        Title.sendTitle(getInfo().getPlayer(), "", builder.toString());
+        
+        current_time++;
+
+        if (current_time == time) {
+            Title.sendTitle(getInfo().getPlayer(), "", "Time reload = " + (System.nanoTime() - start) / 1000000);
+            getInfo().setShoot(true);
+            cancel();
         }
+    }
 
-        if (potion >= 71 && potion <= 72) {
-            Title.sendTitle(getInfo().getPlayer(), adding + "", "Time reload = " + (start - System.nanoTime()) / 1000000);
-        }
-        getInfo().setShoot(true);
+    public int getId() {
+        return id;
+    }
+
+    public JavaPlugin getJavaPlugin() {
+        return javaPlugin;
+    }
+
+    public void cancel() {
+        getJavaPlugin().getServer().getScheduler().cancelTask(getId());
     }
 }
