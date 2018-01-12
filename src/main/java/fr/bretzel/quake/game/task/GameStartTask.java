@@ -24,7 +24,6 @@ import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.inventory.BasicGun;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,7 +31,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.UUID;
 
 /**
  * Created by MrBretzel on 22/06/2015.
@@ -98,16 +96,7 @@ public class GameStartTask extends GameTask {
             for (PlayerInfo id : getGame().getPlayerList()) {
                 Player p = id.getPlayer();
                 if ((p != null) && (p.isOnline())) {
-                    for (Location respawn : getGame().getRespawns()) {
-                        if (locuse >= getGame().getPlayerList().size()) {
-                            locuse = -1;
-                            continue;
-                        }
-                        p.teleport(getGame().getRespawns().get(locuse));
-                        locuse++;
-                        break;
-                    }
-
+                    p.teleport(getGame().getRespawns().get(locuse));
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
                     Chrono chrono = new Chrono();
@@ -117,6 +106,12 @@ public class GameStartTask extends GameTask {
                     getGame().setKill(id, 0);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(1);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(getGame().getKill(p));
+
+                    locuse++;
+
+                    if (locuse >= getGame().getPlayerList().size()) {
+                        locuse = 0;
+                    }
                 }
             }
             cancel();

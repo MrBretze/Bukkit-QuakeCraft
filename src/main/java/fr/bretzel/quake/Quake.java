@@ -17,6 +17,7 @@
 package fr.bretzel.quake;
 
 import fr.bretzel.quake.config.Config;
+import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
@@ -172,9 +173,8 @@ public class Quake extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (label.equalsIgnoreCase("test")) {
             if (sender instanceof Player) {
-                Player player = (Player) sender;
-                player.sendMessage(Language.defaultLanguage.get("test.command.bite"));
-                JsonBuilder.sendJson(player, Language.defaultLanguage.get("test.command.bite"));
+                final Player player = (Player) sender;
+                Bukkit.getScheduler().runTaskTimer(Quake.quake, new ReloadTask(Quake.getPlayerInfo(player)), 20, 0);
                 return true;
             } else return true;
         }

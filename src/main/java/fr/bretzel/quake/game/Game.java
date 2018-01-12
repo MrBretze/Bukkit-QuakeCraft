@@ -271,6 +271,15 @@ public class Game implements Serializable {
         }
     }
 
+    public void broadcastTitle(String msg) {
+        for (PlayerInfo id : getPlayerList()) {
+            Player p = id.getPlayer();
+            if (p != null && p.isOnline()) {
+                p.sendMessage(msg);
+            }
+        }
+    }
+
     public void view(boolean view) {
         this.respawnview = view;
         if (view) {
@@ -490,7 +499,8 @@ public class Game implements Serializable {
     public void shootPlayer(PlayerInfo player) {
         if (player.isShoot() && getState() == State.STARTED) {
             player.setShoot(false);
-            Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(player), (long) (player.getReloadTime() * 20));
+            //Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(player), (long) (player.getReloadTime() * 20));
+            Bukkit.getServer().getScheduler().runTaskTimer(Quake.quake, new ReloadTask(player), 20, 0);
 
             Util.playSound(player.getPlayer().getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 7.5F, 0.8F);
 
