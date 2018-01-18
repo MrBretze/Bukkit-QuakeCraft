@@ -16,6 +16,7 @@
  */
 package fr.bretzel.quake.game.task;
 
+import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.SchootTask;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Title;
@@ -27,64 +28,5 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ReloadTask extends SchootTask {
 
-    private int id = -1;
-    private JavaPlugin javaPlugin;
 
-    private double reload_time = getInfo().getReloadTime();
-
-    private int time = (int) (reload_time * 20);
-
-    private String bare = ChatColor.GREEN + "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||".trim();
-
-    private double position = 3;
-
-    private double remplissage = 5 / reload_time;
-
-    private long start;
-
-    public ReloadTask(JavaPlugin javaPlugin, long l, long l1, PlayerInfo info) {
-        super(info);
-        start = System.nanoTime();
-        Title.sendTimings(info.getPlayer(), 0, 50, 0);
-
-        this.javaPlugin = javaPlugin;
-        this.id = javaPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(javaPlugin, this, l, l1);
-    }
-
-
-    //actualise tout les 0.05sec
-
-    private int current_time = 0;
-
-    @Override
-    public void run() {
-        StringBuilder builder = new StringBuilder(bare);
-
-        position += Math.round(bare.length() * remplissage / 100);
-
-
-        builder.insert((int) position, ChatColor.GRAY);
-
-        Title.sendTitle(getInfo().getPlayer(), "", builder.toString());
-        
-        current_time++;
-
-        if (current_time == time) {
-            Title.sendTitle(getInfo().getPlayer(), "", "Time reload = " + (System.nanoTime() - start) / 1000000);
-            getInfo().setShoot(true);
-            cancel();
-        }
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public JavaPlugin getJavaPlugin() {
-        return javaPlugin;
-    }
-
-    public void cancel() {
-        getJavaPlugin().getServer().getScheduler().cancelTask(getId());
-    }
 }

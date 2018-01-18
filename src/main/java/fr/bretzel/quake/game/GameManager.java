@@ -32,10 +32,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by MrBretzel on 12/06/2015.
@@ -47,8 +44,6 @@ public class GameManager implements Listener {
     public int maxMinute = 10;
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
     private HashMap<Game, GameStartTask> gameQuakeTaskHashMap = new HashMap<>();
-    private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
-    private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private Location lobby;
 
     public GameManager() {
@@ -87,7 +82,7 @@ public class GameManager implements Listener {
     }
 
     public void deleteGame(Game game, Player deleter) {
-        if(game != null) {
+        if (game != null) {
             game.delete();
         } else {
             deleter.sendMessage(ChatColor.RED + "ERROR THE GAME HAS BEEN NOT FOUND !");
@@ -123,13 +118,8 @@ public class GameManager implements Listener {
         this.lobby = lobby;
     }
 
-
     public HashMap<Game, GameStartTask> getQuakeTaskHashMap() {
         return gameQuakeTaskHashMap;
-    }
-
-    public LinkedHashMap<Game, Chrono> getGameChrono() {
-        return gameChrono;
     }
 
     public GameTask getTaskByGame(Game game) {
@@ -152,14 +142,6 @@ public class GameManager implements Listener {
         this.gameLinkedList = gameLinkedList;
     }
 
-    public LinkedHashMap<UUID, Chrono> getUuidToChrono() {
-        return uuidToChrono;
-    }
-
-    public Chrono getChronoByUUID(UUID id) {
-        return getUuidToChrono().get(id);
-    }
-
     public Game getGameByPlayer(PlayerInfo info) {
         return getGameByPlayer(info.getPlayer());
     }
@@ -179,6 +161,22 @@ public class GameManager implements Listener {
         Player player = event.getPlayer();
         PlayerInfo pi = Quake.getPlayerInfo(player);
 
+        if (pi.isInGame()) {
+            if (player.hasPermission("quake.player.shoot") && player.getItemInHand() != null && pi.isInGame()) {
+                Game game = getGameByPlayer(player);
+                if (game.getState() == State.STARTED) {
+                    if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+                        game.dashPlayer(pi);
+                        event.setCancelled(true);
+                    } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                        game.shootPlayer(pi);
+                        event.setCancelled(true);
+                    }
+                }
+            }
+            return;
+        }
+
         if (player.hasPermission("quake.player.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
             switch (action) {
                 case LEFT_CLICK_BLOCK:
@@ -187,19 +185,6 @@ public class GameManager implements Listener {
                 case RIGHT_CLICK_BLOCK:
                     rightClick(player, event);
                     break;
-            }
-        }
-
-        if (player.hasPermission("quake.player.shoot") && player.getItemInHand() != null && pi.isInGame()) {
-            Game game = getGameByPlayer(player);
-            if (game.getState() == State.STARTED) {
-                if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-                    game.dashPlayer(pi);
-                    event.setCancelled(true);
-                } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                    game.shootPlayer(pi);
-                    event.setCancelled(true);
-                }
             }
         }
     }
@@ -217,30 +202,33 @@ public class GameManager implements Listener {
         }
     }
 
+    public boolean afterDate(PlayerInfo info, int maxMinute) {
+        Date currentDate = new Date();
+        Date lastConnection = info.getLastConnection();
+
+        return (currentDate.getTime() - lastConnection.getTime() >= maxMinute * 60 * 1000);
+    }
+
     @EventHandler
     public void PlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
 
         if (info.isInGame()) {
-            Game game = getGameByPlayer(player);
-            Chrono c = getChronoByUUID(player.getUniqueId());
-            if (c != null) {
-                c.stop();
-                int minute = c.getMinutes();
-                int heure = c.getHours();
-                if (heure > 0 || minute >= 5) {
-                    game.getPlayerList().remove(player.getUniqueId());
-                    player.teleport(getLobby());
-                    player.setScoreboard(info.getPlayerScoreboard());
-                    getUuidToChrono().remove(player.getUniqueId());
-                } else {
-                    player.setScoreboard(game.getScoreboardManager().getScoreboard());
+            if (afterDate(info, 5)) {
+                Game game = getGameByPlayer(info);
+                PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);
+                Bukkit.getPluginManager().callEvent(e);
+                if (e.isCancelled()) {
+                    return;
                 }
-            } else {
-                player.teleport(getLobby());
-                player.setScoreboard(info.getPlayerScoreboard());
+                game.getPlayerList().remove(info);
+                Quake.gameManager.signEvent.actualiseJoinSignForGame(game);
+                player.teleport(Quake.gameManager.getLobby());
+                return;
             }
+            player.setWalkSpeed(0.3F);
+            player.setScoreboard(getGameByPlayer(info).getScoreboardManager().getScoreboard());
         } else {
             player.teleport(getLobby());
             player.setScoreboard(info.getPlayerScoreboard());
@@ -251,19 +239,7 @@ public class GameManager implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
-            Game game = getGameByPlayer(player);
-            PlayerLeaveGameEvent ev = new PlayerLeaveGameEvent(player, game);
-            Bukkit.getPluginManager().callEvent(ev);
-            if(ev.isCancelled()) {
-                return;
-            }
-
-            player.teleport(Quake.gameManager.getLobby());
-            game.getPlayerList().remove(player.getUniqueId());
-            signEvent.actualiseJoinSignForGame(game);
-        }
-
+        info.setLastConnection(new Date());
         info.save();
     }
 

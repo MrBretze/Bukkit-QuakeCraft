@@ -17,28 +17,21 @@
 package fr.bretzel.quake;
 
 import fr.bretzel.quake.config.Config;
-import fr.bretzel.quake.game.Game;
-import fr.bretzel.quake.game.State;
-import fr.bretzel.quake.game.event.PlayerDashEvent;
-import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.inventory.Gun;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.util.Vector;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -55,28 +48,26 @@ public class PlayerInfo {
     private boolean shoot = true;
     private boolean dash = true;
     private String name;
-    private Date date;
+    private Date lastConnection;
     private int kill = 0;
     private int coins = 0;
     private int win = 0;
     private int killstreak = 0;
     private int death = 0;
     private int respawn = 0;
-    private Random random = new Random();
 
     public PlayerInfo(Player player) {
         setPlayer(player);
         setName(getPlayer().getName());
-        setDate(new Date());
-        new LoadTask(this).start();
+        load();
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setLastConnection(Date date) {
+        this.lastConnection = date;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getLastConnection() {
+        return lastConnection;
     }
 
     public void setName(String name) {
@@ -106,6 +97,7 @@ public class PlayerInfo {
     public UUID getUUID() {
         return getPlayer().getUniqueId();
     }
+
     public Player getPlayer() {
         return player;
     }
@@ -248,16 +240,10 @@ public class PlayerInfo {
     }
 
     public void syncDB() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                save();
-                if (!isInGame() && getPlayer().isOnline()) {
-                    getPlayer().setScoreboard(getPlayerScoreboard());
-                }
-                Thread.currentThread().interrupt();
-            }
-        }).start();
+        save();
+        if (!isInGame() && getPlayer().isOnline()) {
+            getPlayer().setScoreboard(getPlayerScoreboard());
+        }
     }
 
     public Scoreboard getPlayerScoreboard() {
@@ -291,7 +277,7 @@ public class PlayerInfo {
                 statement.setInt(6, getKillStreak());
                 statement.setInt(7, getDeath());
                 statement.setString(8, getName());
-                Date date = new java.sql.Date(getDate().getTime());
+                Date date = new java.sql.Date(getLastConnection().getTime());
                 Object param = new java.sql.Timestamp(date.getTime());
                 statement.setObject(9, param);
                 statement.setString(10, getUUID().toString());
@@ -311,7 +297,7 @@ public class PlayerInfo {
                 statement.setInt(7, getKillStreak());
                 statement.setInt(8, getDeath());
                 statement.setString(9, getName());
-                Date date = new java.sql.Date(getDate().getTime());
+                Date date = new java.sql.Date(getLastConnection().getTime());
                 Object param = new java.sql.Timestamp(date.getTime());
                 statement.setObject(10, param);
                 Quake.config.executePreparedStatement(statement);
@@ -321,40 +307,24 @@ public class PlayerInfo {
         }
     }
 
-    private class LoadTask extends Thread {
-
-        private PlayerInfo info;
-
-        public LoadTask(PlayerInfo info) {
-            this.info = info;
-        }
-
-        @Override
-        public void run() {
-            if (Quake.config.ifStringExist(info.getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
-                load();
-                Thread.currentThread().interrupt();
+    public void load() {
+        try {
+            Statement statement = Quake.config.openConnection().createStatement();
+            ResultSet set = statement.executeQuery("SELECT * FROM " + Config.Table.PLAYERS.getTable() + " WHERE UUID = '" + getUUID().toString() + "'");
+            if (set.next()) {
+                setEffect(ParticleEffect.fromName(set.getString("Effect")));
+                setReload(set.getDouble("Reload"));
+                setKill(set.getInt("PlayerKill"));
+                setCoins(set.getInt("Coins"));
+                setWin(set.getInt("Win"));
+                setKillStreak(set.getInt("KillStreak"));
+                setDeath(set.getInt("Death"));
+                setLastConnection(set.getDate("LastConnection"));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        public void load() {
-            try {
-                Statement statement = Quake.config.openConnection().createStatement();
-                ResultSet set = statement.executeQuery("SELECT * FROM " + Config.Table.PLAYERS.getTable() + " WHERE UUID = '" + info.getUUID().toString() +"'");
-                if (set.next()) {
-                    setEffect(ParticleEffect.fromName(set.getString("Effect")));
-                    setReload(set.getDouble("Reload"));
-                    setKill(set.getInt("PlayerKill"));
-                    setCoins(set.getInt("Coins"));
-                    setWin(set.getInt("Win"));
-                    setKillStreak(set.getInt("KillStreak"));
-                    setDeath(set.getInt("Death"));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            info.getPlayer().setScoreboard(info.getPlayerScoreboard());
-        }
+        getPlayer().setScoreboard(getPlayerScoreboard());
     }
 }

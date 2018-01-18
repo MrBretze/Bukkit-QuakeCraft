@@ -16,13 +16,14 @@
  */
 package fr.bretzel.quake;
 
+import fr.bretzel.quake.command.LobbyCommand;
+import fr.bretzel.quake.command.QuakeCommand;
 import fr.bretzel.quake.config.Config;
-import fr.bretzel.quake.game.task.ReloadTask;
+import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.hologram.HologramManager;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.GameManager;
-import fr.bretzel.quake.language.JsonBuilder;
 import fr.bretzel.quake.language.Language;
 import fr.bretzel.quake.reader.GameReader;
 
@@ -51,7 +52,6 @@ public class Quake extends JavaPlugin {
     public static Quake quake;
     public static HologramManager holoManager;
     private static LinkedList<PlayerInfo> playerInfos = new LinkedList<>();
-    private static boolean debug = false;
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
@@ -60,7 +60,7 @@ public class Quake extends JavaPlugin {
 
     public static PlayerInfo getPlayerInfo(Player player) {
         for (PlayerInfo pi : playerInfos) {
-            if (pi.getPlayer() == player) {
+            if (pi.getUUID().toString().equalsIgnoreCase(player.getUniqueId().toString())) {
                 return pi;
             }
         }
@@ -81,7 +81,6 @@ public class Quake extends JavaPlugin {
     public void onEnable() {
         quake = this;
 
-
         logInfo("Registering Lang");
         try {
             Language.enable();
@@ -101,10 +100,7 @@ public class Quake extends JavaPlugin {
             saveResource("config.yml", false);
         }
 
-
         reloadConfig();
-        debug = getConfig().getBoolean("debug");
-
 
         logInfo("Starting initialing Holomanager");
         holoManager = new HologramManager(this);
@@ -120,8 +116,9 @@ public class Quake extends JavaPlugin {
         logInfo("End initialing Gamemanager");
 
 
-        logInfo("Registering Command");
-        getCommand("quake").setExecutor(new fr.bretzel.quake.command.Command());
+        logInfo("Registering QuakeCommand");
+        getCommand("quake").setExecutor(new QuakeCommand());
+        getCommand("lobby").setExecutor(new LobbyCommand());
         logInfo("End");
 
 
@@ -165,6 +162,9 @@ public class Quake extends JavaPlugin {
         }
 
         for (Game game : gameManager.getGameLinkedList()) {
+            if (game.getState() == State.STARTED) {
+                game.stop();
+            }
             game.save();
         }
     }
@@ -174,7 +174,12 @@ public class Quake extends JavaPlugin {
         if (label.equalsIgnoreCase("test")) {
             if (sender instanceof Player) {
                 final Player player = (Player) sender;
-                new ReloadTask(this, 20, 0, Quake.getPlayerInfo(player));
+                Game game = gameManager.getGameByPlayer(player);
+                for (PlayerInfo info : game.getPlayerList()) {
+                    logInfo("Info in game: " + info);
+                }
+
+                logInfo("Your info is: " + getPlayerInfo(player));
                 return true;
             } else return true;
         }

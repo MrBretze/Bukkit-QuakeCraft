@@ -76,30 +76,74 @@ public class Config {
         return config;
     }
 
+    public Object getObject(String colon, String where, Table table) {
+        Object o = null;
+        PreparedStatement statement = null;
+        try {
+            statement = openConnection().prepareStatement("SELECT " + colon + " FROM " + table.getTable() + " " + where);
+            ResultSet set = statement.executeQuery();
+            o = set.next() ? set.getObject(1) : null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (getConfigType() == Type.LOCAL_SQL) {
+                try {
+                    if (statement != null)
+                        statement.close();
+                    getConfig().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return o;
+    }
+
     public String getString(String colon, String where, Table table) {
-        return getConfig().getString("SELECT " + colon + " FROM " + table.getTable() + " " + where);
+        return (String) getObject(colon, where, table);
     }
 
     public int getInt(String colon, String where, Table table) {
-        return getConfig().getInt("SELECT " + colon + " FROM " + table.getTable() + " " + where);
+        return (int) getObject(colon, where, table);
     }
 
     public double getDouble(String colon, String where, Table table) {
-        return getConfig().getDouble("SELECT " + colon + " FROM " + table.getTable() + " " + where);
+        return (double) getObject(colon, where, table);
     }
 
-    private String queryBaseSet = "INSERT INTO %table% (%colon%) VALUES (?) %where%";
+    private String queryBaseSet = "INSERT INTO %table% ( %colon% ) VALUES (?) %where%";
+
+    public void setObject(Object value, String colon, String where, Table table) {
+        try {
+            PreparedStatement statement = openConnection().prepareStatement(queryBaseSet.replace("%table%", table.getTable()).replace("%colon%", colon).replace("%where%", where));
+            statement.setObject(1, value);
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (getConfigType() == Type.LOCAL_SQL) {
+                try {
+                    getConfig().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
 
     public void setString(String value, String colon, String where, Table table) {
-        getConfig().setString(queryBaseSet.replace("%table%", table.getTable()).replace("(%colon%)", "(" + colon + ")").replace("%where%", where), value);
+        setObject(value, colon, where, table);
     }
 
     public void setInt(int value, String colon, String where, Table table) {
-        getConfig().setInt(queryBaseSet.replace("%table%", table.getTable()).replace("(%colon%)", "(" + colon + ")").replace("%where%", where), value);
+        setObject(value, colon, where, table);
     }
 
     public void setDouble(double value, String colon, String where, Table table) {
-        getConfig().setDouble(queryBaseSet.replace("%table%", table.getTable()).replace("(%colon%)", "(" + colon + ")").replace("%where%", where), value);
+        setObject(value, colon, where, table);
     }
 
     public void executePreparedStatement(PreparedStatement statement) {
@@ -107,25 +151,24 @@ public class Config {
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (getConfigType() == Type.LOCAL_SQL) {
+                try {
+                    statement.close();
+                    getConfig().getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     public interface IConfig {
         IConfig init(Config config) throws SQLException, ClassNotFoundException;
 
-        String getString(String query);
-
-        int getInt(String query);
-
-        double getDouble(String query);
-
-        void setString(String query, String value);
-
-        void setInt(String query, int value);
-
-        void setDouble(String query, double value);
-
         Connection openConnection() throws ClassNotFoundException, SQLException;
+
+        Connection getConnection();
     }
 
     public enum Table {
@@ -148,12 +191,3 @@ public class Config {
         ONLINE_SQL
     }
 }
-
-
-
-/**
- *
- * CREATE TABLE `QuakeCraft`.`Players` ( `UUID` VARCHAR(36) NULL DEFAULT NULL COMMENT 'UUID Of MC Player' , `Effect` VARCHAR(20) NOT NULL DEFAULT 'fireworksSpark' COMMENT 'Effect player shoot' , `Reload` VARCHAR(5) NOT NULL DEFAULT '1.5' COMMENT 'Reload time for player' , `PlayerKill` INT NOT NULL DEFAULT '0' COMMENT 'Number of player Kill' , `Coins` INT NOT NULL DEFAULT '0' COMMENT 'Coins of Player' , `Won` INT NOT NULL DEFAULT '0' COMMENT 'Number of win' , `KillStreak` INT NOT NULL DEFAULT '0' COMMENT 'Number of KillStreak' , `Death` INT NOT NULL DEFAULT '0' COMMENT 'Death' ) ENGINE = InnoDB;
- *
- *
- */

@@ -99,15 +99,14 @@ public class GameStartTask extends GameTask {
                     p.teleport(getGame().getRespawns().get(locuse));
                     PlayerInfo info = Quake.getPlayerInfo(p);
                     info.give(new BasicGun(info));
-                    Chrono chrono = new Chrono();
                     p.getInventory().setHeldItemSlot(0);
-                    chrono.start();
-                    Quake.gameManager.getGameChrono().put(getGame(), chrono);
                     getGame().setKill(id, 0);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(1);
                     scoreboardAPI.getObjective().getScore(p.getName()).setScore(getGame().getKill(p));
 
                     locuse++;
+
+                    getGame().playerGameTasks.add(new PlayerGameTask(Quake.quake, 0, 0, info));
 
                     if (locuse >= getGame().getPlayerList().size()) {
                         locuse = 0;

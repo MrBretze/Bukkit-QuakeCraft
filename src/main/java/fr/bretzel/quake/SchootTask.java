@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Loïc Nussbaumer
+ * Copyright 2015 Loï¿½c Nussbaumer
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
@@ -15,6 +15,7 @@
  * LICENSE file.
  */
 package fr.bretzel.quake;
+
 
 /**
  * Created by MrBretzel on 21/06/2015.

@@ -17,24 +17,23 @@
 package fr.bretzel.quake.game;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameEndEvent;
 import fr.bretzel.quake.game.event.PlayerDashEvent;
-import fr.bretzel.quake.game.task.DashTask;
 import fr.bretzel.quake.game.task.GameEndTask;
+import fr.bretzel.quake.game.task.PlayerGameTask;
 import fr.bretzel.quake.game.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+
+import org.bukkit.*;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.NameTagVisibility;
@@ -70,10 +69,11 @@ public class Game implements Serializable {
     private State state = State.WAITING;
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
-    private HashMap<PlayerInfo, Integer> playerKills = new HashMap<>();
-    private HashMap<PlayerInfo, Integer> playerDeath = new HashMap<>();
-    private HashMap<PlayerInfo, Integer> killStreak = new HashMap<>();
-    private HashMap<PlayerInfo, Integer> currentKillStreak = new HashMap<>();
+    private HashMap<PlayerInfo, Integer> playerKills = Maps.newHashMap();
+    private HashMap<PlayerInfo, Integer> playerDeath = Maps.newHashMap();
+    private HashMap<PlayerInfo, Integer> killStreak = Maps.newHashMap();
+    private HashMap<PlayerInfo, Integer> currentKillStreak = Maps.newHashMap();
+    public List<PlayerGameTask> playerGameTasks = Lists.newArrayList();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -496,11 +496,15 @@ public class Game implements Serializable {
         this.team = team;
     }
 
+    public boolean isWallHackBlock(Location location) {
+        return location.getBlock().getType().isSolid();
+    }
+
     public void shootPlayer(PlayerInfo player) {
         if (player.isShoot() && getState() == State.STARTED) {
             player.setShoot(false);
-            //Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new ReloadTask(player), (long) (player.getReloadTime() * 20));
-            new ReloadTask(Quake.quake, 20, 0, player);
+
+            new ReloadTask(Quake.quake, player, player.getReloadTime(), false);
 
             Util.playSound(player.getPlayer().getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 7.5F, 0.8F);
 
@@ -517,7 +521,12 @@ public class Game implements Serializable {
             for (int loop = maxRange; loop > 0; loop--) {
                 new ParticleEffect.ParticlePacket(player.getEffect(), 0, 0, 0, 0, 1, true, null).sendTo(f, 200D);
                 f.add(progress);
-                for (Entity e : f.getWorld().getEntities()) {
+
+                if (isWallHackBlock(f)) {
+                    break;
+                }
+
+                for (Entity e : f.getWorld().getNearbyEntities(f, 5, 5, 5)) {
                     if (e instanceof Player) {
                         Player player_killed = (Player) e;
                         Vector pDeplacement = player_killed.getVelocity();
@@ -597,7 +606,7 @@ public class Game implements Serializable {
                 PlayerDashEvent event = new PlayerDashEvent(player.getPlayer(), game);
                 Bukkit.getPluginManager().callEvent(event);
                 player.setDash(false);
-                Bukkit.getServer().getScheduler().runTaskLater(Quake.quake, new DashTask(player), (long) (player.getReloadTime() * 35));
+                new ReloadTask(Quake.quake, player, 3, true);
                 Vector pVector = player.getPlayer().getEyeLocation().getDirection();
                 Vector vector = new Vector(pVector.getX(), 0.4686D, pVector.getZ()).multiply(1.4D);
                 player.getPlayer().setVelocity(vector);
@@ -608,6 +617,10 @@ public class Game implements Serializable {
 
     public void stop() {
         setState(State.WAITING);
+
+        for (PlayerGameTask task : playerGameTasks) {
+            task.cancel();
+        }
 
         for (PlayerInfo info : getPlayerList()) {
             Player p = info.getPlayer();
@@ -653,7 +666,7 @@ public class Game implements Serializable {
             int test = 0;
             Location location = getRespawns().get(random.nextInt(getRespawns().size()));
             if (test >= getRespawns().size() * 2) {
-                for (Entity e : location.getWorld().getNearbyEntities(location, 60, 15, 60)) {
+                for (Entity e : location.getWorld().getNearbyEntities(location, 60, 25, 60)) {
                     if (e instanceof Player) {
                         Player p2 = (Player) e;
                         PlayerInfo info2 = Quake.getPlayerInfo(p2);

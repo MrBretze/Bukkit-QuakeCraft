@@ -17,9 +17,6 @@
 package fr.bretzel.quake.command;
 
 import fr.bretzel.quake.Permission;
-import fr.bretzel.quake.Quake;
-import fr.bretzel.quake.command.partial.game.CommandCreateGame;
-import fr.bretzel.quake.command.partial.game.CommandDeleteGame;
 import fr.bretzel.quake.command.partial.game.PartialCommandGame;
 import fr.bretzel.quake.command.partial.player.PartialCommandPlayer;
 import fr.bretzel.quake.language.JsonBuilder;
@@ -35,7 +32,7 @@ import java.util.List;
 /**
  * Created by MrBretzel on 14/06/2015.
  */
-public class Command extends CommandExe {
+public class QuakeCommand extends CommandExe {
 
     @Override
     public boolean onCommand(CommandSender s, org.bukkit.command.Command command, String label, String[] args) {

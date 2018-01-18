@@ -43,6 +43,9 @@ command.game.delete.valid=TXT=&aYou have delete %game%
 command.game.delete.error=TXT=&cThe don't game exist.
 command.game.delete.usage=TXT=&cUsage: /quake game delete <game>
 
+#Command lobby
+command.lobby=TXT=&aYou were teleported to the lobby.
+
 #Util
 util.quake.game.notfound=TXT=&cThe game %game% is not found.
 util.quake.game.isnull=TXT=&cThe game is null.
