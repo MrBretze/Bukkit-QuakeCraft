@@ -1,24 +1,9 @@
-/**
- * Copyright 2015 Loïc Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake.command;
 
 import fr.bretzel.quake.command.partial.game.PartialCommandGame;
 import fr.bretzel.quake.command.partial.player.PartialCommandPlayer;
 import fr.bretzel.quake.language.JsonBuilder;
+import fr.bretzel.quake.util.CommandExe;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,9 +13,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by MrBretzel on 14/06/2015.
- */
 public class QuakeCommand extends CommandExe {
 
     @Override
@@ -40,7 +22,7 @@ public class QuakeCommand extends CommandExe {
             if(args.length > 0) {
                 if (args[0].equalsIgnoreCase("game")) {
                     if(args.length > 1) {
-                            return new PartialCommandGame(sender, command, Permission.COMMAND_GAME, args).execute().value();
+                            return new PartialCommandGame(sender, command, "", args).execute().value();
                     } else {
                         JsonBuilder.sendJson(sender, getI18n("command.game.usage").replace("%game%", "<game>"));
                         return true;
@@ -48,7 +30,7 @@ public class QuakeCommand extends CommandExe {
                 } else if(args[0].equalsIgnoreCase("players")) {
                     if(args.length > 1) {
                         if (Bukkit.getPlayer(args[1]) != null) {
-                            return new PartialCommandPlayer(sender, command, Permission.COMMAND_PLAYER, args, Bukkit.getPlayer(args[1])).execute().value();
+                            return new PartialCommandPlayer(sender, command, "", args, Bukkit.getPlayer(args[1])).execute().value();
                         } else {
                             sender.sendMessage(ChatColor.RED + "Player can not bee found !");
                             return true;
@@ -57,12 +39,6 @@ public class QuakeCommand extends CommandExe {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
-                } else if(args[0].equalsIgnoreCase("lobby") || args[0].equalsIgnoreCase("hub")) {
-
-
-
-
-                    return true;
                 } else if (args[0].equalsIgnoreCase("help")) {
                     for(String str : getHelps()) {
                         sender.sendMessage(str);

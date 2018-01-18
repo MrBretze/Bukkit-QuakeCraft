@@ -1,17 +1,13 @@
 package fr.bretzel.quake.command.partial.player.kill;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
-import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.ICommandPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by Loic on 31/07/2015.
- */
 public class CommandPlayerRemoveKill extends ICommandPlayer {
 
     private int i;
@@ -23,7 +19,7 @@ public class CommandPlayerRemoveKill extends ICommandPlayer {
 
     @Override
     public PartialCommand execute() {
-        PlayerInfo info = Quake.getPlayerInfo(getPlayer());
+        PlayerInfo info = PlayerInfo.getPlayerInfo(getPlayer());
         info.removePlayerKill(i);
         getPlayer().sendMessage(getI18n("command.players.removekill.valid").replace("%kill%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());

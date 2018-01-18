@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.SignEvent;
@@ -11,9 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by mrbretzel on 20/07/15.
- */
 public class CommandPlayerJoin extends ICommandPlayer {
 
     private Game game;

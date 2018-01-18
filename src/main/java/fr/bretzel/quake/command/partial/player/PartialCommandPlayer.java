@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.coin.CommandPlayerAddCoins;
@@ -20,19 +20,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by MrBretzel on 20/07/15.
- */
 public class PartialCommandPlayer extends ICommandPlayer {
 
     public PartialCommandPlayer(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
         super(sender, command, permission, args, player);
     }
 
+    public PartialCommandPlayer(CommandSender sender, Command command, String permission, String[] args, Player player) {
+        super(sender, command, permission, args, player);
+    }
+
     @Override
     public PartialCommand execute() {
         if (getArgs().length > 2) {
-            PlayerInfo info = Quake.getPlayerInfo(getPlayer());
+            PlayerInfo info = PlayerInfo.getPlayerInfo(getPlayer());
             if (getArgs()[2].equalsIgnoreCase("quit")) {
                 if (info.isInGame()) {
                     return new CommandPlayerQuit(getSender(), getCommand(), getPermission(), getArgs(), getPlayer()).execute();

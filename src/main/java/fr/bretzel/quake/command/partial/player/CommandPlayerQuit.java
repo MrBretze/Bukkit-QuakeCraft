@@ -1,6 +1,7 @@
 package fr.bretzel.quake.command.partial.player;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.PlayerInfo;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
@@ -10,9 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by mrbretzel on 20/07/15.
- */
 public class CommandPlayerQuit extends ICommandPlayer {
 
     public CommandPlayerQuit(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
@@ -28,7 +26,7 @@ public class CommandPlayerQuit extends ICommandPlayer {
             return this;
         }
         getPlayer().teleport(Quake.gameManager.getLobby());
-        game.getPlayerList().remove(getPlayer().getUniqueId());
+        game.getPlayerList().remove(PlayerInfo.getPlayerInfo(getPlayer()));
         Quake.gameManager.signEvent.actualiseJoinSignForGame(game);
         return this;
     }

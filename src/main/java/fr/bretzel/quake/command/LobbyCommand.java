@@ -5,6 +5,7 @@ import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
 import fr.bretzel.quake.language.JsonBuilder;
+import fr.bretzel.quake.util.CommandExe;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,7 +16,7 @@ public class LobbyCommand extends CommandExe {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            PlayerInfo info = Quake.getPlayerInfo(player);
+            PlayerInfo info = PlayerInfo.getPlayerInfo(player);
             if (info.isInGame()) {
                 Game game = Quake.gameManager.getGameByPlayer(info);
                 PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);

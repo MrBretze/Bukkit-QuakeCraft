@@ -1,15 +1,12 @@
-package fr.bretzel.quake.command;
+package fr.bretzel.quake.util;
 
 import fr.bretzel.quake.language.JsonBuilder;
 import fr.bretzel.quake.language.Language;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-
-/**
- * Created by mrbretzel on 19/07/15.
- */
 
 public abstract class PartialCommand {
 
@@ -25,6 +22,17 @@ public abstract class PartialCommand {
         this.sender = sender;
         this.command = command;
         this.permission = permission;
+        this.args = args;
+        if (sender instanceof Player) {
+            isplayer = true;
+            this.player = (Player) sender;
+        }
+    }
+
+    public PartialCommand(CommandSender sender, Command command, String permission, String[] args) {
+        this.sender = sender;
+        this.command = command;
+        this.permission = Bukkit.getPluginManager().getPermission(permission);
         this.args = args;
         if (sender instanceof Player) {
             isplayer = true;

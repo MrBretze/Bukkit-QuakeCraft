@@ -1,6 +1,6 @@
 package fr.bretzel.quake.command.partial.game.respawn;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.game.ICommandGame;
 import fr.bretzel.quake.game.Game;
@@ -9,9 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by Axelo on 18/10/2015.
- */
 public class RemoveRespawn extends ICommandGame {
 
     public RemoveRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {

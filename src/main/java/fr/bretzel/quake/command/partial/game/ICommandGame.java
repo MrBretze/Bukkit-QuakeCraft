@@ -1,14 +1,11 @@
 package fr.bretzel.quake.command.partial.game;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.game.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by Axelo on 09/08/2015.
- */
 public abstract class ICommandGame extends PartialCommand {
 
     private Game game;

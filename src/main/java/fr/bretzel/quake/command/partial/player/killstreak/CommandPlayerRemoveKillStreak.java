@@ -1,17 +1,13 @@
 package fr.bretzel.quake.command.partial.player.killstreak;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.PlayerInfo;
-import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.command.partial.player.ICommandPlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
-/**
- * Created by Axelo on 08/08/2015.
- */
 public class CommandPlayerRemoveKillStreak extends ICommandPlayer {
 
     private int i;
@@ -23,7 +19,7 @@ public class CommandPlayerRemoveKillStreak extends ICommandPlayer {
 
     @Override
     public PartialCommand execute() {
-        PlayerInfo info = Quake.getPlayerInfo(getPlayer());
+        PlayerInfo info = PlayerInfo.getPlayerInfo(getPlayer());
         info.removeKillStreak(i);
         getPlayer().sendMessage(getI18n("command.players.removekillsteak.valid").replace("%killstreak%", "" + i));
         getPlayer().setScoreboard(info.getPlayerScoreboard());

@@ -1,16 +1,12 @@
 package fr.bretzel.quake.command.partial.game;
 
-import fr.bretzel.quake.command.PartialCommand;
+import fr.bretzel.quake.util.PartialCommand;
 import fr.bretzel.quake.Quake;
 import fr.bretzel.quake.language.JsonBuilder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-
-/**
- * Created by mrbretzel on 20/07/15.
- */
 
 public class CommandDeleteGame extends PartialCommand {
 
