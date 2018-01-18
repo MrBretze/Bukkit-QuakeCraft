@@ -1,12 +1,10 @@
-package fr.bretzel.quake;
+package fr.bretzel.quake.util;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public class Title {
 

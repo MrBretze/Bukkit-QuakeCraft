@@ -14,7 +14,7 @@
  * permissions and limitations under the License. See accompanying
  * LICENSE file.
  */
-package fr.bretzel.quake.game.task;
+package fr.bretzel.quake.task.game;
 
 import fr.bretzel.quake.game.Game;
 import org.bukkit.plugin.java.JavaPlugin;

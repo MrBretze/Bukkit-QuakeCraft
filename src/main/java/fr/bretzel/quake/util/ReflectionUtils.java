@@ -1,4 +1,4 @@
-package fr.bretzel.quake;
+package fr.bretzel.quake.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

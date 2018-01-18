@@ -1,28 +1,16 @@
-/**
- * Copyright 2015 Loïc Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake;
 
+import com.google.common.collect.Lists;
+
 import fr.bretzel.quake.config.Config;
-import fr.bretzel.quake.inventory.Gun;
+import fr.bretzel.quake.util.ParticleEffect;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -31,12 +19,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
-import java.util.UUID;
 
-/**
- * Created by MrBretzel on 14/06/2015.
- */
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerInfo {
 
@@ -55,6 +41,31 @@ public class PlayerInfo {
     private int killstreak = 0;
     private int death = 0;
     private int respawn = 0;
+
+    private static List<PlayerInfo> playerInfos = Lists.newLinkedList();
+
+    /**
+     * Start of Static member
+     */
+
+    public static PlayerInfo getPlayerInfo(Player player) {
+        for (PlayerInfo pi : playerInfos) {
+            if (pi.getUUID().toString().equalsIgnoreCase(player.getUniqueId().toString())) {
+                return pi;
+            }
+        }
+        PlayerInfo info = new PlayerInfo(player);
+        playerInfos.add(info);
+        return info;
+    }
+
+    public static List<PlayerInfo> getAllPlayerInfo() {
+        return playerInfos;
+    }
+
+    /**
+     * End of Static member
+     */
 
     public PlayerInfo(Player player) {
         setPlayer(player);
@@ -130,9 +141,9 @@ public class PlayerInfo {
         return Quake.gameManager.getGameByPlayer(getPlayer()) != null;
     }
 
-    public void give(Gun gun) {
+    public void giveGun() {
         getPlayer().getInventory().clear();
-        getPlayer().getInventory().setItem(0, gun.getStack());
+        getPlayer().getInventory().setItem(0, new ItemStack(Material.WOOD_HOE));
     }
 
     public boolean isShoot() {

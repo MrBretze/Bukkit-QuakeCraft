@@ -9,9 +9,6 @@ import org.bukkit.ChatColor;
 import java.io.*;
 import java.util.HashMap;
 
-/**
- * Created by MrBretzel on 25/03/2017.
- */
 public class Language {
 
     public HashMap<String, String> stringToComponent = new HashMap<>();

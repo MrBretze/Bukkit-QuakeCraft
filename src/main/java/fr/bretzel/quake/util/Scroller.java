@@ -1,4 +1,4 @@
-package fr.bretzel.quake;
+package fr.bretzel.quake.util;
 
 import org.bukkit.ChatColor;
 
@@ -12,6 +12,7 @@ import java.util.List;
  */
 
 public class Scroller {
+
     private static final char COLOUR_CHAR = '§';
     private int position;
     private List<String> list;

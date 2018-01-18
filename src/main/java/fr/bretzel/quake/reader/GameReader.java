@@ -1,24 +1,8 @@
-/**
- * Copyright 2015 Loïc Nussbaumer
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake.reader;
 
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.PlayerInfo;
-import fr.bretzel.quake.Util;
+import fr.bretzel.quake.util.Util;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import org.bukkit.Location;
@@ -27,13 +11,10 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
 import java.io.File;
-import java.util.UUID;
-
-/**
- * Created by MrBretzel on 25/06/2015.
- */
 
 public class GameReader {
+
+    //TODO: Remove all reader !
 
     public static NBTTagCompound write (Game game) {
         NBTTagCompound compound = new NBTTagCompound();

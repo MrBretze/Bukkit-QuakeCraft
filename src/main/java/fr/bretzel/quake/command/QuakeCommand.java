@@ -16,7 +16,6 @@
  */
 package fr.bretzel.quake.command;
 
-import fr.bretzel.quake.Permission;
 import fr.bretzel.quake.command.partial.game.PartialCommandGame;
 import fr.bretzel.quake.command.partial.player.PartialCommandPlayer;
 import fr.bretzel.quake.language.JsonBuilder;

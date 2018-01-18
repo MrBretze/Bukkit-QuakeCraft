@@ -1,27 +1,12 @@
-/**
- * Copyright 2015 Lo�c Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake.game;
 
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
 import fr.bretzel.quake.game.event.PlayerLeaveGameEvent;
-import fr.bretzel.quake.game.task.GameStartTask;
-import fr.bretzel.quake.game.task.GameTask;
+import fr.bretzel.quake.task.game.GameStartTask;
+import fr.bretzel.quake.task.game.GameTask;
+import fr.bretzel.quake.util.Util;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,10 +18,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-
-/**
- * Created by MrBretzel on 12/06/2015.
- */
 
 public class GameManager implements Listener {
 
@@ -148,7 +129,7 @@ public class GameManager implements Listener {
 
     public Game getGameByPlayer(Player player) {
         for (Game a : getGameLinkedList()) {
-            if (a.getPlayerList().contains(Quake.getPlayerInfo(player))) {
+            if (a.getPlayerList().contains(PlayerInfo.getPlayerInfo(player))) {
                 return a;
             }
         }
@@ -159,7 +140,7 @@ public class GameManager implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Action action = event.getAction();
         Player player = event.getPlayer();
-        PlayerInfo pi = Quake.getPlayerInfo(player);
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(player);
 
         if (pi.isInGame()) {
             if (player.hasPermission("quake.player.shoot") && player.getItemInHand() != null && pi.isInGame()) {
@@ -192,7 +173,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
             if (!game.isInArea(event.getTo())) {
@@ -212,7 +193,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void PlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
 
         if (info.isInGame()) {
             if (afterDate(info, 5)) {
@@ -238,7 +219,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         info.setLastConnection(new Date());
         info.save();
     }
@@ -280,7 +261,7 @@ public class GameManager implements Listener {
     public void onPlayerQuitGameEvent(PlayerLeaveGameEvent event) {
         Game game = event.getGame();
         final Player player = event.getPlayer();
-        final PlayerInfo info = Quake.getPlayerInfo(player);
+        final PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         if (game.getState() == State.STARTED) {
             if (game.getPlayerList().size() <= 1) {
                 game.stop();
@@ -320,7 +301,7 @@ public class GameManager implements Listener {
     public void onPlayerShoot(PlayerShootEvent event) {
         Player player = event.getPlayer();
         Game game = event.getGame();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
 
         if (info.isShoot()) {
             if (event.getKill() == 2) {
@@ -341,7 +322,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {
         Player player = (Player) event.getEntity();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         if (info.isInGame()) {
             event.setCancelled(true);
         }
@@ -350,7 +331,7 @@ public class GameManager implements Listener {
     @EventHandler
     public void onPlayerChangeSlotBar(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         if (info.isInGame()) {
             Game game = getGameByPlayer(player);
             if (game.getState() == State.STARTED) {
@@ -361,7 +342,7 @@ public class GameManager implements Listener {
     }
 
     private void rightClick(Player player, PlayerInteractEvent event) {
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
         info.setSecondLocation(location.clone());
         player.sendMessage(ChatColor.GREEN + "The second point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());
@@ -369,7 +350,7 @@ public class GameManager implements Listener {
     }
 
     private void leftClick(Player player, PlayerInteractEvent event) {
-        PlayerInfo info = Quake.getPlayerInfo(player);
+        PlayerInfo info = PlayerInfo.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
         info.setFirstLocation(location.clone());
         player.sendMessage(ChatColor.GREEN + "The first point has bin set to: " + location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ());

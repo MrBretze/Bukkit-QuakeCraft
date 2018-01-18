@@ -1,4 +1,4 @@
-package fr.bretzel.quake;
+package fr.bretzel.quake.util;
 
 import org.bukkit.ChatColor;
 

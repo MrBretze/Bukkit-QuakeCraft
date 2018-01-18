@@ -14,7 +14,7 @@
  * permissions and limitations under the License. See accompanying
  * LICENSE file.
  */
-package fr.bretzel.quake.game.task;
+package fr.bretzel.quake.task.game;
 
 import fr.bretzel.quake.PlayerInfo;
 import fr.bretzel.quake.Quake;
@@ -27,7 +27,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.UUID;
 
 /**
  * Created by Loic on 05/07/2015.

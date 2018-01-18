@@ -1,19 +1,3 @@
-/**
- * Copyright 2015 Lo?c Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
 package fr.bretzel.quake.game;
 
 import com.google.common.collect.Lists;
@@ -22,15 +6,17 @@ import com.google.common.collect.Maps;
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameEndEvent;
 import fr.bretzel.quake.game.event.PlayerDashEvent;
-import fr.bretzel.quake.game.task.GameEndTask;
-import fr.bretzel.quake.game.task.PlayerGameTask;
-import fr.bretzel.quake.game.task.ReloadTask;
+import fr.bretzel.quake.task.game.GameEndTask;
+import fr.bretzel.quake.task.game.GamePlayerTask;
+import fr.bretzel.quake.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 
+import fr.bretzel.quake.util.ParticleEffect;
+import fr.bretzel.quake.util.Util;
 import org.bukkit.*;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -45,11 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * Created by MrBretzel on 12/06/2015.
- */
-
-public class Game implements Serializable {
+public class Game {
 
     private LinkedList<Location> respawn = new LinkedList<>();
     private Location firstLocation;
@@ -73,7 +55,7 @@ public class Game implements Serializable {
     private HashMap<PlayerInfo, Integer> playerDeath = Maps.newHashMap();
     private HashMap<PlayerInfo, Integer> killStreak = Maps.newHashMap();
     private HashMap<PlayerInfo, Integer> currentKillStreak = Maps.newHashMap();
-    public List<PlayerGameTask> playerGameTasks = Lists.newArrayList();
+    public List<GamePlayerTask> gamePlayerTasks = Lists.newArrayList();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
         setFirstLocation(firstLocation);
@@ -167,7 +149,7 @@ public class Game implements Serializable {
     }
 
     public void addPlayer(Player player) {
-        addPlayer(Quake.getPlayerInfo(player));
+        addPlayer(PlayerInfo.getPlayerInfo(player));
     }
 
     public void addPlayer(UUID uuid) {
@@ -316,7 +298,7 @@ public class Game implements Serializable {
     }
 
     public int getKill(Player player) {
-        return getKill(Quake.getPlayerInfo(player));
+        return getKill(PlayerInfo.getPlayerInfo(player));
     }
 
     public int getKill(PlayerInfo player) {
@@ -327,7 +309,7 @@ public class Game implements Serializable {
     }
 
     public void addKill(Player player, int kill) {
-        addKill(Quake.getPlayerInfo(player), kill);
+        addKill(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void addKill(PlayerInfo player, int kill) {
@@ -352,7 +334,7 @@ public class Game implements Serializable {
     }
 
     public int getDeath(Player player) {
-        return getDeath(Quake.getPlayerInfo(player));
+        return getDeath(PlayerInfo.getPlayerInfo(player));
     }
 
     public int getDeath(PlayerInfo player) {
@@ -363,7 +345,7 @@ public class Game implements Serializable {
     }
 
     public void addDeath(Player player, int kill) {
-        addDeath(Quake.getPlayerInfo(player), kill);
+        addDeath(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void addDeath(PlayerInfo player, int kill) {
@@ -429,7 +411,7 @@ public class Game implements Serializable {
     }
 
     public void addKillStreak(Player player, int kill) {
-        addKillStreak(Quake.getPlayerInfo(player), kill);
+        addKillStreak(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void addKillStreak(PlayerInfo player, int kill) {
@@ -441,7 +423,7 @@ public class Game implements Serializable {
     }
 
     public int getKillStreak(Player player) {
-        return getKillStreak(Quake.getPlayerInfo(player));
+        return getKillStreak(PlayerInfo.getPlayerInfo(player));
     }
 
     public int getKillStreak(PlayerInfo player) {
@@ -451,7 +433,7 @@ public class Game implements Serializable {
     }
 
     public void setKillSteak(Player player, int kill) {
-        setKillSteak(Quake.getPlayerInfo(player), kill);
+        setKillSteak(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void setKillSteak(PlayerInfo uuid, int kill) {
@@ -461,7 +443,7 @@ public class Game implements Serializable {
     //
 
     public void addCurrentKillStreak(Player player, int kill) {
-        addCurrentKillStreak(Quake.getPlayerInfo(player), kill);
+        addCurrentKillStreak(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void addCurrentKillStreak(PlayerInfo player, int kill) {
@@ -473,7 +455,7 @@ public class Game implements Serializable {
     }
 
     public int getCurrentKillStreak(Player player) {
-        return getCurrentKillStreak(Quake.getPlayerInfo(player));
+        return getCurrentKillStreak(PlayerInfo.getPlayerInfo(player));
     }
 
     public int getCurrentKillStreak(PlayerInfo player) {
@@ -481,7 +463,7 @@ public class Game implements Serializable {
     }
 
     public void setCurrentKillSteak(Player player, int kill) {
-        setCurrentKillSteak(Quake.getPlayerInfo(player), kill);
+        setCurrentKillSteak(PlayerInfo.getPlayerInfo(player), kill);
     }
 
     public void setCurrentKillSteak(PlayerInfo uuid, int kill) {
@@ -540,7 +522,7 @@ public class Game implements Serializable {
                         boolean dZ = Math.abs(f.getZ() - pz) < 0.957D * 0.59D;
 
                         if (dX && dY && dZ && player_killed != player.getPlayer() && !killeds.contains(player_killed.getUniqueId()) && !e.isDead()) {
-                            PlayerInfo info_killed = Quake.getPlayerInfo(player_killed);
+                            PlayerInfo info_killed = PlayerInfo.getPlayerInfo(player_killed);
                             Util.shootFirework(info_killed.getPlayer().getEyeLocation());
                             respawn(info_killed.getPlayer());
                             addDeath(player_killed, 1);
@@ -618,7 +600,7 @@ public class Game implements Serializable {
     public void stop() {
         setState(State.WAITING);
 
-        for (PlayerGameTask task : playerGameTasks) {
+        for (GamePlayerTask task : gamePlayerTasks) {
             task.cancel();
         }
 
@@ -669,7 +651,7 @@ public class Game implements Serializable {
                 for (Entity e : location.getWorld().getNearbyEntities(location, 60, 25, 60)) {
                     if (e instanceof Player) {
                         Player p2 = (Player) e;
-                        PlayerInfo info2 = Quake.getPlayerInfo(p2);
+                        PlayerInfo info2 = PlayerInfo.getPlayerInfo(p2);
                         if (info2.isInGame()) {
                             Game g = Quake.gameManager.getGameByPlayer(info2);
                             if (g.getName().equalsIgnoreCase(this.getName())) {
@@ -701,11 +683,5 @@ public class Game implements Serializable {
     @Override
     public String toString() {
         return "{" + getFirstLocation().toString() + ", " + getSecondLocation().toString() + ", " + "ArenaName: " + getName() + "}";
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map map = new HashMap();
-        return map;
     }
 }

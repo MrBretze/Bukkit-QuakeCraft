@@ -6,9 +6,6 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-/**
- * Created by MrBretzel on 11/07/2015.
- */
 public class PlayerDashEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
