@@ -1,21 +1,21 @@
-package fr.bretzel.quake.game.task;
+package fr.bretzel.quake.task.game;
 
 import fr.bretzel.quake.PlayerInfo;
 
-import fr.bretzel.quake.Title;
+import fr.bretzel.quake.util.Title;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class PlayerGameTask implements Runnable{
+public class GamePlayerTask implements Runnable{
 
-    private int id = -1;
+    private int id;
     private JavaPlugin javaPlugin;
 
     private String bare = "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||".trim();
 
     private PlayerInfo info;
 
-    public PlayerGameTask(JavaPlugin javaPlugin, long l, long l1, PlayerInfo info) {
+    public GamePlayerTask(JavaPlugin javaPlugin, long l, long l1, PlayerInfo info) {
         this.javaPlugin = javaPlugin;
         this.id = javaPlugin.getServer().getScheduler().scheduleSyncRepeatingTask(javaPlugin, this, l, l1);
 

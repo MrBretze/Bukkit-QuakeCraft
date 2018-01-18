@@ -1,27 +1,11 @@
-/**
- * Copyright 2015 Lo�c Nussbaumer
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License"); you
- * may not use this file except in compliance with the License. You
- * may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License. See accompanying
- * LICENSE file.
- */
-package fr.bretzel.quake.game.task;
+package fr.bretzel.quake.task.game;
 
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.Game;
 import fr.bretzel.quake.game.State;
 import fr.bretzel.quake.game.event.GameStartEvent;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
-import fr.bretzel.quake.inventory.BasicGun;
+import fr.bretzel.quake.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -31,10 +15,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
-/**
- * Created by MrBretzel on 22/06/2015.
- */
 
 public class GameStartTask extends GameTask {
 
@@ -94,19 +74,19 @@ public class GameStartTask extends GameTask {
             int locuse = 0;
 
             for (PlayerInfo id : getGame().getPlayerList()) {
-                Player p = id.getPlayer();
-                if ((p != null) && (p.isOnline())) {
-                    p.teleport(getGame().getRespawns().get(locuse));
-                    PlayerInfo info = Quake.getPlayerInfo(p);
-                    info.give(new BasicGun(info));
-                    p.getInventory().setHeldItemSlot(0);
+                Player player = id.getPlayer();
+                if ((player != null) && (player.isOnline())) {
+                    player.teleport(getGame().getRespawns().get(locuse));
+                    PlayerInfo info = PlayerInfo.getPlayerInfo(player);
+                    info.giveGun();
+                    player.getInventory().setHeldItemSlot(0);
                     getGame().setKill(id, 0);
-                    scoreboardAPI.getObjective().getScore(p.getName()).setScore(1);
-                    scoreboardAPI.getObjective().getScore(p.getName()).setScore(getGame().getKill(p));
+                    scoreboardAPI.getObjective().getScore(player.getName()).setScore(1);
+                    scoreboardAPI.getObjective().getScore(player.getName()).setScore(getGame().getKill(player));
 
                     locuse++;
 
-                    getGame().playerGameTasks.add(new PlayerGameTask(Quake.quake, 0, 0, info));
+                    getGame().gamePlayerTasks.add(new GamePlayerTask(Quake.quake, 0, 0, info));
 
                     if (locuse >= getGame().getPlayerList().size()) {
                         locuse = 0;
