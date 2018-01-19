@@ -29,7 +29,7 @@ public class GameManager implements Listener {
 
     public GameManager() {
 
-        Quake.manager.registerEvents(this, Quake.quake);
+        Bukkit.getPluginManager().registerEvents(this, Quake.quake);
 
         this.signEvent = new SignEvent(this);
 

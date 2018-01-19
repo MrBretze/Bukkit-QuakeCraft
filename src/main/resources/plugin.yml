@@ -6,6 +6,4 @@ commands:
       description: The main command of quake.
    lobby:
       description: Use this for return to lobby.
-   sqlSet:
-   sqlGet:
    test:

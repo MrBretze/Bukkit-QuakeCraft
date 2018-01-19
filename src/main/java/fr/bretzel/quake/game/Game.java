@@ -10,9 +10,7 @@ import fr.bretzel.quake.task.game.GameEndTask;
 import fr.bretzel.quake.task.game.GamePlayerTask;
 import fr.bretzel.quake.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
-import fr.bretzel.nbt.NBTCompressedStreamTools;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
-import fr.bretzel.quake.reader.GameReader;
 
 import fr.bretzel.quake.util.ParticleEffect;
 import fr.bretzel.quake.util.Util;
@@ -26,8 +24,6 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 
 public class Game {
@@ -635,25 +631,20 @@ public class Game {
 
     public void respawn(Player p) {
         if (getState() == State.STARTED) {
-            int test = 0;
-            Location location = getRespawns().get(random.nextInt(getRespawns().size()));
-            if (test >= getRespawns().size() * 2) {
-                for (Entity e : location.getWorld().getNearbyEntities(location, 60, 25, 60)) {
-                    if (e instanceof Player) {
-                        Player p2 = (Player) e;
-                        PlayerInfo info2 = PlayerInfo.getPlayerInfo(p2);
-                        if (info2.isInGame()) {
-                            Game g = Quake.gameManager.getGameByPlayer(info2);
-                            if (g.getName().equalsIgnoreCase(this.getName())) {
-                                test++;
-                                respawn(p);
-                                return;
-                            }
+            Location respawn = null;
+            double distRespawn = 0;
+            for (Location location : getRespawns()) {
+                for (Player e : location.getWorld().getEntitiesByClass(Player.class)) {
+                    if (PlayerInfo.getPlayerInfo(e).isInGame()) {
+                        double distanceSquared = p.getLocation().distanceSquared(e.getLocation());
+                        if (distanceSquared > distRespawn) {
+                            respawn = location;
                         }
                     }
                 }
             }
-            p.teleport(location);
+
+            p.teleport(respawn);
         }
     }
 
@@ -662,12 +653,12 @@ public class Game {
         Quake.gameManager.getGameLinkedList().remove(this);
     }
 
+    public void load() {
+
+    }
+
     public void save() {
-        try {
-            NBTCompressedStreamTools.wrhite(GameReader.write(this), new FileOutputStream(getFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //TODO:
     }
 
     @Override

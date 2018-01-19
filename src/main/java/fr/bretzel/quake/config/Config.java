@@ -29,8 +29,8 @@ public class Config {
             "MaxPlayer INTEGER, " +
             "MinPlayer INTEGER, " +
             "MaxKill INTEGER, " +
-            "Respawns VARCHAR(MAX), " +
-            "Signs VARCHAR(MAX) )";
+            "Respawns VARCHAR(65535), " +
+            "Signs VARCHAR(65535) )";
 
     private Type configType;
     private IConfig config;

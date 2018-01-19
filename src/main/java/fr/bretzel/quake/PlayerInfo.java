@@ -276,9 +276,9 @@ public class PlayerInfo {
     }
 
     public void save() {
-        if (Quake.config.ifStringExist(getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
+        if (Quake.database.ifStringExist(getUUID().toString(), "UUID", Config.Table.PLAYERS)) {
             try {
-                PreparedStatement statement = Quake.config.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET Effect = ?, Reload = ?, PlayerKill = ?, Coins = ?, Win = ?," +
+                PreparedStatement statement = Quake.database.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET Effect = ?, Reload = ?, PlayerKill = ?, Coins = ?, Win = ?," +
                         " KillStreak = ?, Death = ?, Name = ?," + " LastConnection = ? WHERE UUID = ?");
                 statement.setString(1, getEffect().getName());
                 statement.setDouble(2, getReloadTime());
@@ -292,13 +292,13 @@ public class PlayerInfo {
                 Object param = new java.sql.Timestamp(date.getTime());
                 statement.setObject(9, param);
                 statement.setString(10, getUUID().toString());
-                Quake.config.executePreparedStatement(statement);
+                Quake.database.executePreparedStatement(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                PreparedStatement statement = Quake.config.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Win, KillStreak, Death, Name, LastConnection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement statement = Quake.database.openConnection().prepareStatement("INSERT INTO " + Config.Table.PLAYERS.getTable() + "(UUID, Effect, Reload, PlayerKill, Coins, Win, KillStreak, Death, Name, LastConnection) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 statement.setString(1, getUUID().toString());
                 statement.setString(2, getEffect().getName());
                 statement.setDouble(3, getReloadTime());
@@ -308,10 +308,13 @@ public class PlayerInfo {
                 statement.setInt(7, getKillStreak());
                 statement.setInt(8, getDeath());
                 statement.setString(9, getName());
+                if (getLastConnection() == null) {
+                    setLastConnection(new Date());
+                }
                 Date date = new java.sql.Date(getLastConnection().getTime());
                 Object param = new java.sql.Timestamp(date.getTime());
                 statement.setObject(10, param);
-                Quake.config.executePreparedStatement(statement);
+                Quake.database.executePreparedStatement(statement);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -320,7 +323,7 @@ public class PlayerInfo {
 
     public void load() {
         try {
-            Statement statement = Quake.config.openConnection().createStatement();
+            Statement statement = Quake.database.openConnection().createStatement();
             ResultSet set = statement.executeQuery("SELECT * FROM " + Config.Table.PLAYERS.getTable() + " WHERE UUID = '" + getUUID().toString() + "'");
             if (set.next()) {
                 setEffect(ParticleEffect.fromName(set.getString("Effect")));
