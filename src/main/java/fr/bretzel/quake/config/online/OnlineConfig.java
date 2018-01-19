@@ -60,11 +60,6 @@ public class OnlineConfig implements Config.IConfig {
     @Override
     public Config.IConfig init(Config config) throws SQLException, ClassNotFoundException {
         openConnection();
-
-        try {
-            Statement statement = openConnection().createStatement();
-            statement.executeUpdate(Config.SQL_CREATE_QUAKE_TABLE);
-        } catch (Exception e) {}
         return this;
     }
 }

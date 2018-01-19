@@ -11,7 +11,6 @@ import fr.bretzel.quake.task.game.GamePlayerTask;
 import fr.bretzel.quake.task.ReloadTask;
 import fr.bretzel.quake.hologram.Hologram;
 import fr.bretzel.nbt.NBTCompressedStreamTools;
-import fr.bretzel.nbt.NBTTagCompound;
 import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.reader.GameReader;
 
@@ -33,14 +32,14 @@ import java.util.*;
 
 public class Game {
 
-    private LinkedList<Location> respawn = new LinkedList<>();
+    private List<Location> respawn = Lists.newArrayList();
     private Location firstLocation;
     private Location secondLocation;
     private Location spawn;
     private String name;
     private File file;
-    private List<PlayerInfo> playerList = new ArrayList<>();
-    private LinkedList<Sign> signList = new LinkedList<>();
+    private List<PlayerInfo> playerList = Lists.newArrayList();
+    private List<Sign> signList = Lists.newArrayList();
     private Random random = new Random();
     private Team team;
     private boolean respawnview = false;
@@ -51,10 +50,11 @@ public class Game {
     private State state = State.WAITING;
     private ScoreboardAPI scoreboardManager = null;
     private String displayName;
-    private HashMap<PlayerInfo, Integer> playerKills = Maps.newHashMap();
-    private HashMap<PlayerInfo, Integer> playerDeath = Maps.newHashMap();
-    private HashMap<PlayerInfo, Integer> killStreak = Maps.newHashMap();
-    private HashMap<PlayerInfo, Integer> currentKillStreak = Maps.newHashMap();
+    private Map<PlayerInfo, Integer> playerKills = Maps.newHashMap();
+    private Map<PlayerInfo, Integer> playerDeath = Maps.newHashMap();
+    private Map<PlayerInfo, Integer> killStreak = Maps.newHashMap();
+    private Map<PlayerInfo, Integer> currentKillStreak = Maps.newHashMap();
+
     public List<GamePlayerTask> gamePlayerTasks = Lists.newArrayList();
 
     public Game(Location firstLocation, Location secondLocation, String name) {
@@ -65,18 +65,8 @@ public class Game {
 
         setSpawn(getDefaultSpawn());
 
-        File mk = new File(Quake.quake.getDataFolder(), File.separator + "game" + File.separator);
-        mk.mkdir();
-        setFile(new File(mk, getName() + ".dat"));
-        try {
-            if (!getFile().exists()) {
-                getFile().createNewFile();
-                NBTTagCompound compound = new NBTTagCompound();
-                NBTCompressedStreamTools.wrhite(compound, new FileOutputStream(getFile()));
-            }
-        } catch (IOException e) {
-            e.fillInStackTrace();
-        }
+
+
         setScoreboardManager(new ScoreboardAPI(this));
         Team team = getScoreboardManager().getScoreboard().registerNewTeam(getName());
         team.setNameTagVisibility(NameTagVisibility.NEVER);
@@ -172,7 +162,7 @@ public class Game {
         this.scoreboardManager = scoreboardManager;
     }
 
-    public LinkedList<Location> getRespawns() {
+    public List<Location> getRespawns() {
         return respawn;
     }
 
@@ -228,7 +218,7 @@ public class Game {
         this.secondLocation = location;
     }
 
-    public LinkedList<Sign> getSignList() {
+    public List<Sign> getSignList() {
         return signList;
     }
 

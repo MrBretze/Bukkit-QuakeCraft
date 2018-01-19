@@ -23,12 +23,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Objects;
 
 
 public class Quake extends JavaPlugin {
 
-    public static Config config;
+    public static Config playerConfig;
+    public static Config localConfig;
 
     public static PluginManager manager;
     public static GameManager gameManager;
@@ -88,28 +91,18 @@ public class Quake extends JavaPlugin {
         getCommand("lobby").setExecutor(new LobbyCommand());
         logInfo("End");
 
-
-        logInfo("Registering Game");
-        File file = new File(getDataFolder(), File.separator + "game" + File.separator);
-        if (file.exists() && file.isDirectory()) {
-            if (Objects.requireNonNull(file.listFiles()).length > 0) {
-                initGame(file);
-            }
-        }
-        logInfo("End.");
-
         logInfo("Start loading database.");
-        boolean isMySQLconf = getConfig().getBoolean("mysql.Enabled");
+        boolean isMySQLconf = getConfig().getBoolean("mysql.player.Enabled");
 
         if (isMySQLconf) {
-            config = new Config(getConfig().getString("mysql.Hotsname"),
-                    getConfig().getString("mysql.Username"),
-                    getConfig().getString("mysql.Password"),
-                    getConfig().getString("mysql.Port"),
-                    getConfig().getString("mysql.Database")) {
+            playerConfig = new Config(getConfig().getString("mysql.player.Hotsname"),
+                    getConfig().getString("mysql.player.Username"),
+                    getConfig().getString("mysql.player.Password"),
+                    getConfig().getString("mysql.player.Port"),
+                    getConfig().getString("mysql.player.Database")) {
             };
         } else {
-            File f = new File(getDataFolder(), "database.db");
+            File f = new File(getDataFolder(), "players.db");
             if (!f.exists()) {
                 try {
                     f.createNewFile();
@@ -117,8 +110,45 @@ public class Quake extends JavaPlugin {
                     e.printStackTrace();
                 }
             }
-            config = new Config(f);
+            playerConfig = new Config(f);
         }
+
+        try {
+            Statement statement = playerConfig.openConnection().createStatement();
+            statement.executeUpdate(Config.SQL_CREATE_QUAKE_TABLE);
+            statement.close();
+            statement.getConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        File f = new File(getDataFolder(), "games.db");
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        localConfig = new Config(f);
+
+        try {
+            Statement statement = localConfig.openConnection().createStatement();
+            statement.executeUpdate(Config.SQL_CREATE_GAMES_TABLE);
+            statement.close();
+            statement.getConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        logInfo("Registering Game");
+
+        //TODO RECODE THIS !
+
+        logInfo("End.");
+
+
         logInfo("Successfully.");
     }
 
@@ -152,14 +182,14 @@ public class Quake extends JavaPlugin {
         }
         if (label.equalsIgnoreCase("sqlSet")) {
             if (sender instanceof Player) {
-                config.setString(args[0], "Test", "", Config.Table.TEST);
+                playerConfig.setString(args[0], "Test", "", Config.Table.TEST);
                 return true;
             } else return true;
         }
         if (label.equalsIgnoreCase("sqlGet")) {
             if (sender instanceof Player) {
-                if (config.ifStringExist(args[0], "Test", Config.Table.TEST)) {
-                    String str = config.getString("Test", "WHERE Test = '" + args[0] + "'", Config.Table.TEST);
+                if (playerConfig.ifStringExist(args[0], "Test", Config.Table.TEST)) {
+                    String str = playerConfig.getString("Test", "WHERE Test = '" + args[0] + "'", Config.Table.TEST);
                     sender.sendMessage("Le message % est dans la BDD".replace("%", str));
                     return true;
                 } else {

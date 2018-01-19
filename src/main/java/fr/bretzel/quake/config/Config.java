@@ -20,6 +20,18 @@ public class Config {
             "Name VARCHAR(42), " +
             "LastConnection DATETIME )";
 
+    public static String SQL_CREATE_GAMES_TABLE = "CREATE TABLE Games ( " +
+            "Name VARCHAR(128), " +
+            "DisplayName VARCHAR(128), " +
+            "FirstLocation VARCHAR(128), " +
+            "SecondLocation VARCHAR(128), " +
+            "SpawnLocation VARCHAR(128), " +
+            "MaxPlayer INTEGER, " +
+            "MinPlayer INTEGER, " +
+            "MaxKill INTEGER, " +
+            "Respawns VARCHAR(MAX), " +
+            "Signs VARCHAR(MAX) )";
+
     private Type configType;
     private IConfig config;
 
