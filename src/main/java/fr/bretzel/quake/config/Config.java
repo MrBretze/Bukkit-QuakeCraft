@@ -127,8 +127,9 @@ public class Config {
     private String queryBaseSet = "INSERT INTO %table% ( %colon% ) VALUES (?) %where%";
 
     public void setObject(Object value, String colon, String where, Table table) {
+        PreparedStatement statement = null;
         try {
-            PreparedStatement statement = openConnection().prepareStatement(queryBaseSet.replace("%table%", table.getTable()).replace("%colon%", colon).replace("%where%", where));
+            statement = openConnection().prepareStatement(queryBaseSet.replace("%table%", table.getTable()).replace("%colon%", colon).replace("%where%", where));
             statement.setObject(1, value);
             statement.executeUpdate();
             statement.close();
@@ -137,6 +138,8 @@ public class Config {
         } finally {
             if (getConfigType() == Type.LOCAL_SQL) {
                 try {
+                    if (statement != null)
+                        statement.close();
                     getConfig().getConnection().close();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -185,7 +188,7 @@ public class Config {
 
     public enum Table {
         PLAYERS("Players"),
-        TEST("Test");
+        GAMES("Games");
 
         private String table;
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.bretzel.quake.*;
+import fr.bretzel.quake.config.Config;
 import fr.bretzel.quake.game.event.GameEndEvent;
 import fr.bretzel.quake.game.event.PlayerDashEvent;
 import fr.bretzel.quake.task.game.GameEndTask;
@@ -15,7 +16,6 @@ import fr.bretzel.quake.game.scoreboard.ScoreboardAPI;
 import fr.bretzel.quake.util.ParticleEffect;
 import fr.bretzel.quake.util.Util;
 import org.bukkit.*;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -24,6 +24,9 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 import java.io.File;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Game {
@@ -62,14 +65,14 @@ public class Game {
         setSpawn(getDefaultSpawn());
 
 
-
         setScoreboardManager(new ScoreboardAPI(this));
         Team team = getScoreboardManager().getScoreboard().registerNewTeam(getName());
         team.setNameTagVisibility(NameTagVisibility.NEVER);
         setTeam(team);
     }
 
-    public Game() {
+    public Game(ResultSet set) {
+        load(set);
     }
 
     public int getSecLaunch() {
@@ -222,8 +225,8 @@ public class Game {
         this.signList = signList;
     }
 
-    public void addSign(Sign sign) {
-        this.signList.add(sign);
+    public void addSign(Location location, Game game) {
+        this.signList.add(new Sign(location, game));
     }
 
     public void removeSign(Sign sign) {
@@ -653,16 +656,57 @@ public class Game {
         Quake.gameManager.getGameLinkedList().remove(this);
     }
 
-    public void load() {
+    public void load(ResultSet set) {
 
     }
 
     public void save() {
-        //TODO:
+        try {
+            if (Quake.database.ifStringExist(getName(), "Name", Config.Table.GAMES)) {
+                PreparedStatement statement = Quake.database.openConnection().prepareStatement("UPDATE " + Config.Table.PLAYERS.getTable() + " SET DisplayName = ?, FirstLocation = ?, SecondLocation = ?, SpawnLocation = ?, MaxPlayer = ?," +
+                        " MinPlayer = ?, MaxKill = ?, Respawns = ?," + " Signs = ? WHERE Name = ?");
+                statement.setString(1, getDisplayName());
+                statement.setString(2, Util.toStringLocation(getFirstLocation()));
+                statement.setString(2, Util.toStringLocation(getSecondLocation()));
+                statement.setString(4, Util.toStringLocation(getSpawn()));
+                statement.setInt(5, getMaxPlayer());
+                statement.setInt(6, getMinPlayer());
+                statement.setInt(7, getMaxKill());
+                statement.setString(8, locsToStrings(getRespawns()));
+                //TODO statement.setString(9, locsToStrings(getSignList()));
+                statement.setString(10, getName());
+            } else {
+                PreparedStatement statement = Quake.database.openConnection().prepareStatement("INSERT INTO " + Config.Table.GAMES.getTable() + "(Name, DisplayName, FirstLocation, SecondLocation, SpawnLocation, MaxPlayer, MinPlayer, MaxKill, Respawns, Signs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                statement.setString(1, getName());
+                statement.setString(2, getDisplayName());
+                statement.setString(3, Util.toStringLocation(getFirstLocation()));
+                statement.setString(4, Util.toStringLocation(getSecondLocation()));
+                statement.setString(5, Util.toStringLocation(getSpawn()));
+                statement.setInt(6, getMaxPlayer());
+                statement.setInt(7, getMinPlayer());
+                statement.setInt(8, getMaxKill());
+                statement.setString(9, locsToStrings(getRespawns()));
+                //TODO statement.setString(10, locsToStrings(getSignList()));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public String toString() {
-        return "{" + getFirstLocation().toString() + ", " + getSecondLocation().toString() + ", " + "ArenaName: " + getName() + "}";
+    private String locsToStrings(List<? extends Location> locs) {
+        StringBuilder builder = new StringBuilder();
+        for (Location l : locs) {
+            builder.append("|").append(Util.toStringLocation(l));
+        }
+        String r = builder.toString();
+
+        if (r.length() > 65535)
+            throw new StringIndexOutOfBoundsException("Please remove a respawn point, you are reach the max value.");
+
+        return r;
+    }
+
+    private String saveSign(List<Location> locations) {
+        return "";
     }
 }
