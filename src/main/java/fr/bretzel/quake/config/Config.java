@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class Config {
 
-    public static String SQL_CREATE_QUAKE_TABLE = "CREATE TABLE Players ( " +
+    public static final String SQL_CREATE_QUAKE_TABLE = "CREATE TABLE Players ( " +
             "UUID VARCHAR(42), " +
             "Effect VARCHAR(42), " +
             "Reload DOUBLE, " +
@@ -20,7 +20,7 @@ public class Config {
             "Name VARCHAR(42), " +
             "LastConnection DATETIME )";
 
-    public static String SQL_CREATE_GAMES_TABLE = "CREATE TABLE Games ( " +
+    public static final String SQL_CREATE_GAMES_TABLE = "CREATE TABLE Games ( " +
             "Name VARCHAR(128), " +
             "DisplayName VARCHAR(128), " +
             "FirstLocation VARCHAR(128), " +
