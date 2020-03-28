@@ -11,19 +11,23 @@ import org.bukkit.permissions.Permission;
  * Created by mrbretzel on 20/07/15.
  */
 
-public class Delete extends PartialCommand {
+public class Delete extends PartialCommand
+{
 
     private String games = "null";
 
-    public Delete(CommandSender sender, Command command, Permission permission, String[] args, String games) {
+    public Delete(CommandSender sender, Command command, Permission permission, String[] args, String games)
+    {
         super(sender, command, permission, args);
         this.games = games;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         Player player = (Player) getSender();
-        if ("null".equals(games)) {
+        if ("null".equals(games))
+        {
             setValue(true);
             getSender().sendMessage(getI18("command.game.create.nameIsNull"));
             return this;

@@ -5,47 +5,57 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class NBTTagIntArray extends NBTBase {
+public class NBTTagIntArray extends NBTBase
+{
 
     private int[] data;
 
-    NBTTagIntArray() {
+    NBTTagIntArray()
+    {
     }
 
-    public NBTTagIntArray(int[] aint) {
+    public NBTTagIntArray(int[] aint)
+    {
         this.data = aint;
     }
 
-    void write(DataOutput dataoutput) throws IOException {
+    void write(DataOutput dataoutput) throws IOException
+    {
         dataoutput.writeInt(this.data.length);
 
-        for (int i = 0; i < this.data.length; ++i) {
+        for (int i = 0; i < this.data.length; ++i)
+        {
             dataoutput.writeInt(this.data[i]);
         }
     }
 
-    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException {
+    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException
+    {
         int j = datainput.readInt();
 
-        nbtreadlimiter.a((long) (32 * j));
+        nbtreadlimiter.a(32 * j);
         this.data = new int[j];
 
-        for (int k = 0; k < j; ++k) {
+        for (int k = 0; k < j; ++k)
+        {
             this.data[k] = datainput.readInt();
         }
 
     }
 
-    public byte getTypeId() {
+    public byte getTypeId()
+    {
         return (byte) 11;
     }
 
-    public String toString() {
+    public String toString()
+    {
         String s = "[";
         int[] aint = this.data;
         int i = aint.length;
 
-        for (int j = 0; j < i; ++j) {
+        for (int j = 0; j < i; ++j)
+        {
             int k = aint[j];
 
             s = s + k + ",";
@@ -54,22 +64,26 @@ public class NBTTagIntArray extends NBTBase {
         return s + "]";
     }
 
-    public NBTBase clone() {
+    public NBTBase clone()
+    {
         int[] aint = new int[this.data.length];
 
         System.arraycopy(this.data, 0, aint, 0, this.data.length);
         return new NBTTagIntArray(aint);
     }
 
-    public boolean equals(Object object) {
-        return super.equals(object) ? Arrays.equals(this.data, ((NBTTagIntArray) object).data) : false;
+    public boolean equals(Object object)
+    {
+        return super.equals(object) && Arrays.equals(this.data, ((NBTTagIntArray) object).data);
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return super.hashCode() ^ Arrays.hashCode(this.data);
     }
 
-    public int[] c() {
+    public int[] c()
+    {
         return this.data;
     }
 }

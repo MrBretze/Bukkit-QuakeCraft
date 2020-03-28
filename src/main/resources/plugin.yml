@@ -1,7 +1,14 @@
 name: Quake
-version: 0.1
+version: 0.5
 main: fr.bretzel.quake.Quake
+api-version: 1.13
+load: POSTWORLD
+depend: [ProtocolLib]
 commands:
-   quake:
-      description: The quake command !
-   test:
+  quake:
+    description: The quake command !
+  fixfalling:
+    description: fixfalling command
+  setnoupdate:
+    description: setnoupdate command
+  test:

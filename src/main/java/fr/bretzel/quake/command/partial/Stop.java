@@ -13,29 +13,35 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by mrbretzel on 20/07/15.
  */
-public class Stop extends PartialCommand {
+public class Stop extends PartialCommand
+{
 
     private String arena = "null";
 
-    public Stop(CommandSender sender, Command command, Permission permission, String[] args, String arena) {
+    public Stop(CommandSender sender, Command command, Permission permission, String[] args, String arena)
+    {
         super(sender, command, permission, args);
         this.arena = arena;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         Player player = (Player) getSender();
-        if("null".equals(arena)) {
+        if ("null".equals(arena))
+        {
             setValue(true);
             return this;
         }
         Game game = Quake.gameManager.getGameByName(arena);
-        if(game.getState() == State.STARTED) {
+        if (game.getState() == State.STARTED)
+        {
             setValue(true);
             game.broadcastMessage(ChatColor.RED + "The game has been break by a admin !");
             game.stop();
             return this;
-        } else {
+        } else
+        {
             setValue(true);
             player.sendMessage(ChatColor.RED + "The game is not started !");
             return this;

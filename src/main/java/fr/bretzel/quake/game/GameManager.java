@@ -16,6 +16,8 @@
  */
 package fr.bretzel.quake.game;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import fr.bretzel.quake.*;
 import fr.bretzel.quake.game.event.GameCreateEvent;
 import fr.bretzel.quake.game.event.PlayerJoinGameEvent;
@@ -32,48 +34,59 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.util.*;
 
 /**
  * Created by MrBretzel on 12/06/2015.
  */
 
-public class GameManager implements Listener {
+public class GameManager implements Listener
+{
 
     public SignEvent signEvent;
-    public int maxMinute = 10;
+    String HEX_SHA1 = "";
     private LinkedList<Game> gameLinkedList = new LinkedList<>();
-    private HashMap<Game, GameStartTask> gameQuakeTaskHashMap = new HashMap<>();
-    private LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
-    private LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
+    private final HashMap<Game, GameStartTask> gameQuakeTaskHashMap = new HashMap<>();
+    private final LinkedHashMap<UUID, Chrono> uuidToChrono = new LinkedHashMap<>();
+    private final LinkedHashMap<Game, Chrono> gameChrono = new LinkedHashMap<>();
     private Location lobby;
+    private byte[] sha1 = null;
 
-    public GameManager() {
+    public GameManager()
+    {
 
         Quake.manager.registerEvents(this, Quake.quake);
 
         this.signEvent = new SignEvent(this);
 
-        if (!Quake.quake.getConfig().isSet("lobby")) {
+        if (!Quake.quake.getConfig().isSet("lobby"))
+        {
             Quake.quake.getConfig().set("lobby", Util.toStringLocation(Bukkit.getWorlds().get(0).getSpawnLocation()));
-        } else {
-            lobby = Util.toLocationString(Quake.quake.getConfig().getString("lobby"));
+        } else
+        {
+            lobby = Util.toLocationString(Objects.requireNonNull(Quake.quake.getConfig().getString("lobby")));
         }
     }
 
-    public void registerGame(Player creator, String name, Location loc1, Location loc2) {
-        if (loc1 == null) {
+    public void registerGame(Player creator, String name, Location loc1, Location loc2)
+    {
+        if (loc1 == null)
+        {
             creator.sendMessage(ChatColor.RED + "The first is not set !");
             return;
         }
-        if (loc2 == null) {
+        if (loc2 == null)
+        {
             creator.sendMessage(ChatColor.RED + "The second is not set !");
             return;
         }
-        if (containsGame(name)) {
+        if (containsGame(name))
+        {
             creator.sendMessage(ChatColor.RED + "The game is already exist !");
             return;
         }
@@ -81,112 +94,164 @@ public class GameManager implements Listener {
         gameLinkedList.add(game);
         GameCreateEvent event = new GameCreateEvent(game, creator);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) {
+        if (event.isCancelled())
+        {
             return;
         }
         creator.sendMessage(ChatColor.GREEN + "The game " + name + " has been create !");
     }
 
-    public void deleteGame(Game game, Player deleter) {
-        if(game != null) {
+    public void deleteGame(Game game, Player deleter)
+    {
+        if (game != null)
+        {
             game.delete();
             deleter.sendMessage(ChatColor.GREEN + "The game has been deleted !");
-        } else {
+        } else
+        {
             deleter.sendMessage(ChatColor.RED + "The game has been not found !");
         }
     }
 
-    public Game getGameByName(String name) {
+    public Game getGameByDisplayName(String name)
+    {
         Game game = null;
-        for (Game a : gameLinkedList) {
-            if (a.getName().equals(name)) {
+        for (Game a : gameLinkedList)
+        {
+            if (a.getDisplayName().equals(name))
+            {
                 game = a;
             }
         }
         return game;
     }
 
-    public boolean containsGame(Game game) {
+    public Game getGameByName(String name)
+    {
+        Game game = null;
+        for (Game a : gameLinkedList)
+        {
+            if (a.getName().equals(name))
+            {
+                game = a;
+            }
+        }
+        return game;
+    }
+
+    public boolean containsGame(Game game)
+    {
         return gameLinkedList.contains(game);
     }
 
-    public boolean containsGame(String name) {
+    public boolean containsGame(String name)
+    {
         return gameLinkedList.contains(getGameByName(name));
     }
 
-    public Location getLobby() {
-        if (lobby == null) {
+    public Location getLobby()
+    {
+        if (lobby == null)
+        {
             return Bukkit.getWorlds().get(0).getSpawnLocation();
         }
         return lobby;
     }
 
-    public void setLobby(Location lobby) {
+    public void setLobby(Location lobby)
+    {
         this.lobby = lobby;
     }
 
-
-    public HashMap<Game, GameStartTask> getQuakeTaskHashMap() {
+    public HashMap<Game, GameStartTask> getQuakeTaskHashMap()
+    {
         return gameQuakeTaskHashMap;
     }
 
-    public LinkedHashMap<Game, Chrono> getGameChrono() {
+    public LinkedHashMap<Game, Chrono> getGameChrono()
+    {
         return gameChrono;
     }
 
-    public Chrono getChronoGame(Game game) {
+    public Chrono getChronoGame(Game game)
+    {
         return getGameChrono().get(game);
     }
 
-    public GameTask getTaskByGame(Game game) {
+    public GameTask getTaskByGame(Game game)
+    {
         return getQuakeTaskHashMap().get(game);
     }
 
-    public SignEvent getSignEvent() {
+    public SignEvent getSignEvent()
+    {
         return signEvent;
     }
 
-    public void setSignEvent(SignEvent signEvent) {
+    public void setSignEvent(SignEvent signEvent)
+    {
         this.signEvent = signEvent;
     }
 
-    public LinkedList<Game> getGameLinkedList() {
+    public LinkedList<Game> getGameLinkedList()
+    {
         return gameLinkedList;
     }
 
-    public void setGameLinkedList(LinkedList<Game> gameLinkedList) {
+    public void setGameLinkedList(LinkedList<Game> gameLinkedList)
+    {
         this.gameLinkedList = gameLinkedList;
     }
 
-    public LinkedHashMap<UUID, Chrono> getUuidToChrono() {
+    public LinkedHashMap<UUID, Chrono> getUuidToChrono()
+    {
         return uuidToChrono;
     }
 
-    public Chrono getChronoByUUID(UUID id) {
+    public Chrono getChronoByUUID(UUID id)
+    {
         return getUuidToChrono().get(id);
     }
 
-    public Game getGameByPlayer(PlayerInfo info) {
+    public Game getGameByPlayer(PlayerInfo info)
+    {
         return getGameByPlayer(info.getPlayer());
     }
 
-    public Game getGameByPlayer(Player player) {
-        for (Game a : getGameLinkedList()) {
-            if (a.getPlayerList().contains(player.getUniqueId())) {
+    public Game getGameByPlayer(Player player)
+    {
+        for (Game a : getGameLinkedList())
+            if (a.getPlayerList().contains(player.getUniqueId()))
                 return a;
-            }
-        }
         return null;
     }
 
+
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event)
+    {
         Action action = event.getAction();
         Player player = event.getPlayer();
         PlayerInfo pi = Quake.getPlayerInfo(player);
 
-        if (player.hasPermission("quake.event.select") && player.getItemInHand() != null && player.getItemInHand().getType() == Material.GOLD_HOE && !pi.isInGame()) {
-            switch (action) {
+        if (player.hasPermission("quake.event.shoot") && pi.isInGame())
+        {
+            Game game = getGameByPlayer(player);
+            if (game.getState() == State.STARTED)
+            {
+                if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)
+                {
+                    pi.dash();
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+
+        if (player.hasPermission("quake.event.select") && player.getInventory().getItemInMainHand().getType() == Material.GOLDEN_HOE && !pi.isInGame())
+        {
+            switch (action)
+            {
                 case LEFT_CLICK_BLOCK:
                     leftClick(player, event);
                     break;
@@ -195,200 +260,300 @@ public class GameManager implements Listener {
                     break;
             }
         }
-
-        if (player.hasPermission("quake.event.shoot") && player.getItemInHand() != null && pi.isInGame()) {
-            Game game = getGameByPlayer(player);
-            if (game.getState() == State.STARTED) {
-                if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-                    pi.dash();
-                    event.setCancelled(true);
-                } else if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                    pi.shoot();
-                    event.setCancelled(true);
-                }
-            }
-        }
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
+    public void onPlayerMove(PlayerMoveEvent event)
+    {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
+        if (info.isInGame())
+        {
             Game game = getGameByPlayer(player);
-            if (!game.isInArea(event.getTo())) {
+            if (event.getTo() != null && !game.isInArea(event.getTo()))
                 player.teleport(event.getFrom().setDirection(player.getEyeLocation().getDirection()));
-            }
         }
     }
 
     @EventHandler
-    public void PlayerJoin(PlayerJoinEvent event) {
+    public void PlayerJoin(PlayerResourcePackStatusEvent event)
+    {
+        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD)
+            Bukkit.getScheduler().runTaskLater(Quake.quake, () -> setResourcePack(event.getPlayer()), 20L);
+    }
+
+    @EventHandler
+    public void PlayerJoin(PlayerJoinEvent event)
+    {
         Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(Quake.quake, () -> setResourcePack(event.getPlayer()), 20L);
+
         PlayerInfo info = Quake.getPlayerInfo(player);
 
-        if (info.isInGame()) {
+        if (info.isInGame())
+        {
             Game game = getGameByPlayer(player);
             Chrono c = getChronoByUUID(player.getUniqueId());
-            if (c != null) {
+            if (c != null)
+            {
                 c.stop();
                 int minute = c.getMinutes();
                 int heure = c.getHours();
-                if (heure > 0 || minute >= 5) {
+                if (heure > 0 || minute >= 5)
+                {
                     game.getPlayerList().remove(player.getUniqueId());
                     player.teleport(getLobby());
                     player.setScoreboard(info.getPlayerScoreboard());
                     getUuidToChrono().remove(player.getUniqueId());
-                } else {
+                } else
+                {
                     player.setScoreboard(game.getScoreboardManager().getScoreboard());
                 }
-            } else {
+            } else
+            {
                 player.teleport(getLobby());
                 player.setScoreboard(info.getPlayerScoreboard());
             }
-        } else {
+        } else
+        {
             player.teleport(getLobby());
             player.setScoreboard(info.getPlayerScoreboard());
         }
     }
 
+    private String readUrl(String urlString) throws Exception
+    {
+        BufferedReader reader = null;
+        try
+        {
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuilder buffer = new StringBuilder();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read);
+
+            return buffer.toString();
+        } finally
+        {
+            if (reader != null)
+                reader.close();
+        }
+    }
+
+    public String toHexString(byte[] messageDigest)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : messageDigest)
+        {
+            if ((255 & b) < 16)
+            {
+                sb.append('0');
+            }
+            sb.append(Integer.toHexString(255 & b));
+        }
+        return sb.toString();
+    }
+
+    public byte[] fileUrlToSHA1(String urlString, String phpHash) throws Exception
+    {
+        if (sha1 == null || (!HEX_SHA1.isEmpty() && !HEX_SHA1.equals(phpHash)))
+        {
+            URL url = new URL(urlString);
+
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            BufferedInputStream bis = new BufferedInputStream(url.openStream());
+
+            int read;
+
+            byte[] buffer = new byte[20];
+
+            while ((read = bis.read(buffer)) != -1)
+                digest.update(buffer, 0, read);
+
+            bis.close();
+            sha1 = digest.digest();
+            HEX_SHA1 = toHexString(sha1);
+
+            System.out.println("[QUAKE] Getting new hash for resource pack !");
+
+            return sha1;
+        } else
+        {
+            return sha1;
+        }
+    }
+
+    public void setResourcePack(Player player)
+    {
+        try
+        {
+            if (!player.isOnline())
+                return;
+            String BASE_URL = "http://mapmaking.fr/bretzel/alslp/";
+            JsonObject object = new JsonParser().parse(readUrl(BASE_URL)).getAsJsonObject();
+            String URL = BASE_URL + object.get("file").getAsString();
+            String HASH = object.get("hash").getAsString();
+            player.setResourcePack(URL, fileUrlToSHA1(URL, HASH));
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event)
+    {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
+        if (info.isInGame())
+        {
             Game game = getGameByPlayer(player);
             PlayerLeaveGameEvent ev = new PlayerLeaveGameEvent(player, game);
             Bukkit.getPluginManager().callEvent(ev);
-            if(ev.isCancelled()) {
+
+            if (ev.isCancelled())
+            {
                 return;
             }
 
             player.teleport(Quake.gameManager.getLobby());
             game.getPlayerList().remove(player.getUniqueId());
-            signEvent.actualiseJoinSignForGame(game);
+            signEvent.updateSign(game);
         }
         info.save();
         Quake.getPlayerInfos().remove(info);
     }
 
     @EventHandler
-    public void onPlayerJoinGame(PlayerJoinGameEvent event) {
+    public void onPlayerJoinGame(PlayerJoinGameEvent event)
+    {
         Player player = event.getPlayer();
         Game game = event.getGame();
 
-        if (game.getState() == State.WAITING) {
+        if (game.getState() == State.WAITING)
+        {
             int players = game.getPlayerList().size() + 1;
-            if (players == game.getMinPlayer()) {
+            if (players == game.getMinPlayer())
+            {
                 GameStartTask gameStartTask = new GameStartTask(Quake.quake, 20L, 20L, game);
                 getQuakeTaskHashMap().put(game, gameStartTask);
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
                 player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
-            } else {
+            } else
+            {
                 game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
                 player.sendMessage(player.getDisplayName() + ChatColor.BLUE + " has joined (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                         + ChatColor.BLUE + ")");
             }
-            if (player.getGameMode() != GameMode.ADVENTURE) {
+            if (player.getGameMode() != GameMode.ADVENTURE)
+            {
                 player.setGameMode(GameMode.ADVENTURE);
             }
             player.setScoreboard(game.getScoreboardManager().getScoreboard());
             game.getTeam().addPlayer(player);
             player.setWalkSpeed(0.3F);
-        } else if (game.getState() == State.STARTED) {
-            player.sendMessage(ChatColor.RED + "The game has bin started !");
+        } else if (game.getState() == State.STARTED)
+        {
+            player.sendMessage(ChatColor.RED + "The game has been started !");
             event.setCancelled(true);
-            return;
         }
     }
 
     @EventHandler
-    public void onPlayerQuitGameEvent(PlayerLeaveGameEvent event) {
+    public void onPlayerQuitGameEvent(PlayerLeaveGameEvent event)
+    {
         Game game = event.getGame();
         final Player player = event.getPlayer();
         final PlayerInfo info = Quake.getPlayerInfo(player);
-        if (game.getState() == State.STARTED) {
-            if (game.getPlayerList().size() - 1 == 0) {
+
+        if (game.getState() == State.STARTED)
+            if (game.getPlayerList().size() - 1 <= 0)
                 game.stop();
-            }
-        }
+
         int players = game.getPlayerList().size() - 1;
         game.broadcastMessage(player.getDisplayName() + ChatColor.BLUE + " has left (" + ChatColor.AQUA + players + ChatColor.DARK_GRAY + "/" + ChatColor.AQUA + game.getMaxPlayer()
                 + ChatColor.BLUE + ")");
         player.setWalkSpeed(0.2F);
-        new BukkitRunnable() {
-
+        player.getInventory().clear();
+        new BukkitRunnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 player.setScoreboard(info.getPlayerScoreboard());
             }
         }.runTaskLater(Quake.quake, 10L);
     }
 
     @EventHandler
-    public void onPlayerHasDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
+    public void onPlayerHasDamage(EntityDamageEvent event)
+    {
+        if (event.getEntity() instanceof Player)
+        {
             Player player = (Player) event.getEntity();
-            if (getGameByPlayer(player) != null) {
-                if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+            if (getGameByPlayer(player) != null)
+            {
+                if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM)
+                {
                     event.setCancelled(true);
                 }
             }
         }
     }
 
-    public int getMaxMinute() {
-        return maxMinute;
-    }
-
     @EventHandler
-    public void onPlayerShoot(PlayerShootEvent event) {
+    public void onPlayerShoot(PlayerShootEvent event)
+    {
         Player player = event.getPlayer();
         Game game = event.getGame();
         PlayerInfo info = Quake.getPlayerInfo(player);
-
-        if (info.isShoot()) {
-            if (event.getKill() == 2) {
-                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Double kill !");
-            } else if (event.getKill() == 3) {
-                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Triple kill !");
-            } else if (event.getKill() >= 4) {
-                game.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Multiple kill !");
-            }
-
-            for (Player p : event.getPlayers()) {
-                Util.shootFirework(p.getEyeLocation());
-                game.broadcastMessage(p.getDisplayName() + ChatColor.BLUE + " has been sprayed by " + ChatColor.RESET + player.getName());
-            }
-        }
     }
 
     @EventHandler
-    public void onPlayerChangeFoodLevel(FoodLevelChangeEvent event) {
+    public void onPlayerChangeFoodLevel(FoodLevelChangeEvent event)
+    {
         Player player = (Player) event.getEntity();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
-            event.setCancelled(true);
+        if (info.isInGame())
+        {
+            player.setFoodLevel(20);
         }
     }
 
     @EventHandler
-    public void onPlayerChangeSlotBar(PlayerItemHeldEvent event) {
+    public void onPlayerChangeSlotBar(PlayerItemHeldEvent event)
+    {
         Player player = event.getPlayer();
         PlayerInfo info = Quake.getPlayerInfo(player);
-        if (info.isInGame()) {
+        if (info.isInGame())
+        {
             Game game = getGameByPlayer(player);
-            if (game.getState() == State.STARTED) {
+            if (game.getState() == State.STARTED)
+            {
                 player.getInventory().setHeldItemSlot(0);
                 event.setCancelled(true);
             }
         }
     }
 
-    private void rightClick(Player player, PlayerInteractEvent event) {
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event)
+    {
+        Player player = event.getPlayer();
+        PlayerInfo info = Quake.getPlayerInfo(player);
+        if (info.isInGame())
+        {
+            event.setCancelled(true);
+        }
+    }
+
+    private void rightClick(Player player, PlayerInteractEvent event)
+    {
         PlayerInfo info = Quake.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
         info.setSecondLocation(location.clone());
@@ -396,7 +561,8 @@ public class GameManager implements Listener {
         event.setCancelled(true);
     }
 
-    private void leftClick(Player player, PlayerInteractEvent event) {
+    private void leftClick(Player player, PlayerInteractEvent event)
+    {
         PlayerInfo info = Quake.getPlayerInfo(player);
         Location location = event.getClickedBlock().getLocation();
         info.setFirstLocation(location.clone());

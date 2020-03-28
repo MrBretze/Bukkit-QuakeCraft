@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Lo�c Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -26,50 +26,59 @@ import org.bukkit.event.HandlerList;
  * Created by MrBretzel on 20/06/2015.
  */
 
-public class PlayerLeaveGameEvent extends Event implements Cancellable {
+public class PlayerLeaveGameEvent extends Event implements Cancellable
+{
 
+    private static final HandlerList handlers = new HandlerList();
     private Player player;
     private Game game;
     private boolean cancel = false;
 
-    public PlayerLeaveGameEvent(Player player, Game game) {
+    public PlayerLeaveGameEvent(Player player, Game game)
+    {
         setGame(game);
         setPlayer(player);
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
-    }
-
-    private static final HandlerList handlers = new HandlerList();
-
-    public HandlerList getHandlers() {
+    public static HandlerList getHandlerList()
+    {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
+    public Player getPlayer()
+    {
+        return player;
+    }
+
+    public void setPlayer(Player player)
+    {
+        this.player = player;
+    }
+
+    public Game getGame()
+    {
+        return game;
+    }
+
+    public void setGame(Game game)
+    {
+        this.game = game;
+    }
+
+    public HandlerList getHandlers()
+    {
         return handlers;
     }
 
     @Override
-    public boolean isCancelled() {
+    public boolean isCancelled()
+    {
         return cancel;
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(boolean cancel)
+    {
         this.cancel = cancel;
     }
 }

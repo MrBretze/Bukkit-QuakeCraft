@@ -35,97 +35,136 @@ import java.util.List;
 /**
  * Created by MrBretzel on 14/06/2015.
  */
-public class Command extends CommandExe {
+public class Command extends CommandExe
+{
 
     @Override
-    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
-        if(sender instanceof Player) {
-            if(args.length > 0) {
-                if (args[0].equalsIgnoreCase("game")) {
-                    if(args.length > 1) {
-                        if (!sender.hasPermission("quake.game")) {
+    public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args)
+    {
+        if (sender instanceof Player)
+        {
+            if (args.length > 0)
+            {
+                if (args[0].equalsIgnoreCase("game"))
+                {
+                    if (args.length > 1)
+                    {
+                        if (!sender.hasPermission("quake.game"))
+                        {
                             sender.sendMessage("You dont have the permission !");
                             return false;
                         }
-                        if (Quake.gameManager.containsGame(args[1])) {
+                        if (Quake.gameManager.containsGame(args[1]))
+                        {
                             // /quake args0 args1  args2         args3...
                             // /quake game  <game> setmineplayer 87
                             return new PartialGame(sender, command, Permission.COMMAND_GAME, args, Quake.gameManager.getGameByName(args[1])).execute().value();
-                        } else {
+                        } else
+                        {
                             sender.sendMessage(getI18n("util.gameNotFound"));
                             return true;
                         }
-                    } else {
+                    } else
+                    {
                         sender.sendMessage(getI18n("command.game.usage"));
                         return true;
                     }
-                } else if(args[0].equalsIgnoreCase("players")) {
-                    if(args.length > 1) {
-                        if (Bukkit.getPlayer(args[1]) != null) {
+                } else if (args[0].equalsIgnoreCase("players"))
+                {
+                    if (args.length > 1)
+                    {
+                        if (Bukkit.getPlayer(args[1]) != null)
+                        {
                             return new PartialPlayer(sender, command, Permission.COMMAND_PLAYER, args, Bukkit.getPlayer(args[1])).execute().value();
-                        } else {
+                        } else
+                        {
                             sender.sendMessage(ChatColor.RED + "Player can not bee found !");
                             return true;
                         }
-                    } else {
+                    } else
+                    {
                         sender.sendMessage(ChatColor.RED + "Usage: /quake players <player> <quit | join | setcoins | addcoins | removecoins | setkill | setkillsteak | setwon>");
                         return true;
                     }
-                } else if (args[0].equalsIgnoreCase("create")) {
-                    if (!sender.hasPermission("quake.create")) {
+                } else if (args[0].equalsIgnoreCase("create"))
+                {
+                    if (!sender.hasPermission("quake.create"))
+                    {
                         sender.sendMessage("You dont have the permission !");
                         return false;
                     }
-                    if (args.length > 1) {
-                        if (Quake.gameManager.getGameByName(args[1]) == null) {
+                    if (args.length > 1)
+                    {
+                        if (Quake.gameManager.getGameByName(args[1]) == null)
+                        {
                             return new Create(sender, command, null, args, args[1]).execute().value();
-                        } else {
+                        } else
+                        {
                             sender.sendMessage(getI18n("util.gameAlreadyCreate"));
                             return true;
                         }
-                    } else {
+                    } else
+                    {
                         sender.sendMessage(getI18n("command.game.create.usage"));
                         return true;
                     }
-                } else if (args[0].equalsIgnoreCase("delete")) {
-                    if (!sender.hasPermission("quake.game")) {
+                } else if (args[0].equalsIgnoreCase("delete"))
+                {
+                    if (!sender.hasPermission("quake.game"))
+                    {
                         sender.sendMessage("You dont have the permission !");
                         return false;
                     }
-                    if (args.length > 1) {
-                        if (Quake.gameManager.getGameByName(args[1]) != null) {
+                    if (args.length > 1)
+                    {
+                        if (Quake.gameManager.getGameByName(args[1]) != null)
+                        {
                             return new Delete(sender, command, null, args, args[1]).execute().value();
-                        } else {
+                        } else
+                        {
                             sender.sendMessage(getI18n("util.gameNotFound"));
                             return true;
                         }
-                    } else {
+                    } else
+                    {
                         sender.sendMessage(getI18n("command.game.delete.usage"));
                         return true;
                     }
-                } else if (args[0].equalsIgnoreCase("help")) {
-                    for(String s : getHelps()) {
+                } else if (args[0].equalsIgnoreCase("setlobby"))
+                {
+                    Player player = (Player) sender;
+                    Quake.gameManager.setLobby(player.getLocation());
+                    return true;
+                } else if (args[0].equalsIgnoreCase("help"))
+                {
+                    for (String s : getHelps())
+                    {
                         sender.sendMessage(s);
                     }
                     return true;
-                } else {
+                } else
+                {
                     //Other command !
-                    sender.sendMessage("Not a valid command");
+                    sender.sendMessage(ChatColor.RED + "/quake help");
                     return true;
                 }
-            } else {
+            } else
+            {
                 sender.sendMessage(ChatColor.RED + "/quake help");
                 return true;
             }
-        } else {
+        } else
+        {
             sender.sendMessage(ChatColor.RED + "It must be a player !");
             return true;
         }
     }
 
-    public List<String> getHelps() {
-        List list = new ArrayList();
-        for(int i = 1; i <= 100; i++) {
+    public List<String> getHelps()
+    {
+        List<String> list = new ArrayList<>();
+        for (int i = 1; i <= 100; i++)
+        {
             String value = getI18n("command.help." + i);
             if (StringUtils.isNotEmpty(value) && !value.equalsIgnoreCase("command.help." + i))
                 list.add(value);

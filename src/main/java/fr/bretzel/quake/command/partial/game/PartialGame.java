@@ -25,55 +25,76 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 09/08/2015.
  */
-public class PartialGame extends IGame {
+public class PartialGame extends IGame
+{
 
 
-    public PartialGame(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public PartialGame(CommandSender sender, Command command, Permission permission, String[] args, Game game)
+    {
         super(sender, command, permission, args, game);
     }
 
     @Override
-    public PartialCommand execute() {
-        if (getArgs().length > 2) {
-            if (getArgs()[2].equalsIgnoreCase("setdisplayname")) {
-                if (getArgs().length > 3) {
+    public PartialCommand execute()
+    {
+        if (getArgs().length > 2)
+        {
+            if (getArgs()[2].equalsIgnoreCase("setdisplayname"))
+            {
+                if (getArgs().length > 3)
+                {
                     return new SetDisplayName(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
+                } else
+                {
                     getSender().sendMessage(getI18("command.game.setdisplayname.usage"));
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("setmaxplayer")) {
-                if (getArgs().length > 3) {
+            } else if (getArgs()[2].equalsIgnoreCase("setmaxplayer"))
+            {
+                if (getArgs().length > 3)
+                {
                     return new SetMaxPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
+                } else
+                {
                     getSender().sendMessage(getI18("command.game.setmaxplayer.usage"));
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("setminplayer")) {
-                if (getArgs().length > 3) {
+            } else if (getArgs()[2].equalsIgnoreCase("setminplayer"))
+            {
+                if (getArgs().length > 3)
+                {
                     return new SetMinPlayer(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
+                } else
+                {
                     getSender().sendMessage(getI18("command.game.setminplayer.usage"));
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("view")) {
-                if (getArgs().length > 3) {
+            } else if (getArgs()[2].equalsIgnoreCase("view"))
+            {
+                if (getArgs().length > 3)
+                {
                     return new View(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-                } else {
+                } else
+                {
                     getSender().sendMessage(getI18("command.game.view.usage"));
                     return this;
                 }
-            } else if (getArgs()[2].equalsIgnoreCase("addrespawn")) {
+            } else if (getArgs()[2].equalsIgnoreCase("addrespawn"))
+            {
                 return new AddRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-            } else if (getArgs()[2].equalsIgnoreCase("deleterespawn")) {
+            } else if (getArgs()[2].equalsIgnoreCase("deleterespawn"))
+            {
                 return new DeleteRespawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-            } else if (getArgs()[2].equalsIgnoreCase("setspawn")) {
+            } else if (getArgs()[2].equalsIgnoreCase("setspawn"))
+            {
                 return new SetSpawn(getSender(), getCommand(), getPermission(), getArgs(), getGame()).execute();
-            } else {
+            } else
+            {
                 getSender().sendMessage(getI18("command.game.usage"));
                 return this;
             }
-        } else {
+        } else
+        {
             getSender().sendMessage(getI18("command.game.usage"));
             return this;
         }

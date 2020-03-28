@@ -9,7 +9,8 @@ import org.bukkit.event.HandlerList;
 /**
  * Created by MrBretzel on 11/07/2015.
  */
-public class PlayerDashEvent extends Event implements Cancellable {
+public class PlayerDashEvent extends Event implements Cancellable
+{
 
     private static final HandlerList handlers = new HandlerList();
     private Player player;
@@ -17,42 +18,51 @@ public class PlayerDashEvent extends Event implements Cancellable {
     private boolean cancelled;
 
 
-    public PlayerDashEvent(Player player, Game game) {
+    public PlayerDashEvent(Player player, Game game)
+    {
         this.game = game;
         this.player = player;
     }
 
-    public static HandlerList getHandlerList() {
+    public static HandlerList getHandlerList()
+    {
         return handlers;
     }
 
-    public Game getGame() {
+    public Game getGame()
+    {
         return game;
     }
 
-    public void setGame(Game game) {
+    public void setGame(Game game)
+    {
         this.game = game;
     }
 
-    public Player getPlayer() {
+    public Player getPlayer()
+    {
         return player;
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(Player player)
+    {
         this.player = player;
     }
 
     @Override
-    public boolean isCancelled() {
+    public boolean isCancelled()
+    {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
+    public void setCancelled(boolean cancelled)
+    {
         this.cancelled = cancelled;
     }
 
-    public HandlerList getHandlers() {
+    public HandlerList getHandlers()
+    {
         return handlers;
     }
 }

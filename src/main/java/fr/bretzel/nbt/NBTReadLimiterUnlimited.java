@@ -1,11 +1,14 @@
 package fr.bretzel.nbt;
 
-final class NBTReadLimiterUnlimited extends NBTReadLimiter {
+final class NBTReadLimiterUnlimited extends NBTReadLimiter
+{
 
-    NBTReadLimiterUnlimited(long i) {
+    NBTReadLimiterUnlimited(long i)
+    {
         super(i);
     }
 
-    public void a(long i) {
+    public void a(long i)
+    {
     }
 }

@@ -12,17 +12,20 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 08/08/2015.
  */
-public class PlayerSetWon extends IPlayer{
+public class PlayerSetWon extends IPlayer
+{
 
-    private int i;
+    private final int i;
 
-    public PlayerSetWon(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public PlayerSetWon(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i)
+    {
         super(sender, command, permission, args, player);
         this.i = i;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.setWon(i);
         getPlayer().sendMessage(getI18("command.players.setwon.valid").replace("%won%", "" + i));

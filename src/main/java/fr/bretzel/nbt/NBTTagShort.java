@@ -4,73 +4,91 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class NBTTagShort extends NBTNumber {
+public class NBTTagShort extends NBTNumber
+{
 
     private short data;
 
-    public NBTTagShort() {
+    public NBTTagShort()
+    {
     }
 
-    public NBTTagShort(short short0) {
+    public NBTTagShort(short short0)
+    {
         this.data = short0;
     }
 
-    void write(DataOutput dataoutput) throws IOException {
+    void write(DataOutput dataoutput) throws IOException
+    {
         dataoutput.writeShort(this.data);
     }
 
-    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException {
+    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException
+    {
         nbtreadlimiter.a(16L);
         this.data = datainput.readShort();
     }
 
-    public byte getTypeId() {
+    public byte getTypeId()
+    {
         return (byte) 2;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return "" + this.data + "s";
     }
 
-    public NBTBase clone() {
+    public NBTBase clone()
+    {
         return new NBTTagShort(this.data);
     }
 
-    public boolean equals(Object object) {
-        if (super.equals(object)) {
+    public boolean equals(Object object)
+    {
+        if (super.equals(object))
+        {
             NBTTagShort nbttagshort = (NBTTagShort) object;
 
             return this.data == nbttagshort.data;
-        } else {
+        } else
+        {
             return false;
         }
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return super.hashCode() ^ this.data;
     }
 
-    public long c() {
-        return (long) this.data;
-    }
-
-    public int d() {
+    public long c()
+    {
         return this.data;
     }
 
-    public short e() {
+    public int d()
+    {
         return this.data;
     }
 
-    public byte f() {
+    public short e()
+    {
+        return this.data;
+    }
+
+    public byte f()
+    {
         return (byte) (this.data & 255);
     }
 
-    public double g() {
-        return (double) this.data;
+    public double g()
+    {
+        return this.data;
     }
 
-    public float h() {
-        return (float) this.data;
+    public float h()
+    {
+        return this.data;
     }
 }

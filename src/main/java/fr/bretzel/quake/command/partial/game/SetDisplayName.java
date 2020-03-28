@@ -11,21 +11,32 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by MrBretzel on 18/10/2015.
  */
-public class SetDisplayName extends IGame {
+public class SetDisplayName extends IGame
+{
 
-    public SetDisplayName(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public SetDisplayName(CommandSender sender, Command command, Permission permission, String[] args, Game game)
+    {
         super(sender, command, permission, args, game);
     }
 
     @Override
-    public PartialCommand execute() {
-        if (getArgs().length > 3) {
+    public PartialCommand execute()
+    {
+        if (getArgs().length > 3)
+        {
+            if (getArgs()[3].length() > 16)
+            {
+                getSender().sendMessage(getI18("command.game.setdisplayname.error"));
+                setValue(false);
+                return this;
+            }
             String name = ChatColor.translateAlternateColorCodes('&', getArgs()[3]);
             getGame().setDisplayName(name);
             getSender().sendMessage(getI18("command.game.setdisplayname.valid").replace("%value%", name));
-            Quake.gameManager.signEvent.actualiseJoinSignForGame(getGame());
+            Quake.gameManager.signEvent.updateSign(getGame());
             return this;
-        } else {
+        } else
+        {
             getSender().sendMessage(getI18("command.game.setdisplayname.usage"));
             return this;
         }

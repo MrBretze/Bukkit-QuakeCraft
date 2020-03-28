@@ -10,21 +10,31 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 18/10/2015.
  */
-public class DeleteRespawn extends IGame {
+public class DeleteRespawn extends IGame
+{
 
-    public DeleteRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public DeleteRespawn(CommandSender sender, Command command, Permission permission, String[] args, Game game)
+    {
         super(sender, command, permission, args, game);
     }
 
     @Override
-    public PartialCommand execute() {
-        if (!getGame().hasRespawn(getPlayer().getEyeLocation())) {
+    public PartialCommand execute()
+    {
+        if (!getGame().hasRespawn(getPlayer().getEyeLocation()))
+        {
             getSender().sendMessage(getI18("command.game.deleterespawn.error"));
             return this;
         }
-        if (getGame().isView())
-            Quake.holoManager.removeHologram(getGame().getRespawn(getPlayer().getEyeLocation()));
+
         getGame().removeRespawn(getPlayer().getEyeLocation());
+
+        if (getGame().isView())
+        {
+            Quake.holoManager.removeHologram(getPlayer().getEyeLocation(), 1.2);
+            getGame().view(true);
+        }
+
         getSender().sendMessage(getI18("command.game.deleterespawn.valid"));
         return this;
     }

@@ -23,15 +23,17 @@ import java.util.Locale;
  * Created by Loic on 30/07/2015.
  */
 
-public class LanguageManager {
+public class LanguageManager
+{
 
-    private static HashMap<Locale, Language> maps = new HashMap<>();
-    private Language defaultLanguage = new Language(Locale.US);
+    private static final HashMap<Locale, Language> maps = new HashMap<>();
+    private final Language defaultLanguage = new Language(Locale.US);
     private Language selectedLanguage;
-    private Locale defaultLocale = Locale.US;
+    private final Locale defaultLocale = Locale.US;
     private Locale selectedLocale;
 
-    public LanguageManager(Locale locale) {
+    public LanguageManager(Locale locale)
+    {
         setSelectedLanguage(new Language(locale));
         setSelectedLocale(locale);
 
@@ -39,16 +41,21 @@ public class LanguageManager {
         maps.put(getSelectedLocale(), getSelectedLanguage());
     }
 
-    private String get(String key) {
-        if (getSelectedLanguage().hasKey(key)) {
+    private String get(String key)
+    {
+        if (getSelectedLanguage().hasKey(key))
+        {
             return getSelectedLanguage().get(key);
-        } else {
+        } else
+        {
             return getDefaultLanguage().get(key);
         }
     }
 
-    public String getI18n(String key) {
-        if (key.contains("/")) {
+    public String getI18n(String key)
+    {
+        if (key.contains("/"))
+        {
             StringBuilder builder = new StringBuilder();
             for (String s : key.split("/"))
                 builder.append(s).append(".");
@@ -57,27 +64,33 @@ public class LanguageManager {
         return get(key);
     }
 
-    public Language getDefaultLanguage() {
+    public Language getDefaultLanguage()
+    {
         return defaultLanguage;
     }
 
-    public Language getSelectedLanguage() {
+    public Language getSelectedLanguage()
+    {
         return selectedLanguage;
     }
 
-    public void setSelectedLanguage(Language selectedLanguage) {
+    public void setSelectedLanguage(Language selectedLanguage)
+    {
         this.selectedLanguage = selectedLanguage;
     }
 
-    public Locale getDefaultLocale() {
+    public Locale getDefaultLocale()
+    {
         return defaultLocale;
     }
 
-    public Locale getSelectedLocale() {
+    public Locale getSelectedLocale()
+    {
         return selectedLocale;
     }
 
-    public void setSelectedLocale(Locale selectedLocale) {
+    public void setSelectedLocale(Locale selectedLocale)
+    {
         this.selectedLocale = selectedLocale;
     }
 }

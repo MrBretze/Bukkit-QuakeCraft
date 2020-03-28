@@ -5,54 +5,65 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class NBTTagByteArray extends NBTBase {
+public class NBTTagByteArray extends NBTBase
+{
 
     private byte[] data;
 
-    NBTTagByteArray() {
+    NBTTagByteArray()
+    {
     }
 
-    public NBTTagByteArray(byte[] abyte) {
+    public NBTTagByteArray(byte[] abyte)
+    {
         this.data = abyte;
     }
 
-    void write(DataOutput dataoutput) throws IOException {
+    void write(DataOutput dataoutput) throws IOException
+    {
         dataoutput.writeInt(this.data.length);
         dataoutput.write(this.data);
     }
 
-    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException {
+    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException
+    {
         int j = datainput.readInt();
 
-        nbtreadlimiter.a((long) (8 * j));
+        nbtreadlimiter.a(8 * j);
         this.data = new byte[j];
         datainput.readFully(this.data);
     }
 
-    public byte getTypeId() {
+    public byte getTypeId()
+    {
         return (byte) 7;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return "[" + this.data.length + " bytes]";
     }
 
-    public NBTBase clone() {
+    public NBTBase clone()
+    {
         byte[] abyte = new byte[this.data.length];
 
         System.arraycopy(this.data, 0, abyte, 0, this.data.length);
         return new NBTTagByteArray(abyte);
     }
 
-    public boolean equals(Object object) {
-        return super.equals(object) ? Arrays.equals(this.data, ((NBTTagByteArray) object).data) : false;
+    public boolean equals(Object object)
+    {
+        return super.equals(object) && Arrays.equals(this.data, ((NBTTagByteArray) object).data);
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return super.hashCode() ^ Arrays.hashCode(this.data);
     }
 
-    public byte[] c() {
+    public byte[] c()
+    {
         return this.data;
     }
 }

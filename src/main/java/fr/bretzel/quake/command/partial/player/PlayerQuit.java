@@ -13,23 +13,27 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by mrbretzel on 20/07/15.
  */
-public class PlayerQuit extends IPlayer {
+public class PlayerQuit extends IPlayer
+{
 
-    public PlayerQuit(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
+    public PlayerQuit(CommandSender sender, Command command, Permission permission, String[] args, Player player)
+    {
         super(sender, command, permission, args, player);
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         Game game = Quake.gameManager.getGameByPlayer(getPlayer());
         PlayerLeaveGameEvent event = new PlayerLeaveGameEvent(getPlayer(), game);
         Bukkit.getPluginManager().callEvent(event);
-        if(event.isCancelled()) {
+        if (event.isCancelled())
+        {
             return this;
         }
         getPlayer().teleport(Quake.gameManager.getLobby());
         game.getPlayerList().remove(getPlayer().getUniqueId());
-        Quake.gameManager.signEvent.actualiseJoinSignForGame(game);
+        Quake.gameManager.signEvent.updateSign(game);
         return this;
     }
 }

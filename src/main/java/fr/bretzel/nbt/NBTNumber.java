@@ -1,8 +1,10 @@
 package fr.bretzel.nbt;
 
-public abstract class NBTNumber extends NBTBase {
+public abstract class NBTNumber extends NBTBase
+{
 
-    protected NBTNumber() {
+    protected NBTNumber()
+    {
     }
 
     public abstract long c();

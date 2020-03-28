@@ -13,16 +13,19 @@ import org.bukkit.permissions.Permission;
  * Created by Loic on 25/07/2015.
  */
 
-public class PlayerAddCoins extends IPlayer {
+public class PlayerAddCoins extends IPlayer
+{
     private int i = 0;
 
-    public PlayerAddCoins(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public PlayerAddCoins(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i)
+    {
         super(sender, command, permission, args, player);
         this.i = i;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.addCoins(i);
         getPlayer().sendMessage(getI18("command.players.addcoins.valid").replace("%coins%", "" + i));

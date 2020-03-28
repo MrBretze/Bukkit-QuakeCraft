@@ -33,93 +33,101 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * Created by MrBretzel on 19/06/2015.
  */
 
-public class SignEvent implements Listener {
+public class SignEvent implements Listener
+{
 
     public static String CLICK_TO_QUIT = ChatColor.RED + "Click to quit !";
     public static String CLICK_TO_JOIN = ChatColor.GREEN + "Click to join !";
     public String lastPlayerInGame = "lastInGame";
     private GameManager manager;
 
-    public SignEvent(GameManager gameManager) {
+    public SignEvent(GameManager gameManager)
+    {
         setManager(gameManager);
 
         Quake.quake.getServer().getPluginManager().registerEvents(this, Quake.quake);
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event)
+    {
         Action action = event.getAction();
         Player player = event.getPlayer();
-        switch (action) {
-            case RIGHT_CLICK_BLOCK:
-                Block block = event.getClickedBlock();
-                if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST && block != null && block.hasMetadata("join") && block.hasMetadata("game") && block.hasMetadata("name")) {
-                    if (getSignByLocation(block.getLocation()) != null) {
-                        Sign sign = getSignByLocation(block.getLocation());
-                        boolean isJoin = sign.getMetadata("join").get(0).asBoolean();
-                        Game game = getManager().getGameByName(sign.getMetadata("game").get(0).asString());
-                        if (isJoin) {
-                            PlayerJoinGameEvent e = new PlayerJoinGameEvent(player, game);
-                            Bukkit.getPluginManager().callEvent(e);
-                            if (e.isCancelled()) {
-                                return;
-                            }
-                            player.teleport(game.getSpawn());
-                            game.addPlayer(player);
-                            actualiseJoinSignForGame(game);
-                            if (this.lastPlayerInGame.equalsIgnoreCase("lastInGame")) {
-                                this.lastPlayerInGame = getInfoPlayer(game);
-                                game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
-                                return;
-                            } else {
-                                game.getScoreboardManager().getScoreboard().resetScores(lastPlayerInGame);
-                                this.lastPlayerInGame = getInfoPlayer(game);
-                                game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
-                                return;
-                            }
-                        } else if (!isJoin) {
-                            PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);
-                            Bukkit.getPluginManager().callEvent(e);
-                            if(e.isCancelled()) {
-                                return;
-                            }
-                            player.teleport(getManager().getLobby());
-                            game.getPlayerList().remove(player.getUniqueId());
-                            actualiseJoinSignForGame(game);
-                            return;
-                        } else {
-                            return;
-                        }
-                    }
+        Block block = event.getClickedBlock();
+        if (action == Action.RIGHT_CLICK_BLOCK && block != null && (block.getType() == Material.OAK_WALL_SIGN || block.getType() == Material.OAK_SIGN) && getSignByLocation(block.getLocation()) != null)
+        {
+            Sign sign = getSignByLocation(block.getLocation());
+            Game game = getGameBySign(sign);
+            if (!sign.getLine(3).isEmpty() && game != null)
+            {
+                PlayerJoinGameEvent e = new PlayerJoinGameEvent(player, game);
+                Bukkit.getPluginManager().callEvent(e);
+                if (e.isCancelled())
+                {
                     return;
                 }
-                return;
+                player.teleport(game.getSpawn());
+                game.addPlayer(player);
+                updateSign(game);
+                if (this.lastPlayerInGame.equalsIgnoreCase("lastInGame"))
+                {
+                    this.lastPlayerInGame = getInfoPlayer(game);
+                    game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
+                } else
+                {
+                    game.getScoreboardManager().getScoreboard().resetScores(lastPlayerInGame);
+                    this.lastPlayerInGame = getInfoPlayer(game);
+                    game.getScoreboardManager().getObjective().getScore(lastPlayerInGame).setScore(7);
+                }
+            } else
+            {
+                PlayerLeaveGameEvent e = new PlayerLeaveGameEvent(player, game);
+                Bukkit.getPluginManager().callEvent(e);
+                if (e.isCancelled())
+                {
+                    return;
+                }
+
+                player.teleport(getManager().getLobby());
+
+                if (game != null && game.getPlayerList().contains(player.getUniqueId()))
+                {
+                    game.getPlayerList().remove(player.getUniqueId());
+                    updateSign(game);
+                }
+            }
         }
     }
 
     @EventHandler
-    public void onBlockBkreakEvent(BlockBreakEvent event) {
+    public void onBlockBkreakEvent(BlockBreakEvent event)
+    {
         Block block = event.getBlock();
         Player player = event.getPlayer();
-        if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-            if(getSignByLocation(block.getLocation()) != null) {
-                if(player.hasPermission("quake.event.sign.break")) {
+        if (block.getType() == Material.OAK_WALL_SIGN || block.getType() == Material.OAK_SIGN)
+        {
+            if (getSignByLocation(block.getLocation()) != null)
+            {
+                if (player.hasPermission("quake.event.sign.break"))
+                {
                     Sign sign = getSignByLocation(block.getLocation());
                     Game game = getGameBySign(sign);
-                    if (player.isSneaking()) {
+                    if (player.isSneaking())
+                    {
                         player.sendMessage(ChatColor.GREEN.toString() + "Remove sign for " + game.getName());
                         game.getSignList().remove(sign);
-                    } else {
+                    } else
+                    {
                         player.sendMessage(ChatColor.RED.toString() + "To break this sign please sneak !");
                         event.setCancelled(true);
                     }
-                } else {
+                } else
+                {
                     event.setCancelled(true);
                 }
             }
@@ -127,56 +135,65 @@ public class SignEvent implements Listener {
     }
 
     @EventHandler
-    public void onSignChangeEvent(SignChangeEvent event) {
+    public void onSignChangeEvent(SignChangeEvent event)
+    {
         String[] lines = event.getLines();
         final Block block = event.getBlock();
-        if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-            if(getSignByLocation(block.getLocation()) != null) {
+        if (block.getType() == Material.OAK_WALL_SIGN || block.getType() == Material.OAK_SIGN)
+        {
+            if (getSignByLocation(block.getLocation()) != null)
+            {
                 Sign sign = getSignByLocation(block.getLocation());
                 Game game = getGameBySign(sign);
                 event.setLine(0, CLICK_TO_JOIN);
-                event.setLine(1, ChatColor.BLUE + game.getDisplayName());
+                event.setLine(1, game.getDisplayName());
                 event.setLine(2, getInfoPlayer(game));
                 event.setLine(3, game.getState().getName());
                 return;
             }
-            if (lines[0].equals("[quake]")) {
+            if (lines[0].equals("[quake]"))
+            {
                 Sign sign = (Sign) block.getState();
-                if (lines[1].equals("join") && getManager().getGameByName(lines[2]) != null) {
+                if (lines[1].equals("join") && getManager().getGameByName(lines[2]) != null)
+                {
                     Game game = getManager().getGameByName(lines[2]);
-                    sign.setMetadata("join", new FixedMetadataValue(Quake.quake, true));
-                    sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
                     event.setLine(0, CLICK_TO_JOIN);
-                    event.setLine(1, ChatColor.BLUE + game.getDisplayName());
+                    event.setLine(1, game.getDisplayName());
                     event.setLine(2, getInfoPlayer(game));
                     event.setLine(3, game.getState().getName());
                     game.addSign(sign);
-                    return;
-                } else if (lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null) {
+                } else if (lines[1].equals("quit") && getManager().getGameByName(lines[2]) != null)
+                {
                     Game game = getManager().getGameByName(lines[2]);
-                    sign.setMetadata("join", new FixedMetadataValue(Quake.quake, false));
-                    sign.setMetadata("game", new FixedMetadataValue(Quake.quake, game.getName()));
                     event.setLine(0, CLICK_TO_QUIT);
-                    event.setLine(1, ChatColor.BLUE + game.getDisplayName());
+                    event.setLine(1, game.getDisplayName());
                     event.setLine(2, "");
                     event.setLine(3, "");
                     game.addSign(sign);
-                    return;
-                } else {
-                    return;
                 }
             }
         }
     }
 
-    public void actualiseJoinSignForGame(Game game) {
-        for (Sign sign : game.getSignList()) {
-            if (sign != null && sign.getChunk().isLoaded() && sign.getMetadata("join").get(0).asBoolean()) {
-                if(!sign.getLocation().getChunk().isLoaded()) {
+    public void updateSign(Game game)
+    {
+        for (Sign sign : game.getSignList())
+        {
+            if (sign != null && sign.getChunk().isLoaded())
+            {
+                if (!sign.getLocation().getChunk().isLoaded())
+                {
                     sign.getLocation().getChunk().load();
                 }
+
+                if (sign.getLine(3).isEmpty())
+                {
+                    sign.setLine(1, game.getDisplayName());
+                    return;
+                }
+
                 sign.setLine(0, CLICK_TO_JOIN);
-                sign.setLine(1, ChatColor.BLUE + game.getDisplayName());
+                sign.setLine(1, game.getDisplayName());
                 sign.setLine(2, getInfoPlayer(game));
                 sign.setLine(3, game.getState().getName());
                 sign.update();
@@ -184,14 +201,19 @@ public class SignEvent implements Listener {
         }
     }
 
-    public Sign getSignByLocation(Location location) {
-        for (Game game : getManager().getGameLinkedList()) {
-            for (Sign sign : game.getSignList()) {
-                if (sign != null) {
+    public Sign getSignByLocation(Location location)
+    {
+        for (Game game : getManager().getGameLinkedList())
+        {
+            for (Sign sign : game.getSignList())
+            {
+                if (sign != null)
+                {
                     if (sign.getLocation().getWorld() == location.getWorld() &&
                             sign.getLocation().getBlockX() == location.getBlockX() &&
                             sign.getLocation().getBlockY() == location.getBlockY() &&
-                            sign.getLocation().getBlockZ() == location.getBlockZ()) {
+                            sign.getLocation().getBlockZ() == location.getBlockZ())
+                    {
                         return sign;
                     }
                 }
@@ -200,13 +222,17 @@ public class SignEvent implements Listener {
         return null;
     }
 
-    public Game getGameBySign(Sign location) {
-        for (Game game : getManager().getGameLinkedList()) {
-            for (Sign sign : game.getSignList()) {
+    public Game getGameBySign(Sign location)
+    {
+        for (Game game : getManager().getGameLinkedList())
+        {
+            for (Sign sign : game.getSignList())
+            {
                 if (sign.getLocation().getWorld() == location.getWorld() &&
                         sign.getLocation().getBlockX() == location.getX() &&
                         sign.getLocation().getBlockY() == location.getY() &&
-                        sign.getLocation().getBlockZ() == location.getZ()) {
+                        sign.getLocation().getBlockZ() == location.getZ())
+                {
                     return game;
                 }
             }
@@ -214,15 +240,18 @@ public class SignEvent implements Listener {
         return null;
     }
 
-    public String getInfoPlayer(Game game) {
+    public String getInfoPlayer(Game game)
+    {
         return (ChatColor.BLUE.toString() + game.getPlayerList().size()) + ChatColor.DARK_GRAY + "/" + ChatColor.BLUE + "" + game.getMaxPlayer();
     }
 
-    public GameManager getManager() {
+    public GameManager getManager()
+    {
         return manager;
     }
 
-    public void setManager(GameManager manager) {
+    public void setManager(GameManager manager)
+    {
         this.manager = manager;
     }
 }

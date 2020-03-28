@@ -4,75 +4,93 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class NBTTagDouble extends NBTNumber {
+public class NBTTagDouble extends NBTNumber
+{
 
     private double data;
 
-    NBTTagDouble() {
+    NBTTagDouble()
+    {
     }
 
-    public NBTTagDouble(double d0) {
+    public NBTTagDouble(double d0)
+    {
         this.data = d0;
     }
 
-    void write(DataOutput dataoutput) throws IOException {
+    void write(DataOutput dataoutput) throws IOException
+    {
         dataoutput.writeDouble(this.data);
     }
 
-    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException {
+    void load(DataInput datainput, int i, NBTReadLimiter nbtreadlimiter) throws IOException
+    {
         nbtreadlimiter.a(64L);
         this.data = datainput.readDouble();
     }
 
-    public byte getTypeId() {
+    public byte getTypeId()
+    {
         return (byte) 6;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return "" + this.data + "d";
     }
 
-    public NBTBase clone() {
+    public NBTBase clone()
+    {
         return new NBTTagDouble(this.data);
     }
 
-    public boolean equals(Object object) {
-        if (super.equals(object)) {
+    public boolean equals(Object object)
+    {
+        if (super.equals(object))
+        {
             NBTTagDouble nbttagdouble = (NBTTagDouble) object;
 
             return this.data == nbttagdouble.data;
-        } else {
+        } else
+        {
             return false;
         }
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         long i = Double.doubleToLongBits(this.data);
 
         return super.hashCode() ^ (int) (i ^ i >>> 32);
     }
 
-    public long c() {
+    public long c()
+    {
         return (long) Math.floor(this.data);
     }
 
-    public int d() {
+    public int d()
+    {
         return MathHelper.floor(this.data);
     }
 
-    public short e() {
+    public short e()
+    {
         return (short) (MathHelper.floor(this.data) & '\uffff');
     }
 
-    public byte f() {
+    public byte f()
+    {
         return (byte) (MathHelper.floor(this.data) & 255);
     }
 
-    public double g() {
+    public double g()
+    {
         return this.data;
     }
 
-    public float h() {
+    public float h()
+    {
         return (float) this.data;
     }
 }

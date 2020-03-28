@@ -9,16 +9,19 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 09/08/2015.
  */
-public abstract class IGame extends PartialCommand {
+public abstract class IGame extends PartialCommand
+{
 
-    private Game game;
+    private final Game game;
 
-    public IGame(CommandSender sender, Command command, Permission permission, String[] args, Game game) {
+    public IGame(CommandSender sender, Command command, Permission permission, String[] args, Game game)
+    {
         super(sender, command, permission, args);
         this.game = game;
     }
 
-    public Game getGame() {
+    public Game getGame()
+    {
         return game;
     }
 }

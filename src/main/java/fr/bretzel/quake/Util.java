@@ -17,9 +17,9 @@
 package fr.bretzel.quake;
 
 import org.bukkit.*;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -28,103 +28,11 @@ import java.util.*;
 /**
  * Created by MrBretzel on 11/06/2015.
  */
-public class Util {
-
-    public static LinkedList<Location> getLocationByDirection(Player player, int range, double distance) {
-        if (distance == 0.0D) {
-            distance = 1.0D;
-        }
-        LinkedList<Location> list = new LinkedList<>();
-        Location playerEyes = player.getEyeLocation();
-        Vector direction = playerEyes.getDirection().normalize();
-        Location f = playerEyes.clone();
-        Vector progress = direction.clone().multiply(distance);
-        int maxRange = 100 * range / 70;
-        boolean wallHack = false;
-
-        for (int loop = maxRange; loop > 0; loop--) {
-            f.add(progress);
-            if (!wallHack && f.getBlock().getType().isSolid()) {
-                break;
-            }
-            list.add(f.clone());
-        }
-        return list;
-    }
-
-    public static List<Player> getPlayerListInDirection(List<Location> locations, Player shoot, double distance) {
-        List<Player> players = new ArrayList<>();
-        for (Entity e : getEntityListInDirection(locations, shoot, distance)) {
-            if (e instanceof Player) {
-                Player p = (Player) e;
-                if (p != shoot && !players.contains(p) && !p.isDead()) {
-                    players.add(p);
-                }
-            }
-        }
-        return players;
-    }
-
-    public static List<Entity> getEntityListInDirection(List<Location> locations, Player shoot, double distance) {
-        List<Entity> entities = new ArrayList<>();
-        for (Location l : locations) {
-            for (Entity e : l.getWorld().getEntities()) {
-                if (e instanceof LivingEntity) {
-                    LivingEntity j = (LivingEntity) e;
-                    Location h = j.getLocation().add(0.0, 1, 0.0);
-
-                    double px = h.getX();
-                    double py = h.getY();
-                    double pz = h.getZ();
-                    boolean dX = Math.abs(l.getX() - px) < 1.0D * distance;
-                    boolean dY = Math.abs(l.getY() - py) < 1.6D * distance;
-                    boolean dZ = Math.abs(l.getZ() - pz) < 1.0D * distance;
-
-                    if (dX && dY && dZ && !entities.contains(e) && e.getUniqueId() != shoot.getUniqueId() && !e.isDead()) {
-                        entities.add(e);
-                    }
-                }
-            }
-        }
-        return entities;
-    }
-
-    public static void playSound(Location location, Sound sound, float f1, float f2) {
-        for(Player player : location.getWorld().getPlayers()) {
-            player.playSound(location, sound, f1, f2);
-        }
-    }
-
-    public static void playSound(Location location, Sound sound) {
-        playSound(location, sound, 1F, 1F);
-    }
-
-    public static void playSound(Location location, String sound) {
-        playSound(location, Sound.valueOf(sound), 1F, 1F);
-    }
-
-    public static void playSound(Location location, String sound, float f1, float f2) {
-        playSound(location, Sound.valueOf(sound), f1, f2);
-    }
-
-    public static void playSound(World world, double x, double y, double z, Sound sound) {
-        playSound(new Location(world, x, y, z), sound, 1F, 1F);
-    }
-
-    public static void playSound(World world, double x, double y, double z, Sound sound, float f1, float f2) {
-        playSound(new Location(world, x, y, z), sound, f1, f2);
-    }
-
-    public static void playSound(World world, double x, double y, double z, String sound) {
-        playSound(new Location(world, x, y, z), sound, 1F, 1F);
-    }
-
-    public static void playSound(World world, double x, double y, double z, String sound, float f1, float f2) {
-        playSound(new Location(world, x, y, z), sound, f1, f2);
-    }
-
-    public static String toStringLocation(Location location) {
-        return (location.getWorld().getName() + ";") +
+public class Util
+{
+    public static String toStringLocation(Location location)
+    {
+        return (location.getWorld() == null ? "" : location.getWorld().getName() + ";") +
                 location.getBlockX() + ";" +
                 location.getBlockY() + ";" +
                 location.getBlockZ() + ";" +
@@ -132,23 +40,28 @@ public class Util {
                 location.getPitch() + "";
     }
 
-    public static ChatColor getChatColorByInt(int i) {
-        if (i >= 10) {
+    public static ChatColor getChatColorByInt(int i)
+    {
+        if (i >= 10)
+        {
             return ChatColor.GREEN;
-        } else if (i > 5 && i < 10) {
+        } else if (i > 5)
+        {
             return ChatColor.GOLD;
-        } else {
+        } else
+        {
             return ChatColor.RED;
         }
     }
 
-    public static Location toLocationString(String string) {
+    public static Location toLocationString(String string)
+    {
         String[] strings = string.split(";");
-        return new Location(Bukkit.getWorld(strings[0]), Double.valueOf(strings[1]),
-                Double.valueOf(strings[2]),
-                Double.valueOf(strings[3]),
-                Float.valueOf(strings[4]),
-                Float.valueOf(strings[5]));
+        return new Location(Bukkit.getWorld(strings[0]), Double.parseDouble(strings[1]),
+                Double.parseDouble(strings[2]),
+                Double.parseDouble(strings[3]),
+                Float.parseFloat(strings[4]),
+                Float.parseFloat(strings[5]));
     }
 
 
@@ -165,7 +78,8 @@ public class Util {
      * Location location = p.getLocation();
      * new InstantFirework(fireworkEffect, location);
      */
-    public static void shootFirework(Location location) {
+    public static void shootFirework(Location location)
+    {
         Random random = new Random();
         int fType = random.nextInt(5) + 1;
         FireworkEffect.Type type = getFireworkType(fType);
@@ -177,7 +91,8 @@ public class Util {
         FireworkMeta fm = f.getFireworkMeta();
         fm.addEffect(effect);
         f.setFireworkMeta(fm);
-        try {
+        try
+        {
             Class<?> entityFireworkClass = getClass("net.minecraft.server.", "EntityFireworks");
             Class<?> craftFireworkClass = getClass("org.bukkit.craftbukkit.", "entity.CraftFirework");
             Object firework = craftFireworkClass.cast(f);
@@ -188,13 +103,16 @@ public class Util {
             ticksFlown.setAccessible(true);
             ticksFlown.setInt(entityFirework, expectedLifespan.getInt(entityFirework) - 1);
             ticksFlown.setAccessible(false);
-        } catch (Exception ex) {
+        } catch (Exception ex)
+        {
             ex.printStackTrace();
         }
     }
 
-    public static FireworkEffect.Type getFireworkType(int i) {
-        switch (i) {
+    public static FireworkEffect.Type getFireworkType(int i)
+    {
+        switch (i)
+        {
             case 1:
                 return FireworkEffect.Type.BALL;
             case 2:
@@ -210,9 +128,11 @@ public class Util {
         }
     }
 
-    public static void spawnFirework(List<Location> location) {
+    public static void spawnFirework(List<Location> location)
+    {
         Iterator<Location> iterator = location.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext())
+        {
             Location l = iterator.next();
             Random random = new Random();
             Firework fw = (Firework) l.getWorld().spawnEntity(l, EntityType.FIREWORK);
@@ -235,11 +155,13 @@ public class Util {
         }
     }
 
-    public static List<Location> getCircle(Location center, double radius, int amount){
+    public static List<Location> getCircle(Location center, double radius, int amount)
+    {
         World world = center.getWorld();
         double increment = (2 * Math.PI) / amount;
         ArrayList<Location> locations = new ArrayList<>();
-        for (int i = 0;i < amount; i++) {
+        for (int i = 0; i < amount; i++)
+        {
             double angle = i * increment;
             double x = center.getX() + (radius * Math.cos(angle));
             double z = center.getZ() + (radius * Math.sin(angle));
@@ -248,16 +170,19 @@ public class Util {
         return locations;
     }
 
-    public static Color getColor(int r, int v, int b) {
+    public static Color getColor(int r, int v, int b)
+    {
         return Color.fromRGB(r, v, b);
     }
 
-    private static Color getColor() {
+    private static Color getColor()
+    {
         Random random = new Random();
         return getColor(random.nextInt(255), random.nextInt(255), random.nextInt(255));
     }
 
-    private static Class<?> getClass(String prefix, String nmsClassString) throws ClassNotFoundException {
+    private static Class<?> getClass(String prefix, String nmsClassString) throws ClassNotFoundException
+    {
         String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
         String name = prefix + version + nmsClassString;
         Class<?> nmsClass = Class.forName(name);

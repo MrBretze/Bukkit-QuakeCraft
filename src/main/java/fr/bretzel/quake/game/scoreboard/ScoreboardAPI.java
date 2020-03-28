@@ -1,12 +1,12 @@
 /**
  * Copyright 2015 Loïc Nussbaumer
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License"); you
  * may not use this file except in compliance with the License. You
  * may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -30,22 +30,24 @@ import org.bukkit.scoreboard.Scoreboard;
  * Created by MrBretzel on 29/06/2015
  */
 
-public class ScoreboardAPI {
+public class ScoreboardAPI
+{
 
     private Scoreboard scoreboard;
 
     private Objective objective;
 
-    private ScoreboardTask task;
+    private final ScoreboardTask task;
 
     private Game game;
 
-    public ScoreboardAPI(Game game) {
+    public ScoreboardAPI(Game game)
+    {
         setGame(game);
 
         setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
 
-        setObjective(getScoreboard().registerNewObjective("quake", "dummy"));
+        setObjective(getScoreboard().registerNewObjective("quake", "dummy", "quake"));
 
         getObjective().getScore(ChatColor.RESET.toString()).setScore(10);
         getObjective().getScore("Map: " + game.getDisplayName()).setScore(9);
@@ -57,31 +59,38 @@ public class ScoreboardAPI {
         task = new ScoreboardTask(Quake.quake, 2, 2, getGame());
     }
 
-    public Game getGame() {
+    public Game getGame()
+    {
         return game;
     }
 
-    public void setGame(Game game) {
+    public void setGame(Game game)
+    {
         this.game = game;
     }
 
-    public Objective getObjective() {
+    public Objective getObjective()
+    {
         return objective;
     }
 
-    public void setObjective(Objective objective) {
+    public void setObjective(Objective objective)
+    {
         this.objective = objective;
     }
 
-    public Scoreboard getScoreboard() {
+    public Scoreboard getScoreboard()
+    {
         return scoreboard;
     }
 
-    public void setScoreboard(Scoreboard scoreboard) {
+    public void setScoreboard(Scoreboard scoreboard)
+    {
         this.scoreboard = scoreboard;
     }
 
-    public ScoreboardTask getTask() {
+    public ScoreboardTask getTask()
+    {
         return task;
     }
 }

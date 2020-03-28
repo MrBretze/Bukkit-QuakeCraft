@@ -9,16 +9,19 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by mrbretzel on 20/07/15.
  */
-public abstract class IPlayer extends PartialCommand {
+public abstract class IPlayer extends PartialCommand
+{
 
-    private Player player;
+    private final Player player;
 
-    public IPlayer(CommandSender sender, Command command, Permission permission, String[] args, Player player) {
+    public IPlayer(CommandSender sender, Command command, Permission permission, String[] args, Player player)
+    {
         super(sender, command, permission, args);
         this.player = player;
     }
 
-    public Player getPlayer() {
+    public Player getPlayer()
+    {
         return player;
     }
 }

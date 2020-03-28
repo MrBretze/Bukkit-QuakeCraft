@@ -12,17 +12,20 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Loic on 31/07/2015.
  */
-public class PlayerAddKill extends IPlayer {
+public class PlayerAddKill extends IPlayer
+{
 
-    private int i;
+    private final int i;
 
-    public PlayerAddKill(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public PlayerAddKill(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i)
+    {
         super(sender, command, permission, args, player);
         this.i = i;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.addPlayerKill(i);
         getPlayer().sendMessage(getI18("command.players.addkill.valid").replace("%kill%", "" + i));

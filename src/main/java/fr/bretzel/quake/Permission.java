@@ -6,7 +6,8 @@ import org.bukkit.Bukkit;
  * Created by mrbretzel on 20/07/15.
  */
 
-public class Permission {
+public class Permission
+{
 
     public static org.bukkit.permissions.Permission COMMAND_PLAYER = Bukkit.getPluginManager().getPermission("quake.command.player");
     public static org.bukkit.permissions.Permission COMMAND_GAME = Bukkit.getPluginManager().getPermission("quake.command.game");

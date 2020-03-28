@@ -12,17 +12,20 @@ import org.bukkit.permissions.Permission;
 /**
  * Created by Axelo on 08/08/2015.
  */
-public class PlayerRemoveKillStreak extends IPlayer {
+public class PlayerRemoveKillStreak extends IPlayer
+{
 
-    private int i;
+    private final int i;
 
-    public PlayerRemoveKillStreak(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i) {
+    public PlayerRemoveKillStreak(CommandSender sender, Command command, Permission permission, String[] args, Player player, int i)
+    {
         super(sender, command, permission, args, player);
         this.i = i;
     }
 
     @Override
-    public PartialCommand execute() {
+    public PartialCommand execute()
+    {
         PlayerInfo info = Quake.getPlayerInfo(getPlayer());
         info.removeKillStreak(i);
         getPlayer().sendMessage(getI18("command.players.removekillsteak.valid").replace("%killstreak%", "" + i));
